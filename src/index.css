@@ -1,0 +1,327 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+* {
+  font-size: 14px;
+}
+
+@variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --app-gradient: linear-gradient(180deg, rgb(14, 138, 180) 0%, rgb(10, 111, 156) 45%, rgb(7, 91, 134) 100%);
+  --blue-btn: var(--app-gradient);
+  --blue-text-color: #0a6f9c;
+  --side-menu: #E8F0FF;
+  --sidebar-top-bg: var(--app-gradient);
+  --table-header-bg: #13729d;
+  --medical-color: #0a6f9c;
+  --bg-white: white;
+  --layer-bg: #f8fafc;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.bg-app-gradient {
+  background: var(--app-gradient) !important;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 100s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.btn-app-gradient {
+  background: var(--app-gradient) !important;
+  color: #ffffff !important;
+}
+
+.btn-app-gradient:hover {
+  opacity: 0.93;
+}
+
+.dark {
+  --layer-bg: oklch(0.145 0 0);
+  --medical-color: #147fc3;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+.layerBg {
+  background-color: var(--layer-bg);
+}
+
+input,
+select,
+button,
+button[role="combobox"] {
+  border-radius: 4px !important;
+  font-size: 12px;
+}
+
+.theme-color {
+  background-color: var(--side-menu);
+  color: var(--blue-text-color);
+
+}
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Prevent table from hiding dropdowns */
+.table-container {
+  overflow: visible !important;
+}
+
+/* Make sure dropdowns appear above table */
+.actions-cell {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure dropdown menu has high z-index */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+/* For custom dropdown */
+.custom-dropdown {
+  z-index: 9999 !important;
+  position: relative;
+}
+
+/* Standalone print portal hidden on screen */
+.print-discharge-summary-standalone {
+  display: none !important;
+}
+
+/* ==========================================
+   PRINT STYLES FOR HOSPITAL DISCHARGE SUMMARY
+   ========================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  /* Reset html and body for A4 printing */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide normal screen UI elements & dialog overlays */
+  #root,
+  header,
+  nav,
+  aside,
+  button,
+  .print\:hidden,
+  .no-print,
+  [data-radix-popper-content-wrapper],
+  div[data-state="open"][class*="bg-black"],
+  div[class*="fixed inset-0"],
+  [role="dialog"] {
+    display: none !important;
+  }
+
+  /* Reset Radix portal wrapper display so it does NOT hide print portal */
+  [data-radix-portal] {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    transform: none !important;
+    background: transparent !important;
+  }
+
+  /* Explicitly make ONLY the standalone print container and its contents visible */
+  .print-discharge-summary-standalone {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 8mm !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    transform: none !important;
+    z-index: 999999 !important;
+  }
+
+  .print-discharge-summary-standalone,
+  .print-discharge-summary-standalone * {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Document element inside standalone portal uses full 100% A4 page width */
+  .print-discharge-summary-standalone .discharge-summary-print,
+  .print-discharge-summary-standalone .print-discharge-summary {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: "Times New Roman", Times, serif !important;
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  /* Prevent page breaks inside table rows, signature section, and footer */
+  .avoid-break,
+  .signature-section,
+  .document-footer,
+  .print-discharge-summary-standalone tr,
+  .print-discharge-summary-standalone table {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

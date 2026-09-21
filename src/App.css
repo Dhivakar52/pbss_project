@@ -1,0 +1,184 @@
+/* Print Stylesheet */
+
+@media print {
+
+  /* Hide everything on the page by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Un-hide printable containers and their children */
+  #printable-application-details,
+  #printable-application-details *,
+  #printable-patient-card,
+  #printable-patient-card *,
+  #printable-discharge-summary,
+  #printable-discharge-summary *,
+  #printable-document-container,
+  #printable-document-container *,
+  .print-page,
+  .print-page * {
+    visibility: visible;
+  }
+
+
+
+
+  /* Pin printable container to top-left of the A4 page */
+  #printable-application-details {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 8mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  #printable-document-container {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  #printable-document-container .print-page {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    height: 297mm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: hidden !important;
+    padding: 8mm 10mm !important;
+    background: #ffffff !important;
+  }
+
+  #printable-document-container,
+  #printable-document-container *,
+  .print-page,
+  .print-page * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Registration Form specific print rules */
+  #printable-document-container .reg-form-page {
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+  }
+
+  #printable-document-container .reg-form-sidebar,
+  .reg-form-sidebar {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 100% !important;
+    min-height: 297mm !important;
+    background-color: #ccc !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  #printable-document-container .reg-form-content {
+    flex: 1 1 0% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 6mm 8mm 6mm 7mm !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hide any non-printable navigation bars, headers, buttons */
+  .no-print,
+  .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Reset Radix / UI dialog overlays during print */
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-content] {
+    position: static !important;
+    transform: none !important;
+    inset: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}
+
+/* ================= REGISTRATION FORM SIDEBAR (SCREEN & PRINT) ================= */
+.reg-form-page {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+.reg-form-sidebar {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  background-color: #ccc !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: stretch !important;
+  user-select: none !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.rectSize {
+  font-size: 20px !important;
+}
+
+.reg-form-sidebar-text {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  writing-mode: vertical-rl !important;
+  transform: rotate(180deg) !important;
+  -webkit-transform: rotate(180deg) !important;
+  font-size: 15px !important;
+  letter-spacing: 0.05em !important;
+  display: inline-block !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  user-select: none !important;
+}
