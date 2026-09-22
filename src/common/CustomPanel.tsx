@@ -23,12 +23,12 @@ const CustomPanel: React.FC<CustomPanelProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 z-50 flex justify-end">
+    <div className="fixed inset-0 bg-black/30 z-100 flex justify-end">
       {/* Backdrop click closes panel */}
       <div className="flex-1" onClick={onClose}></div>
-      
+
       {/* Panel Content */}
-      <div 
+      <div
         className="bg-background h-full shadow-xl flex flex-col overflow-hidden border-l border-border"
         style={{ width }}
         onClick={(e) => e.stopPropagation()}

@@ -16,7 +16,8 @@ import {
   Filter,
   FileSpreadsheet,
   Printer,
-  FileText
+  FileText,
+  Layers,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -53,6 +54,7 @@ export interface AdminDataTableProps<T = any> {
   onEdit?: (record: T) => void
   onDelete?: (record: T) => void
   onAddNew?: () => void
+  onBulkUpdate?: () => void
   onSelectId?: (record: T) => void
   showCheckmarkCols?: boolean
   customFilterPanel?: React.ReactNode
@@ -87,6 +89,7 @@ export function AdminDataTable<T extends Record<string, any>>({
   onEdit,
   onDelete,
   onAddNew,
+  onBulkUpdate,
   onSelectId,
   showCheckmarkCols = true,
   customFilterPanel,
@@ -475,6 +478,19 @@ export function AdminDataTable<T extends Record<string, any>>({
               </div>
             </PopoverContent>
           </Popover>
+
+          {/* Bulk Update Button */}
+          {onBulkUpdate && (
+            <button
+              type="button"
+              onClick={onBulkUpdate}
+              className="h-9 px-3.5 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/70 dark:hover:bg-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Open Bulk Update Panel"
+            >
+              <Layers className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span>Bulk Update</span>
+            </button>
+          )}
 
           {/* Action / Add Button (+) */}
           {onAddNew && (
