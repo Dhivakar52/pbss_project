@@ -12,6 +12,7 @@ interface StudentState {
   addStudent: (payload: Partial<StudentRecord>) => StudentRecord
   updateStudent: (id: string, updates: Partial<StudentRecord>) => StudentRecord | undefined
   deleteStudent: (id: string) => boolean
+  bulkUpdateStudents: (applnNumbers: number[], field: string, value: any) => number
   resetStudents: () => void
 }
 
@@ -61,6 +62,20 @@ export const useStudentStore = create<StudentState>()(
         })
 
         return true
+      },
+
+      bulkUpdateStudents: (applnNumbers: number[], field: string, value: any) => {
+        const { students } = get()
+        const { updatedCount, updatedList } = StudentService.bulkUpdateStudents(
+          students,
+          applnNumbers,
+          field,
+          value
+        )
+        if (updatedCount > 0) {
+          set({ students: updatedList })
+        }
+        return updatedCount
       },
 
       resetStudents: () => {

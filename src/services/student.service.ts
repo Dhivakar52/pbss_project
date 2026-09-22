@@ -83,9 +83,78 @@ export class StudentService {
   }
 
   /**
+   * Helper to check if a student record matches any number in the application numbers set.
+   */
+  static matchesApplnNumber(student: StudentRecord, applnSet: Set<number>): boolean {
+    // 1. Check numeric ID
+    const numericId = Number(student.id)
+    if (!isNaN(numericId) && applnSet.has(numericId)) {
+      return true
+    }
+
+    // 2. Check slNo
+    if (student.slNo && applnSet.has(student.slNo)) {
+      return true
+    }
+
+    // 3. Check digits extracted from registrationNumber (e.g., T25-0100 -> 100)
+    if (student.registrationNumber) {
+      const regDigits = student.registrationNumber.replace(/\D/g, '')
+      if (regDigits) {
+        const num = Number(regDigits)
+        if (!isNaN(num) && applnSet.has(num)) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+
+  /**
+   * Find matching student records for given application numbers.
+   */
+  static findMatchingStudents(applnNumbers: number[], list: StudentRecord[]): StudentRecord[] {
+    if (!applnNumbers || applnNumbers.length === 0) return []
+    const applnSet = new Set(applnNumbers)
+    return list.filter((s) => this.matchesApplnNumber(s, applnSet))
+  }
+
+  /**
+   * Perform bulk update on student records for given application numbers and field/value pair.
+   */
+  static bulkUpdateStudents(
+    list: StudentRecord[],
+    applnNumbers: number[],
+    field: string,
+    value: any
+  ): { updatedCount: number; updatedList: StudentRecord[] } {
+    if (!applnNumbers || applnNumbers.length === 0 || !field) {
+      return { updatedCount: 0, updatedList: list }
+    }
+
+    const applnSet = new Set(applnNumbers)
+    let updatedCount = 0
+
+    const updatedList = list.map((student) => {
+      if (this.matchesApplnNumber(student, applnSet)) {
+        updatedCount++
+        return {
+          ...student,
+          [field]: value,
+        }
+      }
+      return student
+    })
+
+    return { updatedCount, updatedList }
+  }
+
+  /**
    * Initial seed records.
    */
   static getInitialStudents(): StudentRecord[] {
     return mockStudents
   }
 }
+

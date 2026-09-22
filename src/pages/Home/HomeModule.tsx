@@ -717,8 +717,8 @@ export default function HomeModule() {
                             <ArrowLeft className="h-3.5 w-3.5" />
                             <span>Student Master</span>
                         </button>
-                        <span className="px-2.5 py-1 rounded-md text-xs font-extrabold uppercase tracking-wider bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
-                            ✨ New Application
+                        <span className="px-2.5 py-1 rounded-md text-xs font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+                            New Application
                         </span>
                         <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
                             Creating new admission application {childName ? `• ${childName}` : ''}
@@ -730,7 +730,10 @@ export default function HomeModule() {
                             <button
                                 type="button"
                                 onClick={() => navigate('/admission/application-details/add')}
-                                className="h-8 px-3 rounded-lg text-xs font-bold bg-[#1677FF] hover:bg-[#0958D9] text-white shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                                className="h-8 px-3 rounded-lg text-xs font-bold   text-white shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                                style={{
+                                    background: "var(--app-gradient)"
+                                }}
                             >
                                 <FileText className="h-3.5 w-3.5" />
                                 <span>Application Detail</span>

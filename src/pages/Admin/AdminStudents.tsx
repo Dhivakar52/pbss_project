@@ -8,9 +8,10 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { toast } from '@/components/ui/toast'
-import { AdminDataTable } from '@/components/AdminDataTable'
+import { StudentDataTable } from '@/components/students/StudentDataTable'
 import { Field, SelectField } from '@/components/FormPrimitives'
 import { PrintPreviewModal } from '@/components/print'
+import { BulkUpdateDrawer } from '@/components/students/bulk-update/BulkUpdateDrawer'
 
 export const AdminStudents: React.FC = () => {
   const navigate = useNavigate()
@@ -22,6 +23,9 @@ export const AdminStudents: React.FC = () => {
   const [applnFrom, setApplnFrom] = useState('')
   const [applnTo, setApplnTo] = useState('')
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
+
+  // Bulk Update state
+  const [isBulkUpdateOpen, setIsBulkUpdateOpen] = useState(false)
 
   // Extract available application numbers from existing student data
   const availableApplnNumbers = useMemo(() => {
@@ -168,7 +172,7 @@ export const AdminStudents: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* DATA TABLE WITH INTEGRATED CUSTOM FILTER PANEL VIA POPOVER FILTER ICON */}
-      <AdminDataTable
+      <StudentDataTable
         title="Student Applications Master List"
         subtitle="Manage registered pre-kg applicants. Click any Reg Number or ID to view complete application details."
         data={filteredStudents}
@@ -179,6 +183,7 @@ export const AdminStudents: React.FC = () => {
           navigate('/admission/add')
         }}
         onDelete={(student) => setDeletingStudent(student)}
+        onBulkUpdate={() => setIsBulkUpdateOpen(true)}
         onPrintTrackSheet={handlePrintTrackSheet}
         onPrintRegistrationForm={handlePrintRegistrationForm}
         showCheckmarkCols={true}
@@ -400,6 +405,11 @@ export const AdminStudents: React.FC = () => {
         onClose={() => setIsPreviewModalOpen(false)}
         documentType={previewDocType}
         student={selectedStudentForPrint}
+      />
+      {/* ================= BULK UPDATE DRAWER PANEL ================= */}
+      <BulkUpdateDrawer
+        isOpen={isBulkUpdateOpen}
+        onClose={() => setIsBulkUpdateOpen(false)}
       />
     </div>
   )
