@@ -678,39 +678,12 @@ export default function HomeModule() {
         window.print()
     }
 
-    const handlePrintTrackSheet2 = () => {
-        if (!isRegistrationComplete) {
-            toast.error('All required registration steps must be completed before printing.')
-            return
-        }
-        toast.success('Printing Track Sheet V2...')
-        window.print()
-    }
-
     const handlePrintRegistrationForm = () => {
         if (!isRegistrationComplete) {
             toast.error('All required registration steps must be completed before printing.')
             return
         }
         toast.success('Printing Registration Form...')
-        window.print()
-    }
-
-    const handlePrintRegistrationForm4 = () => {
-        if (!isRegistrationComplete) {
-            toast.error('All required registration steps must be completed before printing.')
-            return
-        }
-        toast.success('Printing Registration Form V2...')
-        window.print()
-    }
-
-    const handlePrintRegistrationForm5 = () => {
-        if (!isRegistrationComplete) {
-            toast.error('All required registration steps must be completed before printing.')
-            return
-        }
-        toast.success('Printing Registration Form V3...')
         window.print()
     }
 
@@ -866,10 +839,7 @@ export default function HomeModule() {
                     onCompleteAll={handleCompleteAll}
                     onReset={handleReset}
                     onPrintTrackSheet={handlePrintTrackSheet}
-                    onPrintTrackSheet2={handlePrintTrackSheet2}
                     onPrintRegistrationForm={handlePrintRegistrationForm}
-                    onPrintRegistrationForm4={handlePrintRegistrationForm4}
-                    onPrintRegistrationForm5={handlePrintRegistrationForm5}
                     onOpenSuccessModal={() => setIsSuccessModalOpen(true)}
                     onViewApplicationDetails={handleOpenApplicationDetails}
                 />

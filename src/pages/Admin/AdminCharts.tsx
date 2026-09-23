@@ -27,14 +27,41 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { format, subDays } from 'date-fns'
-import { BarChart3, TrendingUp, Users, CheckCircle, Clock, School } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, CheckCircle, Clock, School, ArrowUpDown } from 'lucide-react'
 import { toast } from '@/components/ui/toast'
+import type { ColumnDef } from '@tanstack/react-table'
+import { SeatAvailabilityTable } from './components/SeatAvailabilityTable'
+
+// ---------- Seat Availability Data ----------
+interface KKNagarSeatRow {
+  date: number
+  slot10to12: number
+  slot1to3: number
+  slot3to6: number
+}
+
+const kkNagarSeatData: KKNagarSeatRow[] = [
+  { date: 14, slot10to12: 1, slot1to3: 5, slot3to6: 10 },
+  { date: 15, slot10to12: 3, slot1to3: 8, slot3to6: 12 },
+  { date: 16, slot10to12: 2, slot1to3: 6, slot3to6: 9 },
+]
+
+interface TNagarSeatRow {
+  date: number
+  slot10to12: number
+  slot1to3: number
+}
+
+const tNagarSeatData: TNagarSeatRow[] = [
+  { date: 14, slot10to12: 4, slot1to3: 7 },
+  { date: 15, slot10to12: 2, slot1to3: 5 },
+  { date: 16, slot10to12: 1, slot1to3: 3 },
+]
 
 // ---------- Data ----------
 const branchData = [
   { name: 'T.Nagar', applications: 45, declared: 32, approved: 10 },
   { name: 'KK Nagar', applications: 38, declared: 25, approved: 8 },
-  { name: 'Nungambakkam', applications: 27, declared: 18, approved: 5 },
 ]
 
 const statusData = [
@@ -44,14 +71,14 @@ const statusData = [
   { status: 'draft', value: 5, fill: 'var(--color-draft)' },
 ]
 
-// ---------- Stacked Timeline Data (3 branches per day) ----------
+// ---------- Stacked Timeline Data (2 branches per day) ----------
 const timelineData = [
-  { date: 'Jan 10', tNagar: 5, kkNagar: 4, nungambakkam: 3 },
-  { date: 'Jan 12', tNagar: 10, kkNagar: 8, nungambakkam: 6 },
-  { date: 'Jan 14', tNagar: 18, kkNagar: 14, nungambakkam: 10 },
-  { date: 'Jan 16', tNagar: 28, kkNagar: 22, nungambakkam: 18 },
-  { date: 'Jan 18', tNagar: 36, kkNagar: 30, nungambakkam: 23 },
-  { date: 'Jan 20', tNagar: 45, kkNagar: 38, nungambakkam: 27 },
+  { date: 'Jan 10', tNagar: 5, kkNagar: 4 },
+  { date: 'Jan 12', tNagar: 10, kkNagar: 8 },
+  { date: 'Jan 14', tNagar: 18, kkNagar: 14 },
+  { date: 'Jan 16', tNagar: 28, kkNagar: 22 },
+  { date: 'Jan 18', tNagar: 36, kkNagar: 30 },
+  { date: 'Jan 20', tNagar: 45, kkNagar: 38 },
 ]
 
 // ---------- Interactive Area Chart Data ----------
@@ -91,7 +118,6 @@ const statusChartConfig = {
 const timelineChartConfig = {
   tNagar: { label: 'T.Nagar', color: '#1677FF' },
   kkNagar: { label: 'KK Nagar', color: '#10B981' },
-  nungambakkam: { label: 'Nungambakkam', color: '#8B5CF6' },
 } satisfies ChartConfig
 
 const interactiveChartConfig = {
@@ -242,9 +268,146 @@ export const AdminCharts: React.FC = () => {
   }
 
   const totalApps = 115
-  const declaredApps = 75
   const approvedApps = 23
   const pendingApps = 12
+
+  const kkNagarColumns = useMemo<ColumnDef<KKNagarSeatRow>[]>(
+    () => [
+      {
+        accessorKey: 'date',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>Date</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-bold text-slate-900 dark:text-white">
+            {row.original.date}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot10to12',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>10:00 AM - 12:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot10to12}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot1to3',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>1:00 PM - 3:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot1to3}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot3to6',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>3:00 PM - 6:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot3to6}
+          </span>
+        ),
+      },
+    ],
+    []
+  )
+
+  const tNagarColumns = useMemo<ColumnDef<TNagarSeatRow>[]>(
+    () => [
+      {
+        accessorKey: 'date',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>Date</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-bold text-slate-900 dark:text-white">
+            {row.original.date}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot10to12',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>10:00 AM - 12:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot10to12}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot1to3',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>1:00 PM - 3:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot1to3}
+          </span>
+        ),
+      },
+    ],
+    []
+  )
 
   return (
     <div className="space-y-6">
@@ -289,7 +452,6 @@ export const AdminCharts: React.FC = () => {
             <option value="">-- Select All --</option>
             <option value="T.Nagar-PSBB">T.Nagar-PSBB</option>
             <option value="KK Nagar-PSBB">KK Nagar-PSBB</option>
-            <option value="Nungambakkam-PSBB">Nungambakkam-PSBB</option>
           </select>
         </div>
 
@@ -319,21 +481,14 @@ export const AdminCharts: React.FC = () => {
         </button>
       </div>
 
-      {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Metric Cards (Declared Applications section removed) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <MetricCard
           label="Total Applications"
           value={totalApps}
           icon={<Users className="h-5 w-5" />}
           valueClass="text-slate-900 dark:text-white"
           iconClass="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
-        />
-        <MetricCard
-          label="Declared Applications"
-          value={declaredApps}
-          icon={<CheckCircle className="h-5 w-5" />}
-          valueClass="text-emerald-600 dark:text-emerald-400"
-          iconClass="bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400"
         />
         <MetricCard
           label="Approved Seats"
@@ -348,6 +503,27 @@ export const AdminCharts: React.FC = () => {
           icon={<Clock className="h-5 w-5" />}
           valueClass="text-amber-600 dark:text-amber-400"
           iconClass="bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400"
+        />
+      </div>
+
+      {/* ================= SEAT AVAILABILITY TABLES ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* KK Nagar Table (Left) */}
+        <SeatAvailabilityTable
+          title="KK Nagar"
+          subtitle="Seat availability across interview slots"
+          data={kkNagarSeatData}
+          columns={kkNagarColumns}
+          iconColorClass="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+        />
+
+        {/* T-Nagar Table (Right) */}
+        <SeatAvailabilityTable
+          title="T-Nagar"
+          subtitle="Seat availability across interview slots"
+          data={tNagarSeatData}
+          columns={tNagarColumns}
+          iconColorClass="bg-blue-50 dark:bg-blue-950/60 text-[#1677FF] dark:text-blue-400"
         />
       </div>
 
@@ -425,10 +601,6 @@ export const AdminCharts: React.FC = () => {
                   <stop offset="5%" stopColor="var(--color-kkNagar)" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="var(--color-kkNagar)" stopOpacity={0.1} />
                 </linearGradient>
-                <linearGradient id="fillNungambakkam" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-nungambakkam)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-nungambakkam)" stopOpacity={0.1} />
-                </linearGradient>
               </defs>
 
               <CartesianGrid vertical={false} />
@@ -459,14 +631,6 @@ export const AdminCharts: React.FC = () => {
                 type="natural"
                 fill="url(#fillKKNagar)"
                 stroke="var(--color-kkNagar)"
-                strokeWidth={2}
-                stackId="a"
-              />
-              <Area
-                dataKey="nungambakkam"
-                type="natural"
-                fill="url(#fillNungambakkam)"
-                stroke="var(--color-nungambakkam)"
                 strokeWidth={2}
                 stackId="a"
               />
