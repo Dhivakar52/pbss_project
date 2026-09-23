@@ -19,12 +19,12 @@ export const BulkUpdateForm: React.FC<BulkUpdateFormProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+    <div className="space-y-3 pt-2 border-slate-200 dark:border-slate-800">
       <div>
-        <FieldLabel>Document Statuses to Apply</FieldLabel>
+        {/* <FieldLabel>Document Statuses to Apply</FieldLabel>
         <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mb-2.5">
           Select or unselect options to set their boolean values (<span className="font-semibold text-emerald-600 dark:text-emerald-400">Checked = true</span>, <span className="font-semibold text-slate-500">Unchecked = false</span>) for the selected students.
-        </p>
+        </p> */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* TrackSheet Checkbox */}
