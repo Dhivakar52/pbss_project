@@ -644,8 +644,8 @@ export function AdminDataTable<T extends Record<string, any>>({
                     <th className="py-3 px-4 text-center border-white/20 whitespace-nowrap">Status</th>
                     {showCheckmarkCols && (
                       <>
-                        <th className="py-3 px-2 text-center w-12 bg-red-900/60 border-white/20 whitespace-nowrap" title="Checkmark 1">✔</th>
-                        <th className="py-3 px-2 text-center w-12 bg-purple-900/60 border-white/20 whitespace-nowrap" title="Checkmark 2">✔</th>
+                        <th className="py-3 px-2 text-center w-12 bg-red-900/60 border-white/20 whitespace-nowrap" title="TrackSheet (status1)">✔</th>
+                        <th className="py-3 px-2 text-center w-12 bg-purple-900/60 border-white/20 whitespace-nowrap" title="Registration Form (status2)">✔</th>
                       </>
                     )}
                     <th className="py-3 px-4 text-center w-24 whitespace-nowrap">Actions</th>
@@ -915,7 +915,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                           {showCheckmarkCols && (
                             <>
                               <td className="py-3 px-2 text-center whitespace-nowrap">
-                                {row.status1 ? (
+                                {row.trackSheet ?? row.status1 ? (
                                   <span className="inline-block p-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
                                     ✔
                                   </span>
@@ -924,7 +924,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                 )}
                               </td>
                               <td className="py-3 px-2 text-center whitespace-nowrap">
-                                {row.status2 ? (
+                                {row.registrationForm ?? row.status2 ? (
                                   <span className="inline-block p-1 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
                                     ✔
                                   </span>

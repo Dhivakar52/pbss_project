@@ -488,6 +488,8 @@ export default function HomeModule() {
             siblingsStudying: Boolean(hasSiblings && siblings.length > 0),
             applicationStatus: isDeclared ? 'Declared' : 'Pending',
             playSchool: Boolean(childGoesToSchool),
+            trackSheet: true,
+            registrationForm: true,
             status1: true,
             status2: true,
         }

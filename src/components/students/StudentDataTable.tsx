@@ -317,34 +317,42 @@ export function StudentDataTable({
     if (showCheckmarkCols) {
       cols.push(
         {
-          accessorKey: 'status1',
-          header: () => <span title="Checkmark 1">✔</span>,
-          cell: ({ row }) => (
-            <div className="text-center whitespace-nowrap">
-              {row.original.status1 ? (
-                <span className="inline-block p-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
-                  ✔
-                </span>
-              ) : (
-                <span className="text-slate-300">-</span>
-              )}
-            </div>
-          ),
+          id: 'trackSheet',
+          accessorFn: (row) => row.trackSheet ?? row.status1,
+          header: () => <span title="TrackSheet">✔</span>,
+          cell: ({ row }) => {
+            const isChecked = Boolean(row.original.trackSheet ?? row.original.status1)
+            return (
+              <div className="text-center whitespace-nowrap">
+                {isChecked ? (
+                  <span className="inline-block p-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
+                    ✔
+                  </span>
+                ) : (
+                  <span className="text-slate-300">-</span>
+                )}
+              </div>
+            )
+          },
         },
         {
-          accessorKey: 'status2',
-          header: () => <span title="Checkmark 2">✔</span>,
-          cell: ({ row }) => (
-            <div className="text-center whitespace-nowrap">
-              {row.original.status2 ? (
-                <span className="inline-block p-1 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
-                  ✔
-                </span>
-              ) : (
-                <span className="text-slate-300">-</span>
-              )}
-            </div>
-          ),
+          id: 'registrationForm',
+          accessorFn: (row) => row.registrationForm ?? row.status2,
+          header: () => <span title="Registration Form">✔</span>,
+          cell: ({ row }) => {
+            const isChecked = Boolean(row.original.registrationForm ?? row.original.status2)
+            return (
+              <div className="text-center whitespace-nowrap">
+                {isChecked ? (
+                  <span className="inline-block p-1 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
+                    ✔
+                  </span>
+                ) : (
+                  <span className="text-slate-300">-</span>
+                )}
+              </div>
+            )
+          },
         }
       )
     }
@@ -658,8 +666,8 @@ export function StudentDataTable({
                 <TableRow key={headerGroup.id} className="border-b-0 hover:bg-transparent">
                   {headerGroup.headers.map((header) => {
                     const isSelect = header.column.id === 'select'
-                    const isStatus1 = header.column.id === 'status1'
-                    const isStatus2 = header.column.id === 'status2'
+                    const isStatus1 = header.column.id === 'trackSheet' || header.column.id === 'status1'
+                    const isStatus2 = header.column.id === 'registrationForm' || header.column.id === 'status2'
                     const isSlNo = header.column.id === 'slNo'
                     const isActions = header.column.id === 'actions'
                     const isStatus = header.column.id === 'applicationStatus'
