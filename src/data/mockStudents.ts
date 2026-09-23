@@ -9,8 +9,10 @@ export interface StudentRecord {
   motherTongue: string
   applicationStatus: 'Declared' | 'Pending' | 'Approved' | 'Draft' | 'Rejected'
   date: string
-  status1: boolean
-  status2: boolean
+  trackSheet: boolean
+  registrationForm: boolean
+  status1?: boolean
+  status2?: boolean
   fatherName: string
   motherName: string
   mobile: string
@@ -40,6 +42,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Tamil",
     applicationStatus: "Declared",
     date: "2025-01-10",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Roopan S",
@@ -69,6 +73,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Tamil",
     applicationStatus: "Declared",
     date: "2025-01-11",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Venkatesan M",
@@ -98,6 +104,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "English",
     applicationStatus: "Approved",
     date: "2025-01-12",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Sundararaman R",
@@ -127,6 +135,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Tamil",
     applicationStatus: "Pending",
     date: "2025-01-13",
+    trackSheet: false,
+    registrationForm: true,
     status1: false,
     status2: true,
     fatherName: "Karthik N",
@@ -156,6 +166,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Malayalam",
     applicationStatus: "Declared",
     date: "2025-01-14",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Krishnan G",
@@ -185,6 +197,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Tamil",
     applicationStatus: "Approved",
     date: "2025-01-15",
+    trackSheet: true,
+    registrationForm: false,
     status1: true,
     status2: false,
     fatherName: "Rajasekar T",
@@ -214,6 +228,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Malayalam",
     applicationStatus: "Draft",
     date: "2025-01-16",
+    trackSheet: false,
+    registrationForm: false,
     status1: false,
     status2: false,
     fatherName: "Unnikrishnan P",
@@ -243,6 +259,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Hindi",
     applicationStatus: "Declared",
     date: "2025-01-18",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Ramesh Kumar Sharma",
@@ -272,6 +290,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Tamil",
     applicationStatus: "Pending",
     date: "2025-01-19",
+    trackSheet: true,
+    registrationForm: false,
     status1: true,
     status2: false,
     fatherName: "Balaji V",
@@ -301,6 +321,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Telugu",
     applicationStatus: "Approved",
     date: "2025-01-20",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Ramesh Teja",
@@ -330,6 +352,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Gujarati",
     applicationStatus: "Declared",
     date: "2025-01-21",
+    trackSheet: true,
+    registrationForm: true,
     status1: true,
     status2: true,
     fatherName: "Bhavesh Patel",
@@ -359,6 +383,8 @@ export const mockStudents: StudentRecord[] = [
     motherTongue: "Tamil",
     applicationStatus: "Draft",
     date: "2025-01-21",
+    trackSheet: false,
+    registrationForm: false,
     status1: false,
     status2: false,
     fatherName: "Venkataraman K",
