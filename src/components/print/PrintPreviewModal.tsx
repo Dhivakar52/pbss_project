@@ -11,12 +11,15 @@ import { Button } from '@/components/ui/button'
 import { Printer, X, FileText } from 'lucide-react'
 import { TrackSheetPrint } from './TrackSheetPrint'
 import { RegistrationFormPrint } from './RegistrationFormPrint'
+import { RegistrationForm2Print } from './RegistrationForm2Print'
+import { RegistrationForm3Print } from './RegistrationForm3Print'
+import { RegistrationForm4Print } from './RegistrationForm4Print'
 import { mapStudentToTrackSheet, mapStudentToRegistrationForm } from './printMappers'
 
 export interface PrintPreviewModalProps {
   isOpen: boolean
   onClose: () => void
-  documentType: 'track-sheet' | 'registration-form'
+  documentType: 'track-sheet' | 'registration-form' | 'registration-form-2' | 'registration-form-3' | 'registration-form-4'
   student: any | null
 }
 
@@ -54,7 +57,18 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
   if (!student) return null
 
   const isTrackSheet = documentType === 'track-sheet'
-  const title = isTrackSheet ? 'Track Sheet Preview' : 'Registration Form Preview'
+  const isRegistrationForm2 = documentType === 'registration-form-2'
+  const isRegistrationForm3 = documentType === 'registration-form-3'
+  const isRegistrationForm4 = documentType === 'registration-form-4'
+  const title = isTrackSheet
+    ? 'Track Sheet Preview'
+    : isRegistrationForm2
+      ? 'Registration Form 2 Preview'
+      : isRegistrationForm3
+        ? 'Registration Form 3 Preview'
+        : isRegistrationForm4
+          ? 'Registration Form 4 Preview'
+          : 'Registration Form Preview'
   const studentName = student.studentName || student.childName || 'Applicant'
   const regNo = student.registrationNumber || student.id || ''
 
@@ -92,8 +106,17 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
             {isTrackSheet && trackSheetData && (
               <TrackSheetPrint data={trackSheetData} />
             )}
-            {!isTrackSheet && registrationFormData && (
+            {documentType === 'registration-form' && registrationFormData && (
               <RegistrationFormPrint data={registrationFormData} />
+            )}
+            {documentType === 'registration-form-2' && registrationFormData && (
+              <RegistrationForm2Print data={registrationFormData} />
+            )}
+            {documentType === 'registration-form-3' && registrationFormData && (
+              <RegistrationForm3Print data={registrationFormData} />
+            )}
+            {documentType === 'registration-form-4' && registrationFormData && (
+              <RegistrationForm4Print data={registrationFormData} />
             )}
           </div>
 
@@ -127,8 +150,17 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
             {isTrackSheet && trackSheetData && (
               <TrackSheetPrint data={trackSheetData} />
             )}
-            {!isTrackSheet && registrationFormData && (
+            {documentType === 'registration-form' && registrationFormData && (
               <RegistrationFormPrint data={registrationFormData} />
+            )}
+            {documentType === 'registration-form-2' && registrationFormData && (
+              <RegistrationForm2Print data={registrationFormData} />
+            )}
+            {documentType === 'registration-form-3' && registrationFormData && (
+              <RegistrationForm3Print data={registrationFormData} />
+            )}
+            {documentType === 'registration-form-4' && registrationFormData && (
+              <RegistrationForm4Print data={registrationFormData} />
             )}
           </div>,
           document.body

@@ -101,6 +101,14 @@ export interface RegistrationFormData extends TrackSheetData {
   parentAchievements: string
   isComingOnTransfer: string
   isTransferParent?: boolean | string
+  fatherEmail?: string
+  motherEmail?: string
+  guardianEmail?: string
+  guardianRelationship?: string
+  fatherAddress?: string
+  motherAddress?: string
+  guardianAddress?: string
+  guardianDob?: string
 }
 
 /**
@@ -404,5 +412,13 @@ export function mapStudentToRegistrationForm(student: StudentRecord | any): Regi
     isTransferParent:
       s.is_parent_coming_on_transfer_from_outside_chennai_or_outside_india === 'Yes' ||
       s.IS_PARENT_COMING_ON_TRANSFER_FROM_OUTSIDE_CHENNAI_OR_OUTSIDE_INDIA === 'Yes',
+    fatherEmail: s.fatherEmail || s.father_email || s.FATHER_EMAIL || 'father@psbb.edu.in',
+    motherEmail: s.motherEmail || s.mother_email || s.MOTHER_EMAIL || 'mother@psbb.edu.in',
+    guardianEmail: s.guardianEmail || s.guardian_email || s.GUARDIAN_EMAIL || 'guardian@psbb.edu.in',
+    guardianRelationship: s.guardianRelationship || s.guardian_relationship || s.GUARDIAN_RELATIONSHIP || 'Paternal Uncle',
+    fatherAddress: s.father_office_address || s.FATHER_OFFICE_ADDRESS || s.fatherAddress || s.address || 'No. 12, OMR Sholinganallur, Chennai - 600119',
+    motherAddress: s.mother_office_address || s.MOTHER_OFFICE_ADDRESS || s.motherAddress || s.address || 'No. 45, Gopalapuram Main Road, Chennai - 600086',
+    guardianAddress: s.guardian_office_address || s.GUARDIAN_OFFICE_ADDRESS || s.guardianAddress || s.address || 'No. 88, 10th Avenue, Ashok Nagar, Chennai - 600083',
+    guardianDob: formatPrintDate(s.guardian_dob || s.GUARDIAN_DOB || s.guardianDob || '1985-04-10'),
   }
 }

@@ -242,7 +242,7 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
           </div>
 
           {/* Common Footer on Page 1 */}
-          <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} />
+          <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={1} totalPages={3} />
         </div>
       </div>
 
@@ -464,7 +464,7 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
           </div>
 
           {/* Common Footer on Page 2 */}
-          <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} />
+          <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={2} totalPages={3} />
         </div>
       </div>
 
@@ -621,7 +621,7 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
           </div>
 
           {/* Common Footer on Page 3 */}
-          <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} />
+          <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={3} totalPages={3} />
         </div>
       </div>
     </div>

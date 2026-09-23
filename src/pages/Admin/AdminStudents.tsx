@@ -150,7 +150,7 @@ export const AdminStudents: React.FC = () => {
 
   // 4. Print Preview Modal State & Handlers
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
-  const [previewDocType, setPreviewDocType] = useState<'track-sheet' | 'registration-form'>('track-sheet')
+  const [previewDocType, setPreviewDocType] = useState<'track-sheet' | 'registration-form' | 'registration-form-2' | 'registration-form-3' | 'registration-form-4'>('track-sheet')
   const [selectedStudentForPrint, setSelectedStudentForPrint] = useState<any | null>(null)
 
   const handlePrintTrackSheet = (student: StudentRecord) => {
@@ -166,6 +166,30 @@ export const AdminStudents: React.FC = () => {
     const fullRecord = useStudentStore.getState().getStudentById(student.id) || student
     setSelectedStudentForPrint(fullRecord)
     setPreviewDocType('registration-form')
+    setIsPreviewModalOpen(true)
+  }
+
+  const handlePrintRegistrationForm2 = (student: StudentRecord) => {
+    // Reusing the same admission data source: fetch complete record from store
+    const fullRecord = useStudentStore.getState().getStudentById(student.id) || student
+    setSelectedStudentForPrint(fullRecord)
+    setPreviewDocType('registration-form-2')
+    setIsPreviewModalOpen(true)
+  }
+
+  const handlePrintRegistrationForm3 = (student: StudentRecord) => {
+    // Reusing the same admission data source: fetch complete record from store
+    const fullRecord = useStudentStore.getState().getStudentById(student.id) || student
+    setSelectedStudentForPrint(fullRecord)
+    setPreviewDocType('registration-form-3')
+    setIsPreviewModalOpen(true)
+  }
+
+  const handlePrintRegistrationForm4 = (student: StudentRecord) => {
+    // Reusing the same admission data source: fetch complete record from store
+    const fullRecord = useStudentStore.getState().getStudentById(student.id) || student
+    setSelectedStudentForPrint(fullRecord)
+    setPreviewDocType('registration-form-4')
     setIsPreviewModalOpen(true)
   }
 
@@ -186,6 +210,9 @@ export const AdminStudents: React.FC = () => {
         onBulkUpdate={() => setIsBulkUpdateOpen(true)}
         onPrintTrackSheet={handlePrintTrackSheet}
         onPrintRegistrationForm={handlePrintRegistrationForm}
+        onPrintRegistrationForm2={handlePrintRegistrationForm2}
+        onPrintRegistrationForm3={handlePrintRegistrationForm3}
+        onPrintRegistrationForm4={handlePrintRegistrationForm4}
         showCheckmarkCols={true}
         onToggleFilterPanel={() => setIsFilterPanelOpen(true)}
         onExportExcel={() => toast.success("Exported Student Master List to Excel")}

@@ -201,7 +201,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
         </div>
 
         {/* Footer Page 1 */}
-        <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} />
+        <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={1} totalPages={3} />
       </div>
 
       {/* ================= PAGE 2 ================= */}
@@ -393,6 +393,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
             </div>
           </div>
         </div>
+
+        {/* Footer Page 2 */}
+        <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={2} totalPages={3} />
       </div>
 
       {/* ================= PAGE 3 ================= */}
@@ -439,7 +442,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
         </div>
 
         {/* Common Footer on Page 3 */}
-        <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} />
+        <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={3} totalPages={3} />
       </div>
     </div>
   )
