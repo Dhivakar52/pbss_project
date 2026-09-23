@@ -829,7 +829,31 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintRegistrationForm(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form
+                                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form 1
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm2 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm2(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-emerald-600" /> Print Registration Form 2
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm3 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm3(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-blue-600" /> Print Registration Form 3
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm4 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm4(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 4
                                   </DropdownMenuItem>
                                 )}
                                 {onDelete && (
