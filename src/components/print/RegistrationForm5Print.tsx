@@ -3,11 +3,11 @@ import { PrintDocumentHeader } from './PrintDocumentHeader'
 import { PrintDocumentFooter } from './PrintDocumentFooter'
 import type { RegistrationFormData } from './printMappers'
 
-export interface RegistrationForm4PrintProps {
+export interface RegistrationForm5PrintProps {
   data: RegistrationFormData
 }
 
-export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ data }) => {
+export const RegistrationForm5Print: React.FC<RegistrationForm5PrintProps> = ({ data }) => {
   const siblings = data.siblings || []
   const siblingRows = [...siblings]
   while (siblingRows.length < 4) {
@@ -230,7 +230,7 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
         </div>
       </div>
 
-      {/* ================= PAGE 2: PARENT & GUARDIAN DETAILS TABLE, RESIDENCE DETAILS, DECLARATION & SIGNATURES ================= */}
+      {/* ================= PAGE 2: PARENT & GUARDIAN DETAILS TABLE, COMPACT MULTI-COLUMN RESIDENCE DETAILS, DECLARATION & SIGNATURES ================= */}
       <div className="print-page reg-form-page relative w-[210mm] min-h-[297mm] mx-auto bg-white flex box-border border border-slate-300 shadow-md print:border-none print:shadow-none print:m-0 text-[11.5px] leading-snug p-0">
         <LeftVerticalSidebar />
 
@@ -443,49 +443,75 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
               </div>
             </div>
 
-            {/* Additional Parent Details - Compact Inline Layout (No Table) */}
-            <div className="space-y-1.5 mt-2 pt-2 border-t border-slate-200 text-[11px] leading-tight">
-              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-                <div className="flex items-start">
-                  <span className="font-bold shrink-0">Residence Telephone No :</span>
-                  <span className="font-normal ml-2">{data.residenceTelephone || '-'}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-bold shrink-0">Distance from Residence :</span>
-                  <span className="font-normal ml-2">{data.distanceFromResidence || '-'}</span>
-                </div>
-              </div>
+            {/* Additional Parent Details - Compact Multi-Column Layout */}
+            <div className="mt-2.5">
+              <div className="border border-black overflow-hidden mb-2.5">
+                <table className="w-full border-collapse text-[10.5px] leading-tight">
+                  <tbody>
+                    {/* Row 1: Residence Telephone No & Distance from Residence */}
+                    <tr className="border-b border-black">
+                      <td className="w-[22%] px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Residence Telephone No
+                      </td>
+                      <td className="w-[28%] px-2 py-1 font-normal text-black border-r border-black">
+                        {data.residenceTelephone || '-'}
+                      </td>
+                      <td className="w-[22%] px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Distance from Residence
+                      </td>
+                      <td className="w-[28%] px-2 py-1 font-normal text-black">
+                        {data.distanceFromResidence || '-'}
+                      </td>
+                    </tr>
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-                <div className="flex items-start">
-                  <span className="font-bold shrink-0">Residential Address :</span>
-                  <span className="font-normal ml-2 break-words">{data.residentialAddress || '-'}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-bold shrink-0">Mode of Transport :</span>
-                  <span className="font-normal ml-2">{data.modeOfTransport || '-'}</span>
-                </div>
-              </div>
+                    {/* Row 2: Residential Address & Mode of Transport */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 align-top">
+                        Residential Address
+                      </td>
+                      <td className="px-2 py-1.5 font-normal text-black border-r border-black align-top break-words">
+                        {data.residentialAddress || '-'}
+                      </td>
+                      <td className="px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 align-top">
+                        Mode of Transport
+                      </td>
+                      <td className="px-2 py-1.5 font-normal text-black align-top">
+                        {data.modeOfTransport || '-'}
+                      </td>
+                    </tr>
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-                <div className="flex items-start">
-                  <span className="font-bold shrink-0">Important Landmark :</span>
-                  <span className="font-normal ml-2 break-words">{data.importantLandmark || data.landmark || '-'}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="font-bold shrink-0">Parent Transfer :</span>
-                  <span className="font-normal ml-2">{data.isComingOnTransfer || (data.isTransferParent ? 'Yes' : 'No')}</span>
-                </div>
-              </div>
+                    {/* Row 3: Important Landmark & Parent Transfer */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 align-top">
+                        Important Landmark
+                      </td>
+                      <td className="px-2 py-1.5 font-normal text-black border-r border-black align-top break-words">
+                        {data.importantLandmark || data.landmark || '-'}
+                      </td>
+                      <td className="px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 align-top">
+                        Is Parent Transfer?
+                      </td>
+                      <td className="px-2 py-1.5 font-normal text-black align-top">
+                        {data.isComingOnTransfer || (data.isTransferParent ? 'Yes' : 'No')}
+                      </td>
+                    </tr>
 
-              <div className="flex items-start">
-                <span className="font-bold shrink-0">Outstanding Achievements of Parents :</span>
-                <span className="font-normal ml-2 break-words">{data.parentAchievements || '-'}</span>
+                    {/* Row 4: Outstanding Achievements of Parents (Spans full width for long content) */}
+                    <tr>
+                      <td className="px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 align-top">
+                        Outstanding Achievements of Parents
+                      </td>
+                      <td colSpan={3} className="px-2 py-1.5 font-normal text-black align-top break-words">
+                        {data.parentAchievements || '-'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
             {/* Declaration Paragraph */}
-            <div className="mt-2.5 text-[10.5px] leading-tight text-justify pt-1.5 border-t border-slate-200">
+            <div className="mt-2 text-[10.5px] leading-tight text-justify pt-1.5 border-t border-slate-200">
               <p>
                 We, the parents (father & mother)/guardian of{' '}
                 <span className="underline font-bold uppercase inline-block min-w-[160px] text-center">
@@ -501,7 +527,7 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
             </div>
 
             {/* Date and Parent Signature */}
-            <div className="mt-3 flex justify-between items-start text-[11px]">
+            <div className="mt-2.5 flex justify-between items-start text-[11px]">
               <div>
                 <span className="font-bold">Date :</span>
               </div>
@@ -512,7 +538,7 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
             </div>
 
             {/* Note & Document Checklist */}
-            <div className="mt-3 text-[10px] leading-tight space-y-1 border-t border-slate-200 pt-2">
+            <div className="mt-2.5 text-[10px] leading-tight space-y-1 border-t border-slate-200 pt-2">
               <p className="font-bold text-[10.5px]">Note :</p>
               <ul className="space-y-0.5 list-disc pl-4">
                 <li>Forms with False/ Incomplete/Vague information will not be considered.</li>
@@ -550,4 +576,4 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
   )
 }
 
-export default RegistrationForm4Print
+export default RegistrationForm5Print

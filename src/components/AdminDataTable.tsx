@@ -62,10 +62,10 @@ export interface AdminDataTableProps<T = any> {
   onPrint?: () => void
   onToggleFilterPanel?: () => void
   onPrintTrackSheet?: (record: T) => void
+  onPrintTrackSheet2?: (record: T) => void
   onPrintRegistrationForm?: (record: T) => void
-  onPrintRegistrationForm2?: (record: T) => void
-  onPrintRegistrationForm3?: (record: T) => void
   onPrintRegistrationForm4?: (record: T) => void
+  onPrintRegistrationForm5?: (record: T) => void
 }
 
 // Width constants for frozen left and right columns
@@ -100,10 +100,10 @@ export function AdminDataTable<T extends Record<string, any>>({
   onPrint,
   onToggleFilterPanel,
   onPrintTrackSheet,
+  onPrintTrackSheet2,
   onPrintRegistrationForm,
-  onPrintRegistrationForm2,
-  onPrintRegistrationForm3,
   onPrintRegistrationForm4,
+  onPrintRegistrationForm5,
 }: AdminDataTableProps<T>) {
   // Search & Filter States
   const [internalSearchTerm, setInternalSearchTerm] = useState('')
@@ -821,7 +821,15 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintTrackSheet(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet
+                                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet 1
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintTrackSheet2 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintTrackSheet2(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <FileText className="h-3.5 w-3.5 text-cyan-600" /> Print Track Sheet 2
                                   </DropdownMenuItem>
                                 )}
                                 {onPrintRegistrationForm && (
@@ -832,28 +840,20 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form 1
                                   </DropdownMenuItem>
                                 )}
-                                {onPrintRegistrationForm2 && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintRegistrationForm2(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Printer className="h-3.5 w-3.5 text-emerald-600" /> Print Registration Form 2
-                                  </DropdownMenuItem>
-                                )}
-                                {onPrintRegistrationForm3 && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintRegistrationForm3(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Printer className="h-3.5 w-3.5 text-blue-600" /> Print Registration Form 3
-                                  </DropdownMenuItem>
-                                )}
                                 {onPrintRegistrationForm4 && (
                                   <DropdownMenuItem
                                     onClick={() => onPrintRegistrationForm4(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 4
+                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 2
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm5 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm5(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form 3
                                   </DropdownMenuItem>
                                 )}
                                 {onDelete && (
@@ -972,7 +972,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintTrackSheet(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet
+                                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet 1
                                   </DropdownMenuItem>
                                 )}
                                 {onPrintRegistrationForm && (
@@ -983,28 +983,20 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form 1
                                   </DropdownMenuItem>
                                 )}
-                                {onPrintRegistrationForm2 && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintRegistrationForm2(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Printer className="h-3.5 w-3.5 text-emerald-600" /> Print Registration Form 2
-                                  </DropdownMenuItem>
-                                )}
-                                {onPrintRegistrationForm3 && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintRegistrationForm3(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Printer className="h-3.5 w-3.5 text-blue-600" /> Print Registration Form 3
-                                  </DropdownMenuItem>
-                                )}
                                 {onPrintRegistrationForm4 && (
                                   <DropdownMenuItem
                                     onClick={() => onPrintRegistrationForm4(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 4
+                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 2
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm5 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm5(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form 3
                                   </DropdownMenuItem>
                                 )}
                                 {onDelete && (
