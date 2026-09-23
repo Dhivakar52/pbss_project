@@ -829,7 +829,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintTrackSheet2(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <FileText className="h-3.5 w-3.5 text-cyan-600" /> Print Track Sheet 2
+                                    <FileText className="h-3.5 w-3.5 text-cyan-600" /> Print Track Sheet V2
                                   </DropdownMenuItem>
                                 )}
                                 {onPrintRegistrationForm && (
@@ -845,7 +845,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintRegistrationForm4(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 2
+                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form V2
                                   </DropdownMenuItem>
                                 )}
                                 {onPrintRegistrationForm5 && (
@@ -853,7 +853,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintRegistrationForm5(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form 3
+                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form V3
                                   </DropdownMenuItem>
                                 )}
                                 {onDelete && (
@@ -988,7 +988,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintRegistrationForm4(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 2
+                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form V2
                                   </DropdownMenuItem>
                                 )}
                                 {onPrintRegistrationForm5 && (
@@ -996,7 +996,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintRegistrationForm5(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form 3
+                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form V3
                                   </DropdownMenuItem>
                                 )}
                                 {onDelete && (

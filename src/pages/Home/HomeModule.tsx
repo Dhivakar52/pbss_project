@@ -683,7 +683,7 @@ export default function HomeModule() {
             toast.error('All required registration steps must be completed before printing.')
             return
         }
-        toast.success('Printing Track Sheet 2...')
+        toast.success('Printing Track Sheet V2...')
         window.print()
     }
 
@@ -701,7 +701,7 @@ export default function HomeModule() {
             toast.error('All required registration steps must be completed before printing.')
             return
         }
-        toast.success('Printing Registration Form 4...')
+        toast.success('Printing Registration Form V2...')
         window.print()
     }
 
@@ -710,7 +710,7 @@ export default function HomeModule() {
             toast.error('All required registration steps must be completed before printing.')
             return
         }
-        toast.success('Printing Registration Form 5...')
+        toast.success('Printing Registration Form V3...')
         window.print()
     }
 

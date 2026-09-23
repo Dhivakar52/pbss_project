@@ -240,7 +240,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white">Track Sheet</h3>
-                    <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#FFD6D6] dark:border-red-900 shadow-2xs">
+                    <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#FFD6D6] dark:border-red-900 shadow-2xs whitespace-nowrap">
                       REQUIRED
                     </span>
                   </div>
@@ -258,7 +258,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                   type="button"
                   onClick={onPrintTrackSheet}
                   disabled={!isRegistrationComplete}
-                  className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                  className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
                     ? 'bg-[#1677FF] dark:bg-blue-600 text-white hover:bg-[#0958D9] dark:hover:bg-blue-500 shadow-2xs cursor-pointer'
                     : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
                     }`}
@@ -268,7 +268,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
               </div>
             </div>
 
-            {/* Track Sheet 2 Card */}
+            {/* Track Sheet V2 Card */}
             {onPrintTrackSheet2 && (
               <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
                 <div className="flex items-start gap-3.5">
@@ -278,13 +278,13 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Track Sheet 2</h3>
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 uppercase border border-cyan-200 dark:border-cyan-800 shadow-2xs">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Track Sheet V2</h3>
+                      <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 uppercase border border-cyan-200 dark:border-cyan-800 shadow-2xs whitespace-nowrap">
                         Reference
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      Download and print Track Sheet 2 reference format.
+                      Download and print Track Sheet V2 reference format.
                     </p>
                   </div>
                 </div>
@@ -294,12 +294,12 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                     type="button"
                     onClick={onPrintTrackSheet2}
                     disabled={!isRegistrationComplete}
-                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
                       ? 'bg-cyan-600 dark:bg-cyan-600 text-white hover:bg-cyan-700 dark:hover:bg-cyan-500 shadow-2xs cursor-pointer'
                       : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
                       }`}
                   >
-                    <Printer className="h-3.5 w-3.5" /> Print Track Sheet 2
+                    <Printer className="h-3.5 w-3.5" /> Print Track Sheet V2
                   </button>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form 1</h3>
-                    <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#BAE0FF] dark:border-blue-900 shadow-2xs">
+                    <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#BAE0FF] dark:border-blue-900 shadow-2xs whitespace-nowrap">
                       Required
                     </span>
                   </div>
@@ -330,7 +330,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                   type="button"
                   onClick={onPrintRegistrationForm}
                   disabled={!isRegistrationComplete}
-                  className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                  className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
                     ? 'bg-[#1677FF] dark:bg-blue-600 text-white hover:bg-[#0958D9] dark:hover:bg-blue-500 shadow-2xs cursor-pointer'
                     : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
                     }`}
@@ -340,7 +340,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
               </div>
             </div>
 
-            {/* Registration Form 4 (Displayed as Registration Form 2) Card */}
+            {/* Registration Form 4 (Displayed as Registration Form V2) Card */}
             {onPrintRegistrationForm4 && (
               <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
                 <div className="flex items-start gap-3.5">
@@ -350,8 +350,8 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form 2</h3>
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 uppercase border border-purple-200 dark:border-purple-800 shadow-2xs">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form V2</h3>
+                      <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 uppercase border border-purple-200 dark:border-purple-800 shadow-2xs whitespace-nowrap">
                         Single Line
                       </span>
                     </div>
@@ -366,18 +366,18 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                     type="button"
                     onClick={onPrintRegistrationForm4}
                     disabled={!isRegistrationComplete}
-                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
                       ? 'bg-purple-600 dark:bg-purple-600 text-white hover:bg-purple-700 dark:hover:bg-purple-500 shadow-2xs cursor-pointer'
                       : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
                       }`}
                   >
-                    <Printer className="h-3.5 w-3.5" /> Print Registration Form 2
+                    <Printer className="h-3.5 w-3.5" /> Print Registration Form V2
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Registration Form 5 (Displayed as Registration Form 3) Card */}
+            {/* Registration Form 5 (Displayed as Registration Form V3) Card */}
             {onPrintRegistrationForm5 && (
               <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
                 <div className="flex items-start gap-3.5">
@@ -387,8 +387,8 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form 3</h3>
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 uppercase border border-teal-200 dark:border-teal-800 shadow-2xs">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form V3</h3>
+                      <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 uppercase border border-teal-200 dark:border-teal-800 shadow-2xs whitespace-nowrap">
                         Compact
                       </span>
                     </div>
@@ -403,12 +403,12 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                     type="button"
                     onClick={onPrintRegistrationForm5}
                     disabled={!isRegistrationComplete}
-                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
                       ? 'bg-teal-600 dark:bg-teal-600 text-white hover:bg-teal-700 dark:hover:bg-teal-500 shadow-2xs cursor-pointer'
                       : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
                       }`}
                   >
-                    <Printer className="h-3.5 w-3.5" /> Print Registration Form 3
+                    <Printer className="h-3.5 w-3.5" /> Print Registration Form V3
                   </button>
                 </div>
               </div>
@@ -424,7 +424,7 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white">Important Notice</h3>
-                    <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF7E6] dark:bg-amber-950/60 text-[#D46B08] dark:text-amber-400 uppercase border border-[#FFD591] dark:border-amber-900 shadow-2xs">
+                    <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF7E6] dark:bg-amber-950/60 text-[#D46B08] dark:text-amber-400 uppercase border border-[#FFD591] dark:border-amber-900 shadow-2xs whitespace-nowrap">
                       NOTICE
                     </span>
                   </div>

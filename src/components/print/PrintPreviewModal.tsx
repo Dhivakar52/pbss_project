@@ -63,11 +63,11 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
   const title = isTrackSheet
     ? 'Track Sheet Preview'
     : isTrackSheet2
-      ? 'Track Sheet 2 Preview'
+      ? 'Track Sheet V2 Preview'
       : isRegistrationForm4
-        ? 'Registration Form 2 Preview'
+        ? 'Registration Form V2 Preview'
         : isRegistrationForm5
-          ? 'Registration Form 3 Preview'
+          ? 'Registration Form V3 Preview'
           : 'Registration Form Preview'
   const studentName = student.studentName || student.childName || 'Applicant'
   const regNo = student.registrationNumber || student.id || ''
