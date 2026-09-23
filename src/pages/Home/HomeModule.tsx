@@ -678,6 +678,15 @@ export default function HomeModule() {
         window.print()
     }
 
+    const handlePrintTrackSheet2 = () => {
+        if (!isRegistrationComplete) {
+            toast.error('All required registration steps must be completed before printing.')
+            return
+        }
+        toast.success('Printing Track Sheet 2...')
+        window.print()
+    }
+
     const handlePrintRegistrationForm = () => {
         if (!isRegistrationComplete) {
             toast.error('All required registration steps must be completed before printing.')
@@ -687,30 +696,21 @@ export default function HomeModule() {
         window.print()
     }
 
-    const handlePrintRegistrationForm2 = () => {
-        if (!isRegistrationComplete) {
-            toast.error('All required registration steps must be completed before printing.')
-            return
-        }
-        toast.success('Printing Registration Form 2...')
-        window.print()
-    }
-
-    const handlePrintRegistrationForm3 = () => {
-        if (!isRegistrationComplete) {
-            toast.error('All required registration steps must be completed before printing.')
-            return
-        }
-        toast.success('Printing Registration Form 3...')
-        window.print()
-    }
-
     const handlePrintRegistrationForm4 = () => {
         if (!isRegistrationComplete) {
             toast.error('All required registration steps must be completed before printing.')
             return
         }
         toast.success('Printing Registration Form 4...')
+        window.print()
+    }
+
+    const handlePrintRegistrationForm5 = () => {
+        if (!isRegistrationComplete) {
+            toast.error('All required registration steps must be completed before printing.')
+            return
+        }
+        toast.success('Printing Registration Form 5...')
         window.print()
     }
 
@@ -866,10 +866,10 @@ export default function HomeModule() {
                     onCompleteAll={handleCompleteAll}
                     onReset={handleReset}
                     onPrintTrackSheet={handlePrintTrackSheet}
+                    onPrintTrackSheet2={handlePrintTrackSheet2}
                     onPrintRegistrationForm={handlePrintRegistrationForm}
-                    onPrintRegistrationForm2={handlePrintRegistrationForm2}
-                    onPrintRegistrationForm3={handlePrintRegistrationForm3}
                     onPrintRegistrationForm4={handlePrintRegistrationForm4}
+                    onPrintRegistrationForm5={handlePrintRegistrationForm5}
                     onOpenSuccessModal={() => setIsSuccessModalOpen(true)}
                     onViewApplicationDetails={handleOpenApplicationDetails}
                 />
