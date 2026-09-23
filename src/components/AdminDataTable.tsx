@@ -61,6 +61,9 @@ export interface AdminDataTableProps<T = any> {
   onToggleFilterPanel?: () => void
   onPrintTrackSheet?: (record: T) => void
   onPrintRegistrationForm?: (record: T) => void
+  onPrintRegistrationForm2?: (record: T) => void
+  onPrintRegistrationForm3?: (record: T) => void
+  onPrintRegistrationForm4?: (record: T) => void
 }
 
 // Width constants for frozen left and right columns
@@ -95,6 +98,9 @@ export function AdminDataTable<T extends Record<string, any>>({
   onToggleFilterPanel,
   onPrintTrackSheet,
   onPrintRegistrationForm,
+  onPrintRegistrationForm2,
+  onPrintRegistrationForm3,
+  onPrintRegistrationForm4,
 }: AdminDataTableProps<T>) {
   // Search & Filter States
   const [internalSearchTerm, setInternalSearchTerm] = useState('')
@@ -307,15 +313,14 @@ export function AdminDataTable<T extends Record<string, any>>({
     if (lowerKey === 'applicationstatus' || lowerKey === 'application_status') {
       return (
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-            val === 'Declared'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200'
-              : val === 'Approved'
-                ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200'
-                : val === 'Pending'
-                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200'
-                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-          }`}
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${val === 'Declared'
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200'
+            : val === 'Approved'
+              ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200'
+              : val === 'Pending'
+                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200'
+                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+            }`}
         >
           {val === 'Declared' && <CheckCircle2 className="h-3 w-3" />}
           {val === 'Pending' && <Clock className="h-3 w-3" />}
@@ -415,11 +420,10 @@ export function AdminDataTable<T extends Record<string, any>>({
                 <button
                   type="button"
                   title="Filter & Export Options"
-                  className={`h-9 w-9 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
-                    isFilterPanelVisible
-                      ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
-                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}
+                  className={`h-9 w-9 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${isFilterPanelVisible
+                    ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
                 </button>
@@ -438,11 +442,10 @@ export function AdminDataTable<T extends Record<string, any>>({
                     }
                   }}
                   title="Toggle Custom Filters"
-                  className={`p-2 rounded-xl transition-all cursor-pointer ${
-                    isFilterPanelVisible
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                  }`}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${isFilterPanelVisible
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                    }`}
                 >
                   <Filter className="h-4 w-4" />
                 </button>
@@ -564,9 +567,8 @@ export function AdminDataTable<T extends Record<string, any>>({
                       <th
                         key={col.key}
                         onClick={() => col.sortable !== false && handleSort(col.key)}
-                        className={`py-3 px-4 ${
-                          col.sortable !== false ? 'cursor-pointer hover:bg-white/10' : ''
-                        } transition-colors border-r border-white/10 whitespace-nowrap ${col.headerClassName || ''}`}
+                        className={`py-3 px-4 ${col.sortable !== false ? 'cursor-pointer hover:bg-white/10' : ''
+                          } transition-colors border-r border-white/10 whitespace-nowrap ${col.headerClassName || ''}`}
                         style={{ minWidth: '150px' }}
                       >
                         <div className="flex items-center gap-1.5">
@@ -746,9 +748,8 @@ export function AdminDataTable<T extends Record<string, any>>({
                           {scrollableColumns.map((col) => (
                             <td
                               key={col.key}
-                              className={`py-3 px-4 whitespace-nowrap border-r border-slate-100 dark:border-slate-800/40 ${
-                                col.className || ''
-                              }`}
+                              className={`py-3 px-4 whitespace-nowrap border-r border-slate-100 dark:border-slate-800/40 ${col.className || ''
+                                }`}
                               style={{ minWidth: '150px' }}
                             >
                               {col.render
@@ -857,15 +858,14 @@ export function AdminDataTable<T extends Record<string, any>>({
                           <td className="py-3 px-4 text-slate-500 whitespace-nowrap">{row.area}, {row.city}</td>
                           <td className="py-3 px-4 text-center whitespace-nowrap">
                             <span
-                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                                row.applicationStatus === 'Declared'
-                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200'
-                                  : row.applicationStatus === 'Approved'
-                                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200'
-                                    : row.applicationStatus === 'Pending'
-                                      ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200'
-                                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                              }`}
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${row.applicationStatus === 'Declared'
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200'
+                                : row.applicationStatus === 'Approved'
+                                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200'
+                                  : row.applicationStatus === 'Pending'
+                                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200'
+                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                }`}
                             >
                               {row.applicationStatus === 'Declared' && <CheckCircle2 className="h-3 w-3" />}
                               {row.applicationStatus === 'Pending' && <Clock className="h-3 w-3" />}
@@ -940,7 +940,31 @@ export function AdminDataTable<T extends Record<string, any>>({
                                     onClick={() => onPrintRegistrationForm(row)}
                                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form
+                                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form 1
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm2 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm2(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-emerald-600" /> Print Registration Form 2
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm3 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm3(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-blue-600" /> Print Registration Form 3
+                                  </DropdownMenuItem>
+                                )}
+                                {onPrintRegistrationForm4 && (
+                                  <DropdownMenuItem
+                                    onClick={() => onPrintRegistrationForm4(row)}
+                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  >
+                                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form 4
                                   </DropdownMenuItem>
                                 )}
                                 {onDelete && (

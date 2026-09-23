@@ -25,6 +25,9 @@ interface RegistrationOverviewProps {
   onReset: () => void
   onPrintTrackSheet: () => void
   onPrintRegistrationForm: () => void
+  onPrintRegistrationForm2?: () => void
+  onPrintRegistrationForm3?: () => void
+  onPrintRegistrationForm4?: () => void
   onOpenSuccessModal?: () => void
   onViewApplicationDetails?: () => void
 }
@@ -42,6 +45,9 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
   onReset,
   onPrintTrackSheet,
   onPrintRegistrationForm,
+  onPrintRegistrationForm2,
+  onPrintRegistrationForm3,
+  onPrintRegistrationForm4,
   onOpenSuccessModal,
   onViewApplicationDetails,
 }) => {
@@ -296,6 +302,117 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
                 </button>
               </div>
             </div>
+
+            {/* Registration Form 1 Card */}
+            {onPrintRegistrationForm2 && (
+              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <FileText className="h-5 w-5" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form 1</h3>
+                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 uppercase border border-emerald-200 dark:border-emerald-800 shadow-2xs">
+                        3-Column
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      Print registration form with 3-column Father & Mother layout.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="shrink-0 self-end md:self-center">
+                  <button
+                    type="button"
+                    onClick={onPrintRegistrationForm2}
+                    disabled={!isRegistrationComplete}
+                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                      ? 'bg-emerald-600 dark:bg-emerald-600 text-white hover:bg-emerald-700 dark:hover:bg-emerald-500 shadow-2xs cursor-pointer'
+                      : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
+                      }`}
+                  >
+                    <Printer className="h-3.5 w-3.5" /> Print Registration Form 1
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Registration Form 3 Card */}
+            {onPrintRegistrationForm3 && (
+              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <FileText className="h-5 w-5" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form 3</h3>
+                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 uppercase border border-blue-200 dark:border-blue-800 shadow-2xs">
+                        Box Layout
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      Print registration form with Father, Mother & Guardian yellow header boxes.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="shrink-0 self-end md:self-center">
+                  <button
+                    type="button"
+                    onClick={onPrintRegistrationForm3}
+                    disabled={!isRegistrationComplete}
+                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                      ? 'bg-blue-600 dark:bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500 shadow-2xs cursor-pointer'
+                      : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
+                      }`}
+                  >
+                    <Printer className="h-3.5 w-3.5" /> Print Registration Form 3
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Registration Form 4 Card */}
+            {onPrintRegistrationForm4 && (
+              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <FileText className="h-5 w-5" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form 4</h3>
+                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 uppercase border border-purple-200 dark:border-purple-800 shadow-2xs">
+                        Combined
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      Print registration form with single combined Father, Mother & Guardian table.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="shrink-0 self-end md:self-center">
+                  <button
+                    type="button"
+                    onClick={onPrintRegistrationForm4}
+                    disabled={!isRegistrationComplete}
+                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 min-w-[170px] ${isRegistrationComplete
+                      ? 'bg-purple-600 dark:bg-purple-600 text-white hover:bg-purple-700 dark:hover:bg-purple-500 shadow-2xs cursor-pointer'
+                      : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
+                      }`}
+                  >
+                    <Printer className="h-3.5 w-3.5" /> Print Registration Form 4
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Important Notice Card */}
             <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all overflow-hidden">

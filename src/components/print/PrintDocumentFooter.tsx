@@ -4,12 +4,16 @@ export interface PrintDocumentFooterProps {
   regNo?: string
   childName?: string
   student?: any
+  pageNumber?: number
+  totalPages?: number
 }
 
 export const PrintDocumentFooter: React.FC<PrintDocumentFooterProps> = ({
   regNo,
   childName,
   student,
+  pageNumber,
+  totalPages,
 }) => {
   const displayRegNo =
     regNo ||
@@ -37,7 +41,18 @@ export const PrintDocumentFooter: React.FC<PrintDocumentFooterProps> = ({
   const displayChildName = formatChildName(rawChildName)
 
   return (
-    <div className="print-footer w-full mt-auto pt-3 flex justify-end items-center select-none text-[12.5px] text-black font-sans">
+    <div className="print-footer w-full mt-auto pt-3 flex justify-between items-center select-none text-[12px] text-black font-sans">
+      <div>
+        {pageNumber !== undefined && (
+          <div className="flex items-center gap-1">
+            <span className="font-bold text-black">Page</span>
+            <span className="font-normal text-black">
+              {pageNumber}{totalPages ? ` of ${totalPages}` : ''}
+            </span>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center gap-6 whitespace-nowrap">
         <div className="flex items-center gap-1.5">
           <span className="font-bold text-black">Reg No. :</span>
