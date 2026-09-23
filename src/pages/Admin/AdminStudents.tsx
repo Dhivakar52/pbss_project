@@ -11,11 +11,16 @@ import { toast } from '@/components/ui/toast'
 import { StudentDataTable } from '@/components/students/StudentDataTable'
 import { Field, SelectField } from '@/components/FormPrimitives'
 import { PrintPreviewModal } from '@/components/print'
-import { BulkUpdateDrawer } from '@/components/students/bulk-update/BulkUpdateDrawer'
+import {
+  BulkUpdateDrawer,
+  BulkUpdateConfirmModal,
+  BulkUpdateSuccessModal,
+  type PendingBulkUpdatePayload,
+} from '@/components/students/bulk-update'
 
 export const AdminStudents: React.FC = () => {
   const navigate = useNavigate()
-  const { students, deleteStudent } = useStudentStore()
+  const { students, deleteStudent, bulkUpdateStudents } = useStudentStore()
 
   // Filter panel state (Default to empty - no preselected values)
   const [academicYear, setAcademicYear] = useState('')
@@ -26,6 +31,10 @@ export const AdminStudents: React.FC = () => {
 
   // Bulk Update state
   const [isBulkUpdateOpen, setIsBulkUpdateOpen] = useState(false)
+  const [tableKey, setTableKey] = useState(0)
+  const [pendingBulkUpdate, setPendingBulkUpdate] = useState<PendingBulkUpdatePayload | null>(null)
+  const [isSubmittingBulkUpdate, setIsSubmittingBulkUpdate] = useState(false)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
 
   // Extract available application numbers from existing student data
   const availableApplnNumbers = useMemo(() => {
@@ -193,10 +202,36 @@ export const AdminStudents: React.FC = () => {
     setIsPreviewModalOpen(true)
   }
 
+  // Bulk Update Confirmation Handler
+  const handleConfirmBulkUpdate = () => {
+    if (!pendingBulkUpdate) return
+    setIsSubmittingBulkUpdate(true)
+    try {
+      const updates: Partial<StudentRecord> = {
+        trackSheet: pendingBulkUpdate.trackSheet,
+        registrationForm: pendingBulkUpdate.registrationForm,
+        status1: pendingBulkUpdate.trackSheet,
+        status2: pendingBulkUpdate.registrationForm,
+      }
+      const count = bulkUpdateStudents(pendingBulkUpdate.applnNumbers, updates)
+      if (count > 0) {
+        setPendingBulkUpdate(null)
+        setIsSuccessModalOpen(true)
+      } else {
+        toast.error('No matching records were updated.')
+      }
+    } catch (err) {
+      toast.error('Unable to update student records. Please try again.')
+    } finally {
+      setIsSubmittingBulkUpdate(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* DATA TABLE WITH INTEGRATED CUSTOM FILTER PANEL VIA POPOVER FILTER ICON */}
       <StudentDataTable
+        key={tableKey}
         title="Student Applications Master List"
         subtitle="Manage registered pre-kg applicants. Click any Reg Number or ID to view complete application details."
         data={filteredStudents}
@@ -433,10 +468,29 @@ export const AdminStudents: React.FC = () => {
         documentType={previewDocType}
         student={selectedStudentForPrint}
       />
+
       {/* ================= BULK UPDATE DRAWER PANEL ================= */}
       <BulkUpdateDrawer
         isOpen={isBulkUpdateOpen}
         onClose={() => setIsBulkUpdateOpen(false)}
+        onInitiateUpdate={(payload) => setPendingBulkUpdate(payload)}
+      />
+
+      {/* ================= BULK UPDATE CONFIRMATION MODAL ================= */}
+      <BulkUpdateConfirmModal
+        isOpen={!!pendingBulkUpdate}
+        onClose={() => setPendingBulkUpdate(null)}
+        onConfirm={handleConfirmBulkUpdate}
+        isSubmitting={isSubmittingBulkUpdate}
+      />
+
+      {/* ================= BULK UPDATE SUCCESS MODAL ================= */}
+      <BulkUpdateSuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => {
+          setIsSuccessModalOpen(false)
+          setTableKey((prev) => prev + 1)
+        }}
       />
     </div>
   )

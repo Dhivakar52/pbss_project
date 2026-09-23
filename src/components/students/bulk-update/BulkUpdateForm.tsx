@@ -1,149 +1,91 @@
 import React from 'react'
-import { Field, SelectField } from '@/components/FormPrimitives'
+import { Checkbox } from '@/components/ui/checkbox'
+import { FieldLabel } from '@/components/FormPrimitives'
+import { FileCheck, FileText } from 'lucide-react'
 
-export interface BulkFieldConfig {
-  key: string
-  label: string
-  options: { label: string; value: any }[]
-}
-
-export const BULK_UPDATE_FIELDS: BulkFieldConfig[] = [
-  {
-    key: 'applicationStatus',
-    label: 'Application Status',
-    options: [
-      { label: 'Pending', value: 'Pending' },
-      { label: 'Approved', value: 'Approved' },
-      { label: 'Declared', value: 'Declared' },
-      { label: 'Draft', value: 'Draft' },
-      { label: 'Rejected', value: 'Rejected' },
-    ],
-  },
-  {
-    key: 'schoolBranch',
-    label: 'School Branch',
-    options: [
-      { label: 'T.Nagar-PSBB', value: 'T.Nagar-PSBB' },
-      { label: 'KK Nagar-PSBB', value: 'KK Nagar-PSBB' },
-      { label: 'Nungambakkam-PSBB', value: 'Nungambakkam-PSBB' },
-    ],
-  },
-  {
-    key: 'academicYear',
-    label: 'Academic Year / Class',
-    options: [
-      { label: '2025-26', value: '2025-26' },
-      { label: '2024-25', value: '2024-25' },
-    ],
-  },
-  {
-    key: 'status1',
-    label: 'Document Status 1',
-    options: [
-      { label: 'Verified (Yes)', value: true },
-      { label: 'Not Verified (No)', value: false },
-    ],
-  },
-  {
-    key: 'status2',
-    label: 'Document Status 2',
-    options: [
-      { label: 'Verified (Yes)', value: true },
-      { label: 'Not Verified (No)', value: false },
-    ],
-  },
-  {
-    key: 'gender',
-    label: 'Gender',
-    options: [
-      { label: 'Male', value: 'Male' },
-      { label: 'Female', value: 'Female' },
-    ],
-  },
-  {
-    key: 'motherTongue',
-    label: 'Mother Tongue',
-    options: [
-      { label: 'Tamil', value: 'Tamil' },
-      { label: 'English', value: 'English' },
-      { label: 'Malayalam', value: 'Malayalam' },
-      { label: 'Telugu', value: 'Telugu' },
-      { label: 'Hindi', value: 'Hindi' },
-      { label: 'Gujarati', value: 'Gujarati' },
-    ],
-  },
-  {
-    key: 'community',
-    label: 'Community',
-    options: [
-      { label: 'FC', value: 'FC' },
-      { label: 'BC', value: 'BC' },
-      { label: 'MBC', value: 'MBC' },
-      { label: 'SC', value: 'SC' },
-      { label: 'ST', value: 'ST' },
-    ],
-  },
-  {
-    key: 'religion',
-    label: 'Religion',
-    options: [
-      { label: 'Hindu', value: 'Hindu' },
-      { label: 'Christian', value: 'Christian' },
-      { label: 'Muslim', value: 'Muslim' },
-      { label: 'Jain', value: 'Jain' },
-      { label: 'Sikh', value: 'Sikh' },
-    ],
-  },
-]
-
-interface BulkUpdateFormProps {
-  selectedFieldKey: string
-  onFieldKeyChange: (key: string) => void
-  selectedValue: string
-  onValueChange: (val: string) => void
+export interface BulkUpdateFormProps {
+  trackSheetChecked: boolean
+  onTrackSheetChange: (checked: boolean) => void
+  registrationFormChecked: boolean
+  onRegistrationFormChange: (checked: boolean) => void
   disabled?: boolean
 }
 
 export const BulkUpdateForm: React.FC<BulkUpdateFormProps> = ({
-  selectedFieldKey,
-  onFieldKeyChange,
-  selectedValue,
-  onValueChange,
+  trackSheetChecked,
+  onTrackSheetChange,
+  registrationFormChecked,
+  onRegistrationFormChange,
   disabled = false,
 }) => {
-  const currentFieldConfig = BULK_UPDATE_FIELDS.find((f) => f.key === selectedFieldKey)
-
   return (
-    <div className="space-y-4 pt-2 border-t border-slate-200 dark:border-slate-800">
-      <Field label="Field To Update" required>
-        <SelectField
-          value={selectedFieldKey}
-          onChange={(val) => {
-            onFieldKeyChange(val)
-            onValueChange('') // Reset value selection when field changes
-          }}
-          disabled={disabled}
-          placeholder="-- Select Field --"
-          options={BULK_UPDATE_FIELDS.map((f) => ({ label: f.label, value: f.key }))}
-        />
-      </Field>
+    <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+      <div>
+        <FieldLabel>Document Statuses to Apply</FieldLabel>
+        <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mb-2.5">
+          Select or unselect options to set their boolean values (<span className="font-semibold text-emerald-600 dark:text-emerald-400">Checked = true</span>, <span className="font-semibold text-slate-500">Unchecked = false</span>) for the selected students.
+        </p>
 
-      <Field label="New Value" required error={!selectedValue && !!selectedFieldKey} errorText="Please select a new value to apply">
-        <SelectField
-          value={selectedValue}
-          onChange={(val) => onValueChange(val)}
-          disabled={disabled || !selectedFieldKey}
-          placeholder={selectedFieldKey ? '-- Select New Value --' : 'Select a field first'}
-          options={
-            currentFieldConfig
-              ? currentFieldConfig.options.map((opt) => ({
-                  label: opt.label,
-                  value: String(opt.value),
-                }))
-              : []
-          }
-        />
-      </Field>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* TrackSheet Checkbox */}
+          <label
+            htmlFor="bulk-update-tracksheet"
+            className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all cursor-pointer select-none ${trackSheetChecked
+              ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-400 dark:border-blue-700 shadow-xs'
+              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+              } ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+          >
+            <Checkbox
+              id="bulk-update-tracksheet"
+              checked={trackSheetChecked}
+              onCheckedChange={(val) => onTrackSheetChange(!!val)}
+              disabled={disabled}
+              className="data-checked:border-transparent data-checked:text-white"
+              style={{ background: trackSheetChecked ? 'var(--app-gradient)' : undefined }}
+            />
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <FileCheck className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  TrackSheet
+                </span>
+              </div>
+              {/* <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                {trackSheetChecked ? 'Will set trackSheet = true' : 'Will set trackSheet = false'}
+              </span> */}
+            </div>
+          </label>
+
+          {/* Registration Form Checkbox */}
+          <label
+            htmlFor="bulk-update-registration-form"
+            className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all cursor-pointer select-none ${registrationFormChecked
+              ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-400 dark:border-blue-700 shadow-xs'
+              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+              } ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+          >
+            <Checkbox
+              id="bulk-update-registration-form"
+              checked={registrationFormChecked}
+              onCheckedChange={(val) => onRegistrationFormChange(!!val)}
+              disabled={disabled}
+              className="data-checked:border-transparent data-checked:text-white"
+              style={{ background: registrationFormChecked ? 'var(--app-gradient)' : undefined }}
+            />
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <FileText className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  Registration Form
+                </span>
+              </div>
+              {/* <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                {registrationFormChecked ? 'Will set registrationForm = true' : 'Will set registrationForm = false'}
+              </span> */}
+            </div>
+          </label>
+        </div>
+      </div>
     </div>
   )
 }

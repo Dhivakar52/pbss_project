@@ -62,8 +62,10 @@ export class StudentService {
       motherTongue: payload.motherTongue || 'Tamil',
       applicationStatus: payload.applicationStatus || 'Declared',
       date: payload.date || now,
-      status1: payload.status1 ?? true,
-      status2: payload.status2 ?? true,
+      trackSheet: payload.trackSheet ?? payload.status1 ?? true,
+      registrationForm: payload.registrationForm ?? payload.status2 ?? true,
+      status1: payload.trackSheet ?? payload.status1 ?? true,
+      status2: payload.registrationForm ?? payload.status2 ?? true,
       fatherName: payload.fatherName || '',
       motherName: payload.motherName || '',
       mobile: payload.mobile || '',
@@ -121,27 +123,32 @@ export class StudentService {
   }
 
   /**
-   * Perform bulk update on student records for given application numbers and field/value pair.
+   * Perform bulk update on student records for given application numbers and field/value pair or partial updates.
    */
   static bulkUpdateStudents(
     list: StudentRecord[],
     applnNumbers: number[],
-    field: string,
-    value: any
+    fieldOrUpdates: string | Partial<StudentRecord>,
+    value?: any
   ): { updatedCount: number; updatedList: StudentRecord[] } {
-    if (!applnNumbers || applnNumbers.length === 0 || !field) {
+    if (!applnNumbers || applnNumbers.length === 0 || !fieldOrUpdates) {
       return { updatedCount: 0, updatedList: list }
     }
 
     const applnSet = new Set(applnNumbers)
     let updatedCount = 0
 
+    const updates: Partial<StudentRecord> =
+      typeof fieldOrUpdates === 'string'
+        ? { [fieldOrUpdates]: value }
+        : fieldOrUpdates
+
     const updatedList = list.map((student) => {
       if (this.matchesApplnNumber(student, applnSet)) {
         updatedCount++
         return {
           ...student,
-          [field]: value,
+          ...updates,
         }
       }
       return student
