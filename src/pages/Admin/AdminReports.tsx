@@ -5,6 +5,7 @@ import { Field, SelectField, TextField } from '@/components/FormPrimitives'
 import { AdminDataTable } from '@/components/AdminDataTable'
 import { reportMockData } from '@/data/reportMockData'
 import { reportConfig, type ReportConfigItem } from '@/data/reportConfig'
+import { exportToExcel, type ExportColumn } from '@/utils/exportToExcel'
 import {
   User,
   Briefcase,
@@ -115,6 +116,33 @@ export const AdminReports: React.FC = () => {
 
   // Export Handler
   const handleExportExcel = () => {
+    // Build export columns: S.No + Application Number + Student Name + all scrollable columns
+    const exportColumns: ExportColumn[] = [
+      { key: '_sno', label: 'S.No' },
+      { key: currentReport.columns.some(c => c.key === 'APPLICATION_NUMBER' || c.key === 'application_number')
+        ? (currentReport.columns.find(c => c.key.toLowerCase() === 'application_number')?.key || 'application_number')
+        : 'application_number',
+        label: 'Application Number' },
+      { key: currentReport.columns.some(c => c.key === 'STUDENT_NAME' || c.key === 'student_name')
+        ? (currentReport.columns.find(c => c.key.toLowerCase() === 'student_name')?.key || 'student_name')
+        : 'student_name',
+        label: 'Student Name' },
+      ...currentReport.columns
+        .filter(c => {
+          const lower = c.key.toLowerCase()
+          return lower !== 'application_number' && lower !== 'student_name' && lower !== 'slno' && lower !== 'id'
+        })
+        .map(c => ({ key: c.key, label: c.label })),
+    ]
+
+    // Add serial numbers to data
+    const exportData = reportData.map((row: any, idx: number) => ({
+      ...row,
+      _sno: idx + 1,
+    }))
+
+    const safeName = currentReport.label.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_')
+    exportToExcel(exportData, exportColumns, `${safeName}_Report`, currentReport.label)
     toast.success(`Exported ${currentReport.label} to Excel successfully!`)
   }
 

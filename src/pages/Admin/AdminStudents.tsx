@@ -10,6 +10,7 @@ import {
 import { toast } from '@/components/ui/toast'
 import { StudentDataTable } from '@/components/students/StudentDataTable'
 import { Field, SelectField } from '@/components/FormPrimitives'
+import { exportToExcel, type ExportColumn } from '@/utils/exportToExcel'
 import { PrintPreviewModal } from '@/components/print'
 import {
   BulkUpdateDrawer,
@@ -250,7 +251,30 @@ export const AdminStudents: React.FC = () => {
         onPrintRegistrationForm5={handlePrintRegistrationForm5}
         showCheckmarkCols={true}
         onToggleFilterPanel={() => setIsFilterPanelOpen(true)}
-        onExportExcel={() => toast.success("Exported Student Master List to Excel")}
+        onExportExcel={() => {
+          const studentExportColumns: ExportColumn[] = [
+            { key: 'slNo', label: 'SL No' },
+            { key: 'registrationNumber', label: 'Reg Number' },
+            { key: 'studentName', label: 'Student Name' },
+            { key: 'fatherName', label: 'Parent / Guardian' },
+            { key: 'schoolBranch', label: 'School Branch' },
+            { key: 'academicYear', label: 'Academic Year' },
+            { key: 'gender', label: 'Gender' },
+            { key: 'motherTongue', label: 'Mother Tongue' },
+            { key: 'applicationStatus', label: 'Application Status' },
+            { key: 'date', label: 'Date' },
+            { key: 'mobile', label: 'Mobile' },
+            { key: 'city', label: 'City' },
+            { key: 'area', label: 'Area' },
+            { key: 'religion', label: 'Religion' },
+            { key: 'caste', label: 'Caste' },
+            { key: 'community', label: 'Community' },
+            { key: 'trackSheet', label: 'Track Sheet' },
+            { key: 'registrationForm', label: 'Registration Form' },
+          ]
+          exportToExcel(filteredStudents, studentExportColumns, 'Student_Master_List', 'Students')
+          toast.success('Exported Student Master List to Excel')
+        }}
         onPrint={() => window.print()}
       />
 

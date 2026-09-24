@@ -62,7 +62,7 @@ const CreateAccount: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#f0f7ff] flex flex-col justify-between font-sans">
+    <div className="min-h-screen w-full bg-[#f5f5f5] flex flex-col items-center justify-center p-4 sm:p-6 ">
       <div>
         {/* ================= MAIN CONTENT CONTAINER ================= */}
         <div className="w-full flex justify-center px-4 mt-7 pb-10">

@@ -8,8 +8,8 @@ import {
   Pie,
   PieChart,
   Cell,
-  Area,
-  AreaChart,
+  Line,
+  LineChart,
 } from 'recharts'
 import {
   ChartContainer,
@@ -19,113 +19,101 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from '@/components/ui/chart'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { format, subDays } from 'date-fns'
-import { BarChart3, TrendingUp, Users, CheckCircle, Clock, School, ArrowUpDown } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, Clock, School, ArrowUpDown } from 'lucide-react'
 import { toast } from '@/components/ui/toast'
 import type { ColumnDef } from '@tanstack/react-table'
 import { SeatAvailabilityTable } from './components/SeatAvailabilityTable'
 
-// ---------- Seat Availability Data ----------
-interface KKNagarSeatRow {
+// ---------- Common Source Dataset Definition ----------
+export interface ApplicationDataItem {
+  academicYear: string
+  branch: 'T.Nagar-PSBB' | 'KK Nagar-PSBB'
+  status: 'Approved' | 'Pending'
+  date: string
+  timeSlot: '10:00 AM - 12:00 PM' | '1:00 PM - 3:00 PM' | '3:00 PM - 6:00 PM'
+  seats: number
+}
+
+// Single source of truth dataset
+const rawApplicationData: ApplicationDataItem[] = [
+  // KK Nagar - Date 14
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '10:00 AM - 12:00 PM', seats: 3 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '10:00 AM - 12:00 PM', seats: 1 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '1:00 PM - 3:00 PM',   seats: 5 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '1:00 PM - 3:00 PM',   seats: 3 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '3:00 PM - 6:00 PM',   seats: 6 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '3:00 PM - 6:00 PM',   seats: 4 },
+
+  // KK Nagar - Date 15
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '10:00 AM - 12:00 PM', seats: 4 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '1:00 PM - 3:00 PM',   seats: 7 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '1:00 PM - 3:00 PM',   seats: 3 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '3:00 PM - 6:00 PM',   seats: 8 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '3:00 PM - 6:00 PM',   seats: 4 },
+
+  // KK Nagar - Date 16
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '1:00 PM - 3:00 PM',   seats: 5 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '1:00 PM - 3:00 PM',   seats: 3 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 6 },
+  { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 3 },
+
+  // T.Nagar - Date 14
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '10:00 AM - 12:00 PM', seats: 4 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '1:00 PM - 3:00 PM',   seats: 6 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '1:00 PM - 3:00 PM',   seats: 3 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '3:00 PM - 6:00 PM',   seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '3:00 PM - 6:00 PM',   seats: 1 },
+
+  // T.Nagar - Date 15
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '10:00 AM - 12:00 PM', seats: 3 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '1:00 PM - 3:00 PM',   seats: 5 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '1:00 PM - 3:00 PM',   seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '3:00 PM - 6:00 PM',   seats: 3 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '3:00 PM - 6:00 PM',   seats: 1 },
+
+  // T.Nagar - Date 16
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '10:00 AM - 12:00 PM', seats: 1 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '1:00 PM - 3:00 PM',   seats: 4 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '1:00 PM - 3:00 PM',   seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 2 },
+  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 1 },
+]
+
+// ---------- Table Row Interface ----------
+interface BranchSeatRow {
   date: number
   slot10to12: number
   slot1to3: number
   slot3to6: number
 }
 
-const kkNagarSeatData: KKNagarSeatRow[] = [
-  { date: 14, slot10to12: 1, slot1to3: 5, slot3to6: 10 },
-  { date: 15, slot10to12: 3, slot1to3: 8, slot3to6: 12 },
-  { date: 16, slot10to12: 2, slot1to3: 6, slot3to6: 9 },
-]
-
-interface TNagarSeatRow {
-  date: number
-  slot10to12: number
-  slot1to3: number
-}
-
-const tNagarSeatData: TNagarSeatRow[] = [
-  { date: 14, slot10to12: 4, slot1to3: 7 },
-  { date: 15, slot10to12: 2, slot1to3: 5 },
-  { date: 16, slot10to12: 1, slot1to3: 3 },
-]
-
-// ---------- Data ----------
-const branchData = [
-  { name: 'T.Nagar', applications: 45, declared: 32, approved: 10 },
-  { name: 'KK Nagar', applications: 38, declared: 25, approved: 8 },
-]
-
-const statusData = [
-  { status: 'declared', value: 75, fill: 'var(--color-declared)' },
-  { status: 'approved', value: 23, fill: 'var(--color-approved)' },
-  { status: 'pending', value: 12, fill: 'var(--color-pending)' },
-  { status: 'draft', value: 5, fill: 'var(--color-draft)' },
-]
-
-// ---------- Stacked Timeline Data (2 branches per day) ----------
-const timelineData = [
-  { date: 'Jan 10', tNagar: 5, kkNagar: 4 },
-  { date: 'Jan 12', tNagar: 10, kkNagar: 8 },
-  { date: 'Jan 14', tNagar: 18, kkNagar: 14 },
-  { date: 'Jan 16', tNagar: 28, kkNagar: 22 },
-  { date: 'Jan 18', tNagar: 36, kkNagar: 30 },
-  { date: 'Jan 20', tNagar: 45, kkNagar: 38 },
-]
-
-// ---------- Interactive Area Chart Data ----------
-const generateDailyData = () => {
-  const today = new Date()
-  const data: { date: string; applications: number }[] = []
-  for (let i = 89; i >= 0; i--) {
-    const d = subDays(today, i)
-    const base = 0.8 + (89 - i) / 90
-    const noise = Math.random() * 1.5
-    const daily = Math.round(base + noise)
-    data.push({
-      date: format(d, 'yyyy-MM-dd'),
-      applications: daily,
-    })
-  }
-  return data
-}
-
-const dailyData = generateDailyData()
-
 // ---------- Chart Configs ----------
-const branchChartConfig = {
-  applications: { label: 'Total Apps', color: '#1677FF' },
-  declared: { label: 'Declared', color: '#10B981' },
+const groupedBarConfig = {
+  slot10to12: { label: '10:00 AM – 12:00 PM', color: '#1677FF' },
+  slot1to3: { label: '1:00 PM – 3:00 PM', color: '#10B981' },
+  slot3to6: { label: '3:00 PM – 6:00 PM', color: '#F59E0B' },
 } satisfies ChartConfig
 
-const statusChartConfig = {
-  value: { label: 'Applications' },
-  declared: { label: 'Declared', color: '#10B981' },
-  approved: { label: 'Approved', color: '#1677FF' },
-  pending: { label: 'Pending', color: '#F59E0B' },
-  draft: { label: 'Draft', color: '#94A3B8' },
+const lineChartConfig = {
+  slot10to12: { label: '10:00 AM – 12:00 PM', color: '#1677FF' },
+  slot1to3: { label: '1:00 PM – 3:00 PM', color: '#10B981' },
+  slot3to6: { label: '3:00 PM – 6:00 PM', color: '#F59E0B' },
 } satisfies ChartConfig
 
-// ✅ Stacked chart config — one key per branch
-const timelineChartConfig = {
-  tNagar: { label: 'T.Nagar', color: '#1677FF' },
-  kkNagar: { label: 'KK Nagar', color: '#10B981' },
+const donutChartConfig = {
+  value: { label: 'Filled Seats' },
+  slot10to12: { label: '10:00 AM – 12:00 PM', color: '#1677FF' },
+  slot1to3: { label: '1:00 PM – 3:00 PM', color: '#10B981' },
+  slot3to6: { label: '3:00 PM – 6:00 PM', color: '#F59E0B' },
 } satisfies ChartConfig
 
-const interactiveChartConfig = {
-  applications: {
-    label: 'Applications',
-    color: '#8B5CF6',
-  },
-} satisfies ChartConfig
+const SLOT_COLORS = ['#1677FF', '#10B981', '#F59E0B']
 
 // ---------- Metric Card ----------
 type MetricCardProps = {
@@ -146,132 +134,161 @@ const MetricCard: React.FC<MetricCardProps> = ({ label, value, icon, valueClass,
   </div>
 )
 
-// ---------- Interactive Area Chart Component ----------
-type TimeRange = '90d' | '30d' | '7d'
-
-const InteractiveAreaChart: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<TimeRange>('90d')
-
-  const filteredData = useMemo(() => {
-    const days = timeRange === '90d' ? 90 : timeRange === '30d' ? 30 : 7
-    return dailyData.slice(-days)
-  }, [timeRange])
-
-  const total = useMemo(
-    () => filteredData.reduce((sum, d) => sum + d.applications, 0),
-    [filteredData],
-  )
-
-  return (
-    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3">
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-purple-600" /> Application Submission Trend
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1">
-            Daily applications over the selected period
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="hidden sm:inline text-xs text-slate-500">
-            Total:{' '}
-            <span className="font-bold text-slate-900 dark:text-white">{total}</span>
-          </span>
-          <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
-            <SelectTrigger
-              className="w-[140px] rounded-lg text-xs h-8"
-              aria-label="Select a time range"
-            >
-              <SelectValue placeholder="Last 3 months" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="90d" className="rounded-lg text-xs">
-                Last 3 months
-              </SelectItem>
-              <SelectItem value="30d" className="rounded-lg text-xs">
-                Last 30 days
-              </SelectItem>
-              <SelectItem value="7d" className="rounded-lg text-xs">
-                Last 7 days
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Chart */}
-      <ChartContainer config={interactiveChartConfig} className="h-64 w-full">
-        <AreaChart accessibilityLayer data={filteredData}>
-          <defs>
-            <linearGradient id="fillApplicationsInteractive" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--color-applications)" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="var(--color-applications)" stopOpacity={0.1} />
-            </linearGradient>
-          </defs>
-
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="date"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            minTickGap={32}
-            tick={{ fontSize: 11 }}
-            tickFormatter={(value) => {
-              const date = new Date(value)
-              return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-              })
-            }}
-          />
-          <ChartTooltip
-            cursor={false}
-            content={
-              <ChartTooltipContent
-                indicator="line"
-                labelFormatter={(value) =>
-                  new Date(value).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })
-                }
-              />
-            }
-          />
-          <Area
-            dataKey="applications"
-            type="natural"
-            fill="url(#fillApplicationsInteractive)"
-            stroke="var(--color-applications)"
-            strokeWidth={2}
-            stackId="a"
-          />
-        </AreaChart>
-      </ChartContainer>
-    </div>
-  )
-}
-
-// ---------- Main ----------
+// ---------- Main Component ----------
 export const AdminCharts: React.FC = () => {
-  const [academicYear, setAcademicYear] = useState('2025-26')
-  const [branch, setBranch] = useState('T.Nagar-PSBB')
-  const [applicationStatus, setApplicationStatus] = useState('Declared')
+  // Controlled dropdown states
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState('2025-26')
+  const [selectedBranch, setSelectedBranch] = useState('ALL')
+  const [selectedStatus, setSelectedStatus] = useState('ALL')
+
+  // Applied filter state (updated ONLY when SUBMIT is clicked)
+  const [appliedFilters, setAppliedFilters] = useState({
+    academicYear: '2025-26',
+    branch: 'ALL',
+    status: 'ALL',
+  })
 
   const handleSubmit = () => {
-    toast.success(`Filter Applied: Academic Year (${academicYear}) | Branch (${branch || 'All'}) | Status (${applicationStatus || 'All'})`)
+    setAppliedFilters({
+      academicYear: selectedAcademicYear,
+      branch: selectedBranch,
+      status: selectedStatus,
+    })
+    const branchLabel = selectedBranch === 'ALL' ? 'Select All' : selectedBranch
+    const statusLabel = selectedStatus === 'ALL' ? 'Select All' : selectedStatus
+    toast.success(`Filter Applied: Academic Year (${selectedAcademicYear}) | Branch (${branchLabel}) | Status (${statusLabel})`)
   }
 
-  const totalApps = 115
-  const approvedApps = 23
-  const pendingApps = 12
+  // 1. Common Filtered Dataset derived from appliedFilters
+  const filteredData = useMemo(() => {
+    return rawApplicationData.filter((item) => {
+      const matchYear = item.academicYear === appliedFilters.academicYear
+      const matchBranch = appliedFilters.branch === 'ALL' || item.branch === appliedFilters.branch
+      const matchStatus = appliedFilters.status === 'ALL' || item.status === appliedFilters.status
+      return matchYear && matchBranch && matchStatus
+    })
+  }, [appliedFilters])
 
-  const kkNagarColumns = useMemo<ColumnDef<KKNagarSeatRow>[]>(
+  // 2. Summary Cards Derived Data
+  const { totalApps, approvedApps, pendingApps } = useMemo(() => {
+    let approved = 0
+    let pending = 0
+
+    filteredData.forEach((item) => {
+      if (item.status === 'Approved') {
+        approved += item.seats
+      } else if (item.status === 'Pending') {
+        pending += item.seats
+      }
+    })
+
+    return {
+      totalApps: approved + pending,
+      approvedApps: approved,
+      pendingApps: pending,
+    }
+  }, [filteredData])
+
+  // 3. Combined Time Slot Data for Grouped Bar & Line Charts
+  const combinedSlotData = useMemo(() => {
+    const dateMap = new Map<string, { date: string; slot10to12: number; slot1to3: number; slot3to6: number }>()
+
+    filteredData.forEach((item) => {
+      if (!dateMap.has(item.date)) {
+        dateMap.set(item.date, {
+          date: item.date,
+          slot10to12: 0,
+          slot1to3: 0,
+          slot3to6: 0,
+        })
+      }
+      const entry = dateMap.get(item.date)!
+      if (item.timeSlot === '10:00 AM - 12:00 PM') {
+        entry.slot10to12 += item.seats
+      } else if (item.timeSlot === '1:00 PM - 3:00 PM') {
+        entry.slot1to3 += item.seats
+      } else if (item.timeSlot === '3:00 PM - 6:00 PM') {
+        entry.slot3to6 += item.seats
+      }
+    })
+
+    return Array.from(dateMap.values()).sort((a, b) => Number(a.date) - Number(b.date))
+  }, [filteredData])
+
+  // 4. Donut Chart Data
+  const donutData = useMemo(() => {
+    let total10to12 = 0
+    let total1to3 = 0
+    let total3to6 = 0
+
+    filteredData.forEach((item) => {
+      if (item.timeSlot === '10:00 AM - 12:00 PM') {
+        total10to12 += item.seats
+      } else if (item.timeSlot === '1:00 PM - 3:00 PM') {
+        total1to3 += item.seats
+      } else if (item.timeSlot === '3:00 PM - 6:00 PM') {
+        total3to6 += item.seats
+      }
+    })
+
+    return [
+      { slot: 'slot10to12', label: '10:00 AM – 12:00 PM', value: total10to12, fill: '#1677FF' },
+      { slot: 'slot1to3', label: '1:00 PM – 3:00 PM', value: total1to3, fill: '#10B981' },
+      { slot: 'slot3to6', label: '3:00 PM – 6:00 PM', value: total3to6, fill: '#F59E0B' },
+    ]
+  }, [filteredData])
+
+  const totalFilledSeats = useMemo(
+    () => donutData.reduce((sum, d) => sum + d.value, 0),
+    [donutData]
+  )
+
+  // 5. KK Nagar Branch Table Data
+  const kkNagarSeatData = useMemo<BranchSeatRow[]>(() => {
+    if (appliedFilters.branch !== 'ALL' && appliedFilters.branch !== 'KK Nagar-PSBB') {
+      return []
+    }
+    const items = filteredData.filter((item) => item.branch === 'KK Nagar-PSBB')
+    const map = new Map<number, BranchSeatRow>()
+
+    items.forEach((item) => {
+      const dNum = Number(item.date)
+      if (!map.has(dNum)) {
+        map.set(dNum, { date: dNum, slot10to12: 0, slot1to3: 0, slot3to6: 0 })
+      }
+      const row = map.get(dNum)!
+      if (item.timeSlot === '10:00 AM - 12:00 PM') row.slot10to12 += item.seats
+      if (item.timeSlot === '1:00 PM - 3:00 PM') row.slot1to3 += item.seats
+      if (item.timeSlot === '3:00 PM - 6:00 PM') row.slot3to6 += item.seats
+    })
+
+    return Array.from(map.values()).sort((a, b) => a.date - b.date)
+  }, [filteredData, appliedFilters.branch])
+
+  // 6. T-Nagar Branch Table Data
+  const tNagarSeatData = useMemo<BranchSeatRow[]>(() => {
+    if (appliedFilters.branch !== 'ALL' && appliedFilters.branch !== 'T.Nagar-PSBB') {
+      return []
+    }
+    const items = filteredData.filter((item) => item.branch === 'T.Nagar-PSBB')
+    const map = new Map<number, BranchSeatRow>()
+
+    items.forEach((item) => {
+      const dNum = Number(item.date)
+      if (!map.has(dNum)) {
+        map.set(dNum, { date: dNum, slot10to12: 0, slot1to3: 0, slot3to6: 0 })
+      }
+      const row = map.get(dNum)!
+      if (item.timeSlot === '10:00 AM - 12:00 PM') row.slot10to12 += item.seats
+      if (item.timeSlot === '1:00 PM - 3:00 PM') row.slot1to3 += item.seats
+      if (item.timeSlot === '3:00 PM - 6:00 PM') row.slot3to6 += item.seats
+    })
+
+    return Array.from(map.values()).sort((a, b) => a.date - b.date)
+  }, [filteredData, appliedFilters.branch])
+
+  // 7. Table Columns Definition
+  const branchColumns = useMemo<ColumnDef<BranchSeatRow>[]>(
     () => [
       {
         accessorKey: 'date',
@@ -349,66 +366,6 @@ export const AdminCharts: React.FC = () => {
     []
   )
 
-  const tNagarColumns = useMemo<ColumnDef<TNagarSeatRow>[]>(
-    () => [
-      {
-        accessorKey: 'date',
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
-          >
-            <span>Date</span>
-            <ArrowUpDown className="h-3 w-3 opacity-70" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="font-bold text-slate-900 dark:text-white">
-            {row.original.date}
-          </span>
-        ),
-      },
-      {
-        accessorKey: 'slot10to12',
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
-          >
-            <span>10:00 AM - 12:00 PM</span>
-            <ArrowUpDown className="h-3 w-3 opacity-70" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="font-semibold text-slate-800 dark:text-slate-200">
-            {row.original.slot10to12}
-          </span>
-        ),
-      },
-      {
-        accessorKey: 'slot1to3',
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
-          >
-            <span>1:00 PM - 3:00 PM</span>
-            <ArrowUpDown className="h-3 w-3 opacity-70" />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <span className="font-semibold text-slate-800 dark:text-slate-200">
-            {row.original.slot1to3}
-          </span>
-        ),
-      },
-    ],
-    []
-  )
-
   return (
     <div className="space-y-6">
       {/* Page Title */}
@@ -418,7 +375,7 @@ export const AdminCharts: React.FC = () => {
         </div>
         <div>
           <h1 className="text-lg font-bold text-slate-900 dark:text-white">
-            Registration Analytics & Charts
+            Registration Analytics &amp; Charts
           </h1>
           <p className="text-xs text-slate-500 font-medium">
             Visual statistics for Pre-KG 2025-26 applications
@@ -426,18 +383,17 @@ export const AdminCharts: React.FC = () => {
         </div>
       </div>
 
-      {/* ================= TOP FILTER BAR (MATCHING USER REFERENCE) ================= */}
+      {/* ================= TOP FILTER BAR ================= */}
       <div className="bg-[#f0f4f8] dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-xl shadow-2xs flex flex-wrap items-center gap-x-6 gap-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
         <div className="flex items-center gap-2">
           <label htmlFor="academicYear">Academic Year</label>
           <select
             id="academicYear"
-            value={academicYear}
-            onChange={(e) => setAcademicYear(e.target.value)}
+            value={selectedAcademicYear}
+            onChange={(e) => setSelectedAcademicYear(e.target.value)}
             className="h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
           >
             <option value="2025-26">2025-26</option>
-            <option value="2024-25">2024-25</option>
           </select>
         </div>
 
@@ -445,11 +401,11 @@ export const AdminCharts: React.FC = () => {
           <label htmlFor="branch">Branch</label>
           <select
             id="branch"
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
+            value={selectedBranch}
+            onChange={(e) => setSelectedBranch(e.target.value)}
             className="h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
           >
-            <option value="">-- Select All --</option>
+            <option value="ALL">-- Select All --</option>
             <option value="T.Nagar-PSBB">T.Nagar-PSBB</option>
             <option value="KK Nagar-PSBB">KK Nagar-PSBB</option>
           </select>
@@ -459,15 +415,13 @@ export const AdminCharts: React.FC = () => {
           <label htmlFor="appStatus">Application Status</label>
           <select
             id="appStatus"
-            value={applicationStatus}
-            onChange={(e) => setApplicationStatus(e.target.value)}
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
             className="h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
           >
-            <option value="">-- Select All --</option>
-            <option value="Declared">Declared</option>
+            <option value="ALL">-- Select All --</option>
             <option value="Approved">Approved</option>
             <option value="Pending">Pending</option>
-            <option value="Draft">Draft</option>
           </select>
         </div>
 
@@ -475,13 +429,13 @@ export const AdminCharts: React.FC = () => {
           type="button"
           onClick={handleSubmit}
           className="h-8 px-6 text-white font-extrabold rounded-xl shadow-md border border-sky-400/50 transition-all cursor-pointer tracking-wider text-xs flex items-center justify-center active:scale-95 btn-app-gradient"
-          style={{ background: "var(--app-gradient)" }}
+          style={{ background: 'var(--app-gradient)' }}
         >
           SUBMIT
         </button>
       </div>
 
-      {/* Metric Cards (Declared Applications section removed) */}
+      {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <MetricCard
           label="Total Applications"
@@ -506,142 +460,162 @@ export const AdminCharts: React.FC = () => {
         />
       </div>
 
-      {/* ================= SEAT AVAILABILITY TABLES ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* KK Nagar Table (Left) */}
-        <SeatAvailabilityTable
-          title="KK Nagar"
-          subtitle="Seat availability across interview slots"
-          data={kkNagarSeatData}
-          columns={kkNagarColumns}
-          iconColorClass="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-        />
-
-        {/* T-Nagar Table (Right) */}
-        <SeatAvailabilityTable
-          title="T-Nagar"
-          subtitle="Seat availability across interview slots"
-          data={tNagarSeatData}
-          columns={tNagarColumns}
-          iconColorClass="bg-blue-50 dark:bg-blue-950/60 text-[#1677FF] dark:text-blue-400"
-        />
-      </div>
-
-      {/* Charts Grid */}
+      {/* ================= 3 CHARTS (TOP) ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Chart 1: Applications by Branch */}
+        {/* Chart 1: Grouped Bar Chart — Daily Slot Comparison */}
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
           <div className="border-b pb-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              <School className="h-4 w-4 text-blue-600" /> Applications by Branch
+              <BarChart3 className="h-4 w-4 text-blue-600" /> Daily Slot Comparison
             </h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Combined filled seats per time slot by date
+            </p>
           </div>
-          <ChartContainer config={branchChartConfig} className="h-64 w-full">
-            <BarChart accessibilityLayer data={branchData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="name"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tick={{ fontSize: 11 }}
-              />
-              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent />} />
-              <Bar dataKey="applications" fill="var(--color-applications)" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="declared" fill="var(--color-declared)" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ChartContainer>
-        </div>
-
-        {/* Chart 2: Status Breakdown Pie */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-          <div className="border-b pb-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-emerald-600" /> Application Status Breakdown
-            </h3>
-          </div>
-          <ChartContainer config={statusChartConfig} className="h-64 w-full">
-            <PieChart>
-              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-              <Pie
-                data={statusData}
-                dataKey="value"
-                nameKey="status"
-                innerRadius={50}
-                outerRadius={85}
-                paddingAngle={4}
-                strokeWidth={2}
-              >
-                {statusData.map((entry) => (
-                  <Cell key={entry.status} fill={entry.fill} />
-                ))}
-              </Pie>
-              <ChartLegend content={<ChartLegendContent nameKey="status" />} />
-            </PieChart>
-          </ChartContainer>
-        </div>
-
-        {/* Chart 3: Stacked Area Chart — Branch contribution over time */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-          <div className="border-b pb-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-purple-600" /> Application Submission Trend Over Time
-            </h3>
-          </div>
-          <ChartContainer config={timelineChartConfig} className="h-64 w-full">
-            <AreaChart accessibilityLayer data={timelineData}>
-              <defs>
-                <linearGradient id="fillTNagar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-tNagar)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-tNagar)" stopOpacity={0.1} />
-                </linearGradient>
-                <linearGradient id="fillKKNagar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-kkNagar)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-kkNagar)" stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-
+          <ChartContainer config={groupedBarConfig} className="h-72 w-full">
+            <BarChart accessibilityLayer data={combinedSlotData} barCategoryGap="20%">
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="date"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 12, fontWeight: 600 }}
               />
-              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 11 }}
+                allowDecimals={false}
+              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="slot10to12" fill="var(--color-slot10to12)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="slot1to3" fill="var(--color-slot1to3)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="slot3to6" fill="var(--color-slot3to6)" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
+        </div>
+
+        {/* Chart 2: Line Chart — Slot Occupancy Trend */}
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+          <div className="border-b pb-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-emerald-600" /> Slot Occupancy Trend
+            </h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Occupancy trend for each time slot across dates
+            </p>
+          </div>
+          <ChartContainer config={lineChartConfig} className="h-72 w-full">
+            <LineChart accessibilityLayer data={combinedSlotData}>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tick={{ fontSize: 12, fontWeight: 600 }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 11 }}
+                allowDecimals={false}
+              />
+              <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Line
+                type="monotone"
+                dataKey="slot10to12"
+                stroke="var(--color-slot10to12)"
+                strokeWidth={2.5}
+                dot={{ r: 5, strokeWidth: 2, fill: 'white' }}
+                activeDot={{ r: 7 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="slot1to3"
+                stroke="var(--color-slot1to3)"
+                strokeWidth={2.5}
+                dot={{ r: 5, strokeWidth: 2, fill: 'white' }}
+                activeDot={{ r: 7 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="slot3to6"
+                stroke="var(--color-slot3to6)"
+                strokeWidth={2.5}
+                dot={{ r: 5, strokeWidth: 2, fill: 'white' }}
+                activeDot={{ r: 7 }}
+              />
+            </LineChart>
+          </ChartContainer>
+        </div>
+
+        {/* Chart 3: Donut / Pie Chart — Total Slot Occupancy */}
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+          <div className="border-b pb-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <School className="h-4 w-4 text-amber-600" /> Total Slot Occupancy
+            </h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Aggregated filled seats — {totalFilledSeats} total across all slots
+            </p>
+          </div>
+          <ChartContainer config={donutChartConfig} className="h-72 w-full">
+            <PieChart>
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent indicator="dot" />}
+                content={<ChartTooltipContent hideLabel />}
               />
-              <ChartLegend content={<ChartLegendContent />} />
-
-              <Area
-                dataKey="tNagar"
-                type="natural"
-                fill="url(#fillTNagar)"
-                stroke="var(--color-tNagar)"
+              <Pie
+                data={donutData}
+                dataKey="value"
+                nameKey="label"
+                innerRadius={55}
+                outerRadius={95}
+                paddingAngle={4}
                 strokeWidth={2}
-                stackId="a"
-              />
-              <Area
-                dataKey="kkNagar"
-                type="natural"
-                fill="url(#fillKKNagar)"
-                stroke="var(--color-kkNagar)"
-                strokeWidth={2}
-                stackId="a"
-              />
-            </AreaChart>
+                label={({ value, percent }) =>
+                  totalFilledSeats > 0 ? `${value} (${((percent ?? 0) * 100).toFixed(0)}%)` : '0 (0%)'
+                }
+                labelLine={false}
+              >
+                {donutData.map((entry, index) => (
+                  <Cell key={entry.slot} fill={SLOT_COLORS[index % SLOT_COLORS.length]} />
+                ))}
+              </Pie>
+              <ChartLegend content={<ChartLegendContent nameKey="label" />} />
+            </PieChart>
           </ChartContainer>
         </div>
       </div>
 
-      {/* Interactive Area Chart — Full Width */}
-      <InteractiveAreaChart />
+      {/* ================= DATA TABLES (BOTTOM) ================= */}
+      <div className={`grid grid-cols-1 ${appliedFilters.branch === 'ALL' ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-6`}>
+        {/* KK Nagar Table */}
+        {(appliedFilters.branch === 'ALL' || appliedFilters.branch === 'KK Nagar-PSBB') && (
+          <SeatAvailabilityTable
+            title="KK Nagar"
+            subtitle="Seat Booked across interview slots"
+            data={kkNagarSeatData}
+            columns={branchColumns}
+            iconColorClass="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+          />
+        )}
 
+        {/* T-Nagar Table */}
+        {(appliedFilters.branch === 'ALL' || appliedFilters.branch === 'T.Nagar-PSBB') && (
+          <SeatAvailabilityTable
+            title="T-Nagar"
+            subtitle="Seat Booked across interview slots"
+            data={tNagarSeatData}
+            columns={branchColumns}
+            iconColorClass="bg-blue-50 dark:bg-blue-950/60 text-[#1677FF] dark:text-blue-400"
+          />
+        )}
+      </div>
     </div>
   )
 }
