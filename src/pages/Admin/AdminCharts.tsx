@@ -60,37 +60,37 @@ const rawApplicationData: ApplicationDataItem[] = [
   { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 6 },
   { academicYear: '2025-26', branch: 'KK Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 3 },
 
-  // T.Nagar - Date 14
+  // T.Nagar - Date 14 (ONLY 10:00 AM - 12:00 PM and 1:00 PM - 3:00 PM)
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '10:00 AM - 12:00 PM', seats: 4 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '1:00 PM - 3:00 PM',   seats: 6 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '1:00 PM - 3:00 PM',   seats: 3 },
-  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '14', timeSlot: '3:00 PM - 6:00 PM',   seats: 2 },
-  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '14', timeSlot: '3:00 PM - 6:00 PM',   seats: 1 },
 
-  // T.Nagar - Date 15
+  // T.Nagar - Date 15 (ONLY 10:00 AM - 12:00 PM and 1:00 PM - 3:00 PM)
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '10:00 AM - 12:00 PM', seats: 3 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '1:00 PM - 3:00 PM',   seats: 5 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '1:00 PM - 3:00 PM',   seats: 2 },
-  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '15', timeSlot: '3:00 PM - 6:00 PM',   seats: 3 },
-  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '15', timeSlot: '3:00 PM - 6:00 PM',   seats: 1 },
 
-  // T.Nagar - Date 16
+  // T.Nagar - Date 16 (ONLY 10:00 AM - 12:00 PM and 1:00 PM - 3:00 PM)
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '10:00 AM - 12:00 PM', seats: 2 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '10:00 AM - 12:00 PM', seats: 1 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '1:00 PM - 3:00 PM',   seats: 4 },
   { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '1:00 PM - 3:00 PM',   seats: 2 },
-  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Approved', date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 2 },
-  { academicYear: '2025-26', branch: 'T.Nagar-PSBB', status: 'Pending',  date: '16', timeSlot: '3:00 PM - 6:00 PM',   seats: 1 },
 ]
 
-// ---------- Table Row Interface ----------
-interface BranchSeatRow {
+// ---------- Table Row Interfaces ----------
+interface KKNagarSeatRow {
   date: number
   slot10to12: number
   slot1to3: number
   slot3to6: number
+}
+
+interface TNagarSeatRow {
+  date: number
+  slot10to12: number
+  slot1to3: number
 }
 
 // ---------- Chart Configs ----------
@@ -244,12 +244,12 @@ export const AdminCharts: React.FC = () => {
   )
 
   // 5. KK Nagar Branch Table Data
-  const kkNagarSeatData = useMemo<BranchSeatRow[]>(() => {
+  const kkNagarSeatData = useMemo<KKNagarSeatRow[]>(() => {
     if (appliedFilters.branch !== 'ALL' && appliedFilters.branch !== 'KK Nagar-PSBB') {
       return []
     }
     const items = filteredData.filter((item) => item.branch === 'KK Nagar-PSBB')
-    const map = new Map<number, BranchSeatRow>()
+    const map = new Map<number, KKNagarSeatRow>()
 
     items.forEach((item) => {
       const dNum = Number(item.date)
@@ -265,30 +265,29 @@ export const AdminCharts: React.FC = () => {
     return Array.from(map.values()).sort((a, b) => a.date - b.date)
   }, [filteredData, appliedFilters.branch])
 
-  // 6. T-Nagar Branch Table Data
-  const tNagarSeatData = useMemo<BranchSeatRow[]>(() => {
+  // 6. T-Nagar Branch Table Data (ONLY 10:00 AM - 12:00 PM and 1:00 PM - 3:00 PM)
+  const tNagarSeatData = useMemo<TNagarSeatRow[]>(() => {
     if (appliedFilters.branch !== 'ALL' && appliedFilters.branch !== 'T.Nagar-PSBB') {
       return []
     }
     const items = filteredData.filter((item) => item.branch === 'T.Nagar-PSBB')
-    const map = new Map<number, BranchSeatRow>()
+    const map = new Map<number, TNagarSeatRow>()
 
     items.forEach((item) => {
       const dNum = Number(item.date)
       if (!map.has(dNum)) {
-        map.set(dNum, { date: dNum, slot10to12: 0, slot1to3: 0, slot3to6: 0 })
+        map.set(dNum, { date: dNum, slot10to12: 0, slot1to3: 0 })
       }
       const row = map.get(dNum)!
       if (item.timeSlot === '10:00 AM - 12:00 PM') row.slot10to12 += item.seats
       if (item.timeSlot === '1:00 PM - 3:00 PM') row.slot1to3 += item.seats
-      if (item.timeSlot === '3:00 PM - 6:00 PM') row.slot3to6 += item.seats
     })
 
     return Array.from(map.values()).sort((a, b) => a.date - b.date)
   }, [filteredData, appliedFilters.branch])
 
-  // 7. Table Columns Definition
-  const branchColumns = useMemo<ColumnDef<BranchSeatRow>[]>(
+  // 7. KK Nagar Table Columns Definition (All 3 time slots)
+  const kkNagarColumns = useMemo<ColumnDef<KKNagarSeatRow>[]>(
     () => [
       {
         accessorKey: 'date',
@@ -359,6 +358,67 @@ export const AdminCharts: React.FC = () => {
         cell: ({ row }) => (
           <span className="font-semibold text-slate-800 dark:text-slate-200">
             {row.original.slot3to6}
+          </span>
+        ),
+      },
+    ],
+    []
+  )
+
+  // 8. T-Nagar Table Columns Definition (ONLY 10:00 AM - 12:00 PM and 1:00 PM - 3:00 PM)
+  const tNagarColumns = useMemo<ColumnDef<TNagarSeatRow>[]>(
+    () => [
+      {
+        accessorKey: 'date',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>Date</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-bold text-slate-900 dark:text-white">
+            {row.original.date}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot10to12',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>10:00 AM - 12:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot10to12}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'slot1to3',
+        header: ({ column }) => (
+          <button
+            type="button"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-white/10 p-1 rounded transition-colors select-none font-semibold text-white"
+          >
+            <span>1:00 PM - 3:00 PM</span>
+            <ArrowUpDown className="h-3 w-3 opacity-70" />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {row.original.slot1to3}
           </span>
         ),
       },
@@ -600,7 +660,7 @@ export const AdminCharts: React.FC = () => {
             title="KK Nagar"
             subtitle="Seat Booked across interview slots"
             data={kkNagarSeatData}
-            columns={branchColumns}
+            columns={kkNagarColumns}
             iconColorClass="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
           />
         )}
@@ -611,7 +671,7 @@ export const AdminCharts: React.FC = () => {
             title="T-Nagar"
             subtitle="Seat Booked across interview slots"
             data={tNagarSeatData}
-            columns={branchColumns}
+            columns={tNagarColumns}
             iconColorClass="bg-blue-50 dark:bg-blue-950/60 text-[#1677FF] dark:text-blue-400"
           />
         )}
