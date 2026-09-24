@@ -30,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
 import { toast } from '@/components/ui/toast'
+import { isDateField, formatDateToDDMMYYYY } from '@/utils/exportToExcel'
 
 export interface TableColumn<T = any> {
   key: string
@@ -330,6 +331,11 @@ export function AdminDataTable<T extends Record<string, any>>({
           {String(val)}
         </span>
       )
+    }
+
+    // Date formatting: Display all date values in DD-MM-YYYY format
+    if (isDateField(key) && typeof val === 'string') {
+      return formatDateToDDMMYYYY(val)
     }
 
     return String(val)

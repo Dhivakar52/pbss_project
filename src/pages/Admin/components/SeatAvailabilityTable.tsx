@@ -158,7 +158,7 @@ export function SeatAvailabilityTable<T extends Record<string, any>>({
                     <div className="flex flex-col items-center justify-center gap-2">
                       <School className="h-8 w-8 text-slate-300 dark:text-slate-600" />
                       <span className="font-semibold text-sm">
-                        No records matching search criteria.
+                        No records found.
                       </span>
                       <span className="text-xs text-slate-400">
                         Try adjusting your search keyword.
