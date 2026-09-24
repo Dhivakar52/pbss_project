@@ -35,93 +35,86 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
           {/* Header */}
           <PrintDocumentHeader documentType="track-sheet" student={data} />
 
-          {/* Top Section with Registration & Photo Box */}
-          <div className="flex justify-between items-start gap-4 mt-1">
-            <div className="space-y-2 flex-1">
+          {/* Top Section with Student Details (Full Width) */}
+          <div className="space-y-2 mt-1 w-full">
+            <div className="flex items-center">
+              <span className="w-44 font-bold shrink-0">Registration No.</span>
+              <span className="w-4 font-bold text-center shrink-0">:</span>
+              <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
+                {data.registrationNo}
+              </span>
+            </div>
+
+            <div className="flex items-start">
+              <span className="w-44 font-bold shrink-0">Name of the Child</span>
+              <span className="w-4 font-bold text-center shrink-0">:</span>
+              <span className="font-normal uppercase break-words">{data.childName}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
               <div className="flex items-center">
-                <span className="w-44 font-bold">Registration No.</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
-                  {data.registrationNo}
-                </span>
+                <span className="w-44 font-bold shrink-0">Date of Birth</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.dob}</span>
               </div>
-
-              <div className="flex items-start">
-                <span className="w-44 font-bold">Name of the Child</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal uppercase">{data.childName}</span>
-              </div>
-
               <div className="flex items-center">
-                <div className="flex items-center w-[320px]">
-                  <span className="w-44 font-bold">Date of Birth</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.dob}</span>
-                </div>
-                <div className="flex items-center pl-8">
-                  <span className="w-20 font-bold">Gender</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.gender}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-44 font-bold">Mother Tongue</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherTongue}</span>
-              </div>
-
-              <div className="flex items-center">
-                <div className="flex items-center w-[320px]">
-                  <span className="w-44 font-bold">Religion</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.religion}</span>
-                </div>
-                <div className="flex items-center pl-8">
-                  <span className="w-20 font-bold">Caste</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.caste}</span>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0">Residential Address</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal leading-snug">{data.residentialAddress}</span>
+                <span className="w-44 font-bold shrink-0">Gender</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.gender}</span>
               </div>
             </div>
 
-            {/* Applicant Photo Box */}
-            <div className="w-[130px] h-[155px] border border-black flex flex-col items-center justify-center p-2 text-center shrink-0">
-              <span className="text-[10.5px] text-black font-bold leading-tight">
-                Affix latest Passport size photo of the applicant with Reg No. at the back.
-              </span>
+            <div className="flex items-center">
+              <span className="w-44 font-bold shrink-0">Mother Tongue</span>
+              <span className="w-4 font-bold text-center shrink-0">:</span>
+              <span className="font-normal">{data.motherTongue}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex items-center">
+                <span className="w-44 font-bold shrink-0">Religion</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.religion}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-44 font-bold shrink-0">Caste</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.caste}</span>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <span className="w-44 font-bold shrink-0">Residential Address</span>
+              <span className="w-4 font-bold text-center shrink-0">:</span>
+              <span className="font-normal leading-snug break-words flex-1">{data.residentialAddress}</span>
             </div>
           </div>
 
           {/* Contact & Transport Details */}
-          <div className="space-y-1.5 mt-2.5">
+          <div className="space-y-2 mt-2 w-full">
             <div className="grid grid-cols-2 gap-6">
               <div className="flex items-center">
-                <span className="w-44 font-bold">Father's Mobile No</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-44 font-bold shrink-0">Father's Mobile No</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{fatherMobile}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-44 font-bold">Mother's Mobile No :</span>
-                <span className="font-normal ml-2">{motherMobile}</span>
+                <span className="w-44 font-bold shrink-0">Mother's Mobile No</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{motherMobile}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
               <div className="flex items-center">
-                <span className="w-44 font-bold">Distance from Residence</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-44 font-bold shrink-0">Distance from Residence</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{data.distanceFromResidence}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-44 font-bold">Mode of Transport:</span>
-                <span className="font-normal ml-2">{data.modeOfTransport}</span>
+                <span className="w-44 font-bold shrink-0">Mode of Transport</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.modeOfTransport}</span>
               </div>
             </div>
           </div>
@@ -344,7 +337,7 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
                   </tr>
 
                   {/* Row 11: Reason for Leaving */}
-                  <tr className="border-b border-black">
+                  <tr>
                     <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
                       Reason for Leaving
                     </td>
@@ -356,22 +349,6 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
                     </td>
                     <td className="px-2 py-1 font-normal text-black break-words">
                       -
-                    </td>
-                  </tr>
-
-                  {/* Row 12: Photo Instructions Aligned Inside Continuous Table */}
-                  <tr>
-                    <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60 align-middle">
-                      Photo Instructions
-                    </td>
-                    <td className="px-2 py-1 font-normal text-[9.5px] leading-tight text-black border-r border-black align-middle">
-                      Affix latest Passport size photo of Father with Reg No. at back.
-                    </td>
-                    <td className="px-2 py-1 font-normal text-[9.5px] leading-tight text-black border-r border-black align-middle">
-                      Affix latest Passport size photo of Mother with Reg No. at back.
-                    </td>
-                    <td className="px-2 py-1 font-normal text-[9.5px] leading-tight text-black align-middle">
-                      Affix latest Passport size photo of Guardian (if applicable) with Reg No. at back.
                     </td>
                   </tr>
                 </tbody>
@@ -409,21 +386,21 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
             </div>
           </div>
 
-          {/* Three Photo Boxes */}
-          <div className="mt-5 flex justify-center items-center gap-5">
-            <div className="w-[130px] h-[150px] border border-black flex flex-col items-center justify-center p-2 text-center">
+          {/* Three Photo Boxes - Increased width for attached photos */}
+          <div className="mt-5 flex justify-center items-center gap-6">
+            <div className="w-[165px] h-[170px] border border-black flex flex-col items-center justify-center p-2 text-center">
               <span className="text-[10px] font-bold leading-tight">
                 Affix latest Passport size photo of the Guardian<br />(if applicable)<br />with Reg No. at the back.
               </span>
             </div>
 
-            <div className="w-[130px] h-[150px] border border-black flex flex-col items-center justify-center p-2 text-center">
+            <div className="w-[165px] h-[170px] border border-black flex flex-col items-center justify-center p-2 text-center">
               <span className="text-[10px] font-bold leading-tight">
                 Affix latest Passport size photo of the Father<br />with Reg No. at the back.
               </span>
             </div>
 
-            <div className="w-[130px] h-[150px] border border-black flex flex-col items-center justify-center p-2 text-center">
+            <div className="w-[165px] h-[170px] border border-black flex flex-col items-center justify-center p-2 text-center">
               <span className="text-[10px] font-bold leading-tight">
                 Affix latest Passport size photo of the Mother<br />with Reg No. at the back.
               </span>
@@ -446,15 +423,21 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
             </p>
           </div>
 
-          {/* Signatures Row */}
-          <div className="mt-5">
-            <div className="flex justify-between items-center text-[12px] font-bold">
-              <div>Date :</div>
-              <div>Signature of Father</div>
-              <div>Signature of Mother</div>
-              <div className="text-center">
-                Signature of Guardian<br />
-                <span className="text-[10px] font-normal">(If Applicable)</span>
+          {/* Signatures Row - Dedicated Signing Height */}
+          <div className="mt-6 pt-2">
+            <div className="flex justify-between items-start text-[12px] font-bold min-h-[85px] pt-14">
+              <div className="pt-1.5 font-bold shrink-0">Date :</div>
+              <div className="flex justify-end gap-6 flex-1">
+                <div className="text-center border-t border-black pt-1.5 px-2 w-[150px]">
+                  Signature of Father
+                </div>
+                <div className="text-center border-t border-black pt-1.5 px-2 w-[150px]">
+                  Signature of Mother
+                </div>
+                <div className="text-center border-t border-black pt-1.5 px-2 w-[165px]">
+                  <div>Signature of Guardian</div>
+                  <div className="text-[10px] font-normal leading-tight">(If Applicable)</div>
+                </div>
               </div>
             </div>
 
@@ -509,7 +492,7 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
           <PrintDocumentHeader documentType="track-sheet" student={data} />
 
           <div className="space-y-4 pt-4 px-2">
-            <h3 className="font-bold text-[14px]">Note:</h3>
+            <h3 className="font-bold text-[14px]">Instruction:</h3>
 
             <ul className="space-y-3 list-disc pl-5">
               <li>

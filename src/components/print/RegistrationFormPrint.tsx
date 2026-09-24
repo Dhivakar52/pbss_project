@@ -86,96 +86,100 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
             {/* Top Registration No & School Applied For */}
             <div className="flex justify-between items-center mt-1 mb-2">
               <div className="flex items-center">
-                <span className="w-36 font-bold">Registration No.</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-36 font-bold shrink-0">Registration No.</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
                   {data.registrationNo}
                 </span>
               </div>
               <div className="flex items-center">
-                <span className="font-bold">School Applied For :</span>
-                <span className="font-bold ml-2 uppercase">{data.schoolAppliedFor}</span>
+                <span className="font-bold shrink-0">School Applied For</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-bold ml-1 uppercase">{data.schoolAppliedFor}</span>
               </div>
             </div>
 
             {/* Child Details */}
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               <div className="flex items-start">
-                <span className="w-48 font-bold">Name of the Child</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal uppercase">{data.childName}</span>
+                <span className="w-48 font-bold shrink-0">Name of the Child</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal uppercase break-words">{data.childName}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-48 font-bold">Date of Birth</span>
-                  <span className="w-6 font-bold">:</span>
+                  <span className="w-48 font-bold shrink-0">Date of Birth</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.dob}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-28 font-bold">Passport No :</span>
-                  <span className="font-normal ml-2">{data.passportNo || ''}</span>
+                  <span className="w-40 font-bold shrink-0">Passport No.</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.passportNo || '-'}</span>
                 </div>
               </div>
 
               <div className="flex items-center">
-                <span className="w-48 font-bold">Mother Tongue</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-48 font-bold shrink-0">Mother Tongue</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{data.motherTongue}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-48 font-bold">Religion</span>
-                  <span className="w-6 font-bold">:</span>
+                  <span className="w-48 font-bold shrink-0">Religion</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.religion}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-28 font-bold">Caste :</span>
-                  <span className="font-normal ml-2">{data.caste}</span>
+                  <span className="w-40 font-bold shrink-0">Caste</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.caste}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-48 font-bold">Nationality</span>
-                  <span className="w-6 font-bold">:</span>
+                  <span className="w-48 font-bold shrink-0">Nationality</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.nationality}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-28 font-bold">Gender :</span>
-                  <span className="font-normal ml-2">{data.gender}</span>
+                  <span className="w-40 font-bold shrink-0">Gender</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.gender}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-48 font-bold">Community</span>
-                  <span className="w-6 font-bold">:</span>
+                  <span className="w-48 font-bold shrink-0">Community</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.community}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-48 font-bold leading-tight">Does the Child go<br />to any play school?</span>
-                  <span className="w-6 font-bold">:</span>
+                  <span className="w-64 font-bold shrink-0 leading-tight">Does the Child go to play school?</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.goesToPlaySchool ? 'Yes' : 'No'}</span>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <span className="w-48 font-bold leading-tight">If yes, Play<br />School Name</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.playSchoolName || ''}</span>
+                <span className="w-48 font-bold shrink-0 leading-tight">If yes, Play School Name</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.playSchoolName || '-'}</span>
               </div>
 
               <div className="flex items-center">
-                <span className="w-80 font-bold">Is the child One of Twins/Triplets/Quadruplets</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-80 font-bold shrink-0">Is the child One of Twins/Triplets/Quadruplets</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{data.isMultipleBirth ? 'Yes' : 'No'}</span>
               </div>
 
               <div className="flex items-center">
-                <span className="w-80 font-bold">Does the child have any school going Siblings?</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-80 font-bold shrink-0">Does the child have any school going Siblings?</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{data.hasSchoolGoingSiblings ? 'Yes' : 'No'}</span>
               </div>
             </div>
@@ -213,28 +217,33 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
               </div>
 
               <div className="flex items-start">
-                <span className="w-64 font-bold leading-tight">Specify Major<br />ailment, If any :<br />(Past/Present)</span>
-                <span className="font-normal ml-2">{data.majorAilment || 'Nil'}</span>
+                <span className="w-64 font-bold shrink-0 leading-tight">Specify Major ailment, If any (Past/Present)</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.majorAilment || 'Nil'}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-1">
                 <div className="flex items-center">
-                  <span className="w-36 font-bold">Father's Name :</span>
+                  <span className="w-36 font-bold shrink-0">Father's Name</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal uppercase">{data.fatherName}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-36 font-bold">Mother's Name :</span>
+                  <span className="w-36 font-bold shrink-0">Mother's Name</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal uppercase">{data.motherName}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-36 font-bold">Father's DOB :</span>
+                  <span className="w-36 font-bold shrink-0">Father's DOB</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.fatherDob || ''}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-36 font-bold">Mother's DOB :</span>
+                  <span className="w-36 font-bold shrink-0">Mother's DOB</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
                   <span className="font-normal">{data.motherDob || ''}</span>
                 </div>
               </div>
@@ -479,86 +488,99 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
 
             {/* Guardian and Residence Details */}
             <div className="space-y-1.5 pt-1">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-48 font-bold">Guardian's Gender :</span>
-                  <span className="font-normal ml-2">{data.guardianGender || ''}</span>
+                  <span className="w-48 font-bold shrink-0">Guardian's Gender</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianGender || ''}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-36 font-bold">Occupation :</span>
-                  <span className="font-normal ml-2">{data.guardianOccupation || ''}</span>
+                  <span className="w-40 font-bold shrink-0">Occupation</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianOccupation || ''}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-start">
-                  <span className="w-48 font-bold leading-tight">Institution / Company<br />Name :</span>
-                  <span className="font-normal ml-2">{data.guardianCompany || ''}</span>
+                  <span className="w-48 font-bold shrink-0 leading-tight">Institution / Company Name</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianCompany || ''}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-36 font-bold">Monthly Income:</span>
-                  <span className="font-normal ml-2">{data.guardianIncome || ''}</span>
+                  <span className="w-40 font-bold shrink-0">Monthly Income</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianIncome || ''}</span>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <span className="w-48 font-bold">Office Address :</span>
-                <span className="font-normal ml-2">{data.guardianOfficeAddress || ''}</span>
+                <span className="w-48 font-bold shrink-0">Office Address</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal break-words">{data.guardianOfficeAddress || ''}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <span className="w-48 font-bold">Guardian's Ph. No-Off :</span>
-                  <span className="font-normal ml-2">{data.guardianPhoneOffice || ''}</span>
+                  <span className="w-48 font-bold shrink-0">Guardian's Ph. No-Off</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianPhoneOffice || ''}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-44 font-bold">Guardian's Ph. No-Res :</span>
-                  <span className="font-normal ml-2">{data.guardianPhoneRes || ''}</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-48 font-bold leading-tight">Guardian's Mobile<br />Number :</span>
-                  <span className="font-normal ml-2">{data.guardianMobile || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-44 font-bold">Residence Telephone No :</span>
-                  <span className="font-normal ml-2">{data.residenceTelephone || ''}</span>
+                  <span className="w-40 font-bold shrink-0">Guardian's Ph. No-Res</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianPhoneRes || ''}</span>
                 </div>
               </div>
 
-              <div className="flex items-start pt-0.5">
-                <span className="w-48 font-bold leading-tight shrink-0">Residential<br />Address :</span>
-                <span className="font-normal ml-2">{data.residentialAddress || ''}</span>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center">
+                  <span className="w-48 font-bold shrink-0">Guardian's Mobile No</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.guardianMobile || ''}</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="w-40 font-bold shrink-0">Residence Telephone No</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.residenceTelephone || ''}</span>
+                </div>
               </div>
 
               <div className="flex items-start">
-                <span className="w-48 font-bold leading-tight shrink-0">Important<br />land mark :</span>
-                <span className="font-normal ml-2">{data.importantLandmark || ''}</span>
+                <span className="w-48 font-bold shrink-0">Residential Address</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal break-words">{data.residentialAddress || ''}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-48 font-bold leading-tight">Distance from<br />Residence :</span>
-                  <span className="font-normal ml-2">{data.distanceFromResidence || ''}</span>
+              <div className="flex items-start">
+                <span className="w-48 font-bold shrink-0">Important land mark</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal break-words">{data.importantLandmark || ''}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center">
+                  <span className="w-48 font-bold shrink-0">Distance from Residence</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.distanceFromResidence || ''}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="w-44 font-bold">Mode of Transport :</span>
-                  <span className="font-normal ml-2">{data.modeOfTransport || ''}</span>
+                  <span className="w-40 font-bold shrink-0">Mode of Transport</span>
+                  <span className="w-4 font-bold text-center shrink-0">:</span>
+                  <span className="font-normal">{data.modeOfTransport || ''}</span>
                 </div>
               </div>
 
-              <div className="flex items-start pt-0.5">
-                <span className="w-48 font-bold leading-tight shrink-0">Outstanding achievements<br />of parents :</span>
-                <span className="font-normal ml-2">{data.parentAchievements || ''}</span>
+              <div className="flex items-start">
+                <span className="w-48 font-bold shrink-0 leading-tight">Outstanding achievements of parents</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal break-words">{data.parentAchievements || ''}</span>
               </div>
 
-              <div className="flex items-start pt-0.5">
-                <span className="w-56 font-bold leading-tight shrink-0">
-                  Is the Parent coming on<br />transfer<br />from outside Chennai/from<br />outside India :
-                </span>
-                <span className="font-normal ml-2">{data.isTransferParent ? 'Yes' : 'No'}</span>
+              <div className="flex items-start">
+                <span className="w-48 font-bold shrink-0 leading-tight">Is the Parent coming on transfer from outside Chennai / from outside India</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.isTransferParent ? 'Yes' : 'No'}</span>
               </div>
             </div>
 
@@ -578,20 +600,30 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
               </p>
             </div>
 
-            {/* Date and Parent Signature */}
-            <div className="mt-4 flex justify-between items-start text-[11.5px]">
-              <div>
-                <span className="font-bold">Date :</span>
+            {/* Date and Parent Signature - Dedicated Writing Height */}
+            <div className="mt-6 pt-1">
+              <div className="flex justify-between items-start text-[11.5px] min-h-[80px] pt-12">
+                <div className="pt-1.5 font-bold shrink-0">
+                  Date :&nbsp;&nbsp;
+                  <span className="inline-block border-b border-black w-32">&nbsp;</span>
+                </div>
+                <div className="text-center font-bold">
+                  <div className="border-t border-black pt-1.5 px-4 min-w-[230px]">
+                    Signature of the Parent / Guardian
+                  </div>
+                </div>
               </div>
-              <div className="text-right space-y-2">
-                <div className="font-bold">Signature of the Parent / Guardian</div>
-                <div className="pt-1 font-bold">Name in BLOCK LETTER :</div>
+
+              {/* Name in BLOCK LETTER */}
+              <div className="mt-3.5 text-[11.5px] font-bold flex items-center">
+                <span className="shrink-0">Name in BLOCK LETTER :&nbsp;&nbsp;</span>
+                <span className="flex-1 border-b border-black max-w-[280px]">&nbsp;</span>
               </div>
             </div>
 
             {/* Note & Document Checklist */}
             <div className="mt-4 text-[10.5px] leading-tight space-y-1">
-              <p className="font-bold">Note :</p>
+              <p className="font-bold">Instruction :</p>
               <ul className="space-y-0.5 list-disc pl-4">
                 <li>Forms with False/ Incomplete/Vague information will not be considered.</li>
                 <li>Submit the Track Sheet signed by both parents (to the school office of the branch applied for)</li>

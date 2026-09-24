@@ -18,4 +18,7 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['xlsx', 'file-saver'],
+  },
 })

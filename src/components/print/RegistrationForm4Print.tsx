@@ -500,20 +500,30 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
               </p>
             </div>
 
-            {/* Date and Parent Signature */}
-            <div className="mt-3 flex justify-between items-start text-[11px]">
-              <div>
-                <span className="font-bold">Date :</span>
+            {/* Date and Parent Signature - Dedicated Writing Height */}
+            <div className="mt-5 pt-1">
+              <div className="flex justify-between items-start text-[11px] min-h-[75px] pt-11">
+                <div className="pt-1.5 font-bold shrink-0">
+                  Date :&nbsp;&nbsp;
+                  <span className="inline-block border-b border-black w-32">&nbsp;</span>
+                </div>
+                <div className="text-center font-bold">
+                  <div className="border-t border-black pt-1.5 px-4 min-w-[230px]">
+                    Signature of the Parent / Guardian
+                  </div>
+                </div>
               </div>
-              <div className="text-right space-y-1">
-                <div className="font-bold">Signature of the Parent / Guardian</div>
-                <div className="pt-0.5 font-bold">Name in BLOCK LETTER :</div>
+
+              {/* Name in BLOCK LETTER */}
+              <div className="mt-3 text-[11px] font-bold flex items-center">
+                <span className="shrink-0">Name in BLOCK LETTER :&nbsp;&nbsp;</span>
+                <span className="flex-1 border-b border-black max-w-[260px]">&nbsp;</span>
               </div>
             </div>
 
             {/* Note & Document Checklist */}
             <div className="mt-3 text-[10px] leading-tight space-y-1 border-t border-slate-200 pt-2">
-              <p className="font-bold text-[10.5px]">Note :</p>
+              <p className="font-bold text-[10.5px]">Instruction :</p>
               <ul className="space-y-0.5 list-disc pl-4">
                 <li>Forms with False/ Incomplete/Vague information will not be considered.</li>
                 <li>Submit the Track Sheet signed by both parents (to the school office of the branch applied for)</li>

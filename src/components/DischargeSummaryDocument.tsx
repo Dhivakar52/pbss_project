@@ -478,15 +478,15 @@ export const DischargeSummaryDocument: React.FC<DischargeSummaryDocumentProps> =
           {/* Right (Bottom-Right Corner): Doctor's Signature */}
           <div className="w-1/2 pl-4 text-right flex flex-col items-end justify-end space-y-1">
             {/* Signature Graphic / Blank Signature Space */}
-            <div className="h-14 flex items-end justify-end mb-1">
+            <div className="h-16 flex items-end justify-end mb-1">
               {data?.doctorSignature ? (
                 <img
                   src={data.doctorSignature}
                   alt="Doctor's Signature"
-                  className="h-12 w-auto max-w-[160px] object-contain"
+                  className="h-14 w-auto max-w-[160px] object-contain"
                 />
               ) : (
-                <div className="w-44 border-b border-black h-10"></div>
+                <div className="w-48 border-b border-black h-12"></div>
               )}
             </div>
 

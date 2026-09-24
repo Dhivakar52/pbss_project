@@ -96,25 +96,27 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           <div className="space-y-2 mt-3">
             <div className="grid grid-cols-2 gap-6">
               <div className="flex items-center">
-                <span className="w-44 font-bold">Father's Mobile No</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-44 font-bold shrink-0">Father's Mobile No</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{data.fatherMobile}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-44 font-bold">Mother's Mobile No :</span>
-                <span className="font-normal ml-2">{data.motherMobile}</span>
+                <span className="w-44 font-bold shrink-0">Mother's Mobile No</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.motherMobile}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
               <div className="flex items-center">
-                <span className="w-44 font-bold">Distance from Residence</span>
-                <span className="w-6 font-bold">:</span>
+                <span className="w-44 font-bold shrink-0">Distance from Residence</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
                 <span className="font-normal">{data.distanceFromResidence}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-44 font-bold">Mode of Transport:</span>
-                <span className="font-normal ml-2">{data.modeOfTransport}</span>
+                <span className="w-44 font-bold shrink-0">Mode of Transport</span>
+                <span className="w-4 font-bold text-center shrink-0">:</span>
+                <span className="font-normal">{data.modeOfTransport}</span>
               </div>
             </div>
           </div>
@@ -156,45 +158,53 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           <div className="mt-4 space-y-2">
             <div className="grid grid-cols-2 gap-6">
               <div className="flex items-center">
-                <span className="w-36 font-bold">Father's Name :</span>
+                <span className="w-44 font-bold shrink-0">Father's Name</span>
+                <span className="w-6 font-bold shrink-0">:</span>
                 <span className="font-normal uppercase">{data.fatherName}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-36 font-bold">Mother's Name :</span>
+                <span className="w-44 font-bold shrink-0">Mother's Name</span>
+                <span className="w-6 font-bold shrink-0">:</span>
                 <span className="font-normal uppercase">{data.motherName}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-36 font-bold leading-tight">Father's<br />Qualification :</span>
-                <span className="font-normal ml-2">{data.fatherQualification}</span>
+              <div className="flex items-start">
+                <span className="w-44 font-bold shrink-0 leading-tight">Father's Qualification</span>
+                <span className="w-6 font-bold shrink-0">:</span>
+                <span className="font-normal">{data.fatherQualification}</span>
               </div>
-              <div className="flex items-center">
-                <span className="w-36 font-bold leading-tight">Mother's<br />Qualification :</span>
-                <span className="font-normal ml-2">{data.motherQualification}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-36 font-bold leading-tight">Father's<br />Designation :</span>
-                <span className="font-normal ml-2">{data.fatherDesignation}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-36 font-bold leading-tight">Mother's<br />Designation :</span>
-                <span className="font-normal ml-2">{data.motherDesignation}</span>
+              <div className="flex items-start">
+                <span className="w-44 font-bold shrink-0 leading-tight">Mother's Qualification</span>
+                <span className="w-6 font-bold shrink-0">:</span>
+                <span className="font-normal">{data.motherQualification}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-36 font-bold leading-tight">Father's<br />Income :</span>
-                <span className="font-normal ml-2">{data.fatherIncome}</span>
+              <div className="flex items-start">
+                <span className="w-44 font-bold shrink-0 leading-tight">Father's Designation</span>
+                <span className="w-6 font-bold shrink-0">:</span>
+                <span className="font-normal">{data.fatherDesignation}</span>
               </div>
-              <div className="flex items-center">
-                <span className="w-36 font-bold leading-tight">Mother's<br />Income :</span>
-                <span className="font-normal ml-2">{data.motherIncome}</span>
+              <div className="flex items-start">
+                <span className="w-44 font-bold shrink-0 leading-tight">Mother's Designation</span>
+                <span className="w-6 font-bold shrink-0">:</span>
+                <span className="font-normal">{data.motherDesignation}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex items-start">
+                <span className="w-44 font-bold shrink-0 leading-tight">Father's Income</span>
+                <span className="w-6 font-bold shrink-0">:</span>
+                <span className="font-normal">{data.fatherIncome}</span>
+              </div>
+              <div className="flex items-start">
+                <span className="w-44 font-bold shrink-0 leading-tight">Mother's Income</span>
+                <span className="w-6 font-bold shrink-0">:</span>
+                <span className="font-normal">{data.motherIncome}</span>
               </div>
             </div>
           </div>
@@ -232,8 +242,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
                 <span className="font-normal">{data.fatherPassingYear || ''}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-52 font-bold">Year of Passing/ Leaving:</span>
-                <span className="font-normal ml-2">{data.motherPassingYear || ''}</span>
+                <span className="w-52 font-bold">Year of Passing/ Leaving</span>
+                <span className="w-6 font-bold">:</span>
+                <span className="font-normal">{data.motherPassingYear || ''}</span>
               </div>
             </div>
 
@@ -244,8 +255,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
                 <span className="font-normal">{data.fatherYearsStudied || ''}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-52 font-bold">No of Years Studied :</span>
-                <span className="font-normal ml-2">{data.motherYearsStudied || ''}</span>
+                <span className="w-52 font-bold">No of Years Studied</span>
+                <span className="w-6 font-bold">:</span>
+                <span className="font-normal">{data.motherYearsStudied || ''}</span>
               </div>
             </div>
 
@@ -256,8 +268,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
                 <span className="font-normal">{data.fatherClassLastStudied || ''}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-52 font-bold">Class Last Studied :</span>
-                <span className="font-normal ml-2">{data.motherClassLastStudied || ''}</span>
+                <span className="w-52 font-bold">Class Last Studied</span>
+                <span className="w-6 font-bold">:</span>
+                <span className="font-normal">{data.motherClassLastStudied || ''}</span>
               </div>
             </div>
 
@@ -268,8 +281,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
                 <span className="font-normal">{data.fatherBranch || ''}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-52 font-bold">Branch :</span>
-                <span className="font-normal ml-2">{data.motherBranch || ''}</span>
+                <span className="w-52 font-bold">Branch</span>
+                <span className="w-6 font-bold">:</span>
+                <span className="font-normal">{data.motherBranch || ''}</span>
               </div>
             </div>
 
@@ -280,8 +294,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
                 <span className="font-normal">{data.fatherReasonLeaving || ''}</span>
               </div>
               <div className="flex items-center">
-                <span className="w-52 font-bold">Reason for Leaving :</span>
-                <span className="font-normal ml-2">{data.motherReasonLeaving || ''}</span>
+                <span className="w-52 font-bold">Reason for Leaving</span>
+                <span className="w-6 font-bold">:</span>
+                <span className="font-normal">{data.motherReasonLeaving || ''}</span>
               </div>
             </div>
           </div>
@@ -342,15 +357,21 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
             </p>
           </div>
 
-          {/* Signatures Row */}
-          <div className="mt-5">
-            <div className="flex justify-between items-center text-[12px] font-bold">
-              <div>Date :</div>
-              <div>Signature of Father</div>
-              <div>Signature of Mother</div>
-              <div className="text-center">
-                Signature of Guardian<br />
-                <span className="text-[10px] font-normal">(If Applicable)</span>
+          {/* Signatures Row - Dedicated Signing Height */}
+          <div className="mt-6 pt-2">
+            <div className="flex justify-between items-start text-[12px] font-bold min-h-[85px] pt-14">
+              <div className="pt-1.5 font-bold shrink-0">Date :</div>
+              <div className="flex justify-end gap-6 flex-1">
+                <div className="text-center border-t border-black pt-1.5 px-2 w-[150px]">
+                  Signature of Father
+                </div>
+                <div className="text-center border-t border-black pt-1.5 px-2 w-[150px]">
+                  Signature of Mother
+                </div>
+                <div className="text-center border-t border-black pt-1.5 px-2 w-[165px]">
+                  <div>Signature of Guardian</div>
+                  <div className="text-[10px] font-normal leading-tight">(If Applicable)</div>
+                </div>
               </div>
             </div>
 
@@ -405,7 +426,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           <PrintDocumentHeader documentType="track-sheet" student={data} />
 
           <div className="space-y-4 pt-4 px-2">
-            <h3 className="font-bold text-[14px]">Note:</h3>
+            <h3 className="font-bold text-[14px]">Instruction:</h3>
 
             <ul className="space-y-3 list-disc pl-5">
               <li>
