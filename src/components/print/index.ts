@@ -4,7 +4,6 @@ export * from './PrintDocumentFooter'
 export * from './TrackSheetPrint'
 export * from './TrackSheet2Print'
 export * from './RegistrationFormPrint'
-export * from './RegistrationForm4Print'
 export * from './RegistrationForm5Print'
 export * from './PrintPreviewModal'
 

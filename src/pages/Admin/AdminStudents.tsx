@@ -160,7 +160,7 @@ export const AdminStudents: React.FC = () => {
 
   // 4. Print Preview Modal State & Handlers
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
-  const [previewDocType, setPreviewDocType] = useState<'track-sheet' | 'track-sheet-2' | 'registration-form' | 'registration-form-4' | 'registration-form-5'>('track-sheet')
+  const [previewDocType, setPreviewDocType] = useState<'track-sheet' | 'track-sheet-2' | 'registration-form' | 'registration-form-5'>('track-sheet')
   const [selectedStudentForPrint, setSelectedStudentForPrint] = useState<any | null>(null)
 
   const handlePrintTrackSheet = (student: StudentRecord) => {
@@ -184,14 +184,6 @@ export const AdminStudents: React.FC = () => {
     const fullRecord = useStudentStore.getState().getStudentById(student.id) || student
     setSelectedStudentForPrint(fullRecord)
     setPreviewDocType('registration-form')
-    setIsPreviewModalOpen(true)
-  }
-
-  const handlePrintRegistrationForm4 = (student: StudentRecord) => {
-    // Reusing the same admission data source: fetch complete record from store
-    const fullRecord = useStudentStore.getState().getStudentById(student.id) || student
-    setSelectedStudentForPrint(fullRecord)
-    setPreviewDocType('registration-form-4')
     setIsPreviewModalOpen(true)
   }
 
@@ -247,7 +239,6 @@ export const AdminStudents: React.FC = () => {
         onPrintTrackSheet={handlePrintTrackSheet}
         onPrintTrackSheet2={handlePrintTrackSheet2}
         onPrintRegistrationForm={handlePrintRegistrationForm}
-        onPrintRegistrationForm4={handlePrintRegistrationForm4}
         onPrintRegistrationForm5={handlePrintRegistrationForm5}
         showCheckmarkCols={true}
         onToggleFilterPanel={() => setIsFilterPanelOpen(true)}

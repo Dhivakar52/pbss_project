@@ -149,7 +149,7 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
 
           {/* SECTION 3: Action Link, Usual Clean Styling & Print Deadline Note */}
           <div className="space-y-2 text-center pt-1">
-            {/* Click link to go to Home page to print Track Sheet */}
+            {/* Click link to go to Home page to Print Track Sheet */}
             <div>
               <button
                 type="button"

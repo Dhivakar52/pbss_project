@@ -24,7 +24,10 @@ export const PrintDocumentHeader: React.FC<PrintDocumentHeaderProps> = ({
       : `Registration Form for Pre KG ${year}`
 
   return (
-    <div className="w-full pb-2 mb-4 select-none">
+    <div
+      className="w-full pb-2 mb-3 select-none"
+      style={{ borderBottom: '1.5px solid #000', paddingBottom: '6px', marginBottom: '10px' }}
+    >
       <div className="flex items-center justify-between gap-2">
         {/* School Logo */}
         <div className="shrink-0 w-20 flex items-center justify-center">
@@ -36,7 +39,7 @@ export const PrintDocumentHeader: React.FC<PrintDocumentHeaderProps> = ({
         </div>
 
         {/* Center: School Info & Document Title */}
-        <div className="flex-1 text-center pr-16">
+        <div className="flex-1 text-center">
           <h1 className="text-[19px] font-normal text-black tracking-normal leading-tight font-sans">
             Padma Seshadri Bala Bhavan Sr. Sec. School
           </h1>
@@ -47,6 +50,9 @@ export const PrintDocumentHeader: React.FC<PrintDocumentHeaderProps> = ({
             {title}
           </h2>
         </div>
+
+        {/* Right Spacer matching logo width for perfect centering */}
+        <div className="shrink-0 w-20" />
       </div>
     </div>
   )

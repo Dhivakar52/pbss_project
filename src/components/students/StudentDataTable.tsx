@@ -70,7 +70,6 @@ export interface StudentDataTableProps {
   onPrintTrackSheet?: (record: StudentRecord) => void
   onPrintTrackSheet2?: (record: StudentRecord) => void
   onPrintRegistrationForm?: (record: StudentRecord) => void
-  onPrintRegistrationForm4?: (record: StudentRecord) => void
   onPrintRegistrationForm5?: (record: StudentRecord) => void
 }
 
@@ -94,7 +93,6 @@ export function StudentDataTable({
   onPrintTrackSheet,
   onPrintTrackSheet2,
   onPrintRegistrationForm,
-  onPrintRegistrationForm4,
   onPrintRegistrationForm5,
 }: StudentDataTableProps) {
   // Search & Filter States
@@ -401,7 +399,7 @@ export function StudentDataTable({
                     onClick={() => onPrintTrackSheet(record)}
                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
-                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet 1
+                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet
                   </DropdownMenuItem>
                 )}
                 {onPrintTrackSheet2 && (
@@ -417,15 +415,7 @@ export function StudentDataTable({
                     onClick={() => onPrintRegistrationForm(record)}
                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
-                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form 1
-                  </DropdownMenuItem>
-                )}
-                {onPrintRegistrationForm4 && (
-                  <DropdownMenuItem
-                    onClick={() => onPrintRegistrationForm4(record)}
-                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    <Printer className="h-3.5 w-3.5 text-purple-600" /> Print Registration Form V2
+                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form
                   </DropdownMenuItem>
                 )}
                 {onPrintRegistrationForm5 && (
@@ -433,7 +423,7 @@ export function StudentDataTable({
                     onClick={() => onPrintRegistrationForm5(record)}
                     className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
-                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form V3
+                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form V2
                   </DropdownMenuItem>
                 )}
                 {onDelete && (
@@ -460,7 +450,6 @@ export function StudentDataTable({
     onPrintTrackSheet,
     onPrintTrackSheet2,
     onPrintRegistrationForm,
-    onPrintRegistrationForm4,
     onPrintRegistrationForm5,
     onDelete,
   ])
