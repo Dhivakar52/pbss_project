@@ -5,6 +5,7 @@ export * from './TrackSheetPrint'
 export * from './TrackSheet2Print'
 export * from './RegistrationFormPrint'
 export * from './RegistrationForm5Print'
+export * from './PrintField'
 export * from './PrintPreviewModal'
 
 

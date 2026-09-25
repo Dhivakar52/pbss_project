@@ -248,18 +248,29 @@ export const RegistrationForm5Print: React.FC<RegistrationForm5PrintProps> = ({ 
               </tbody>
             </table>
 
-            {/* Health Details */}
-            <div className="space-y-2 mt-2.5">
-              <div className="flex items-center">
-                <span className="w-80 font-bold shrink-0">Is the Child a normal and healthy Child</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.isNormalHealthyChild ? 'Yes' : 'No'}</span>
-              </div>
-
-              <div className="flex items-start">
-                <span className="w-80 font-bold shrink-0 leading-tight">Specify Major ailment, If any (Past/Present)</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal break-words">{data.majorAilment || 'Nil'}</span>
+            {/* Health Details Table */}
+            <div className="mt-2.5">
+              <div className="border border-black overflow-hidden">
+                <table className="w-full border-collapse text-[10.5px] leading-tight">
+                  <tbody>
+                    <tr className="border-b border-black">
+                      <td className="w-[72%] px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 leading-tight">
+                        Is the Child a normal and healthy Child
+                      </td>
+                      <td className="w-[28%] px-2 py-1.5 font-normal text-black">
+                        {data.isNormalHealthyChild === 'Yes' ? 'Yes' : (data.isNormalHealthyChild || 'No')}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="w-[72%] px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 leading-tight">
+                        Specify Major ailment, If any (Past/Present)
+                      </td>
+                      <td className="w-[28%] px-2 py-1.5 font-normal text-black break-words">
+                        {data.majorAilment || 'Nil'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -280,7 +291,7 @@ export const RegistrationForm5Print: React.FC<RegistrationForm5PrintProps> = ({ 
 
             {/* ================= SINGLE COMBINED TABLE (3 COLUMNS FOR DETAILS) ================= */}
             <div className="mt-1">
-              <div className="border-b border-black pb-0.5 mb-1.5 text-[11.5px] font-bold uppercase tracking-wide text-black">
+              <div className="border-black pb-0.5 mb-1.5 text-[11.5px] font-bold uppercase tracking-wide text-black">
                 Parent & Guardian Details
               </div>
               <div className="border border-black overflow-hidden mb-2.5">

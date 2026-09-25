@@ -1,6 +1,7 @@
 import React from 'react'
 import { PrintDocumentHeader } from './PrintDocumentHeader'
 import { PrintDocumentFooter } from './PrintDocumentFooter'
+import { PrintField } from './PrintField'
 import type { RegistrationFormData } from './printMappers'
 
 export interface RegistrationFormPrintProps {
@@ -85,103 +86,69 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
 
             {/* Top Registration No & School Applied For */}
             <div className="flex justify-between items-center mt-1 mb-2">
-              <div className="flex items-center">
-                <span className="w-36 font-bold shrink-0">Registration No.</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
-                  {data.registrationNo}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="font-bold shrink-0">School Applied For</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-bold ml-1 uppercase">{data.schoolAppliedFor}</span>
-              </div>
+              <PrintField
+                label="Registration No."
+                value={
+                  <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
+                    {data.registrationNo}
+                  </span>
+                }
+              />
+              <PrintField
+                label="School Applied For"
+                value={<span className="font-bold uppercase">{data.schoolAppliedFor}</span>}
+              />
             </div>
 
             {/* Child Details */}
             <div className="space-y-2.5">
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0">Name of the Child</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal uppercase break-words">{data.childName}</span>
+              <PrintField
+                label="Name of the Child"
+                value={<span className="uppercase">{data.childName}</span>}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField label="Date of Birth" value={data.dob} />
+                <PrintField label="Passport No." value={data.passportNo || '-'} />
+              </div>
+
+              <PrintField label="Mother Tongue" value={data.motherTongue} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField label="Religion" value={data.religion} />
+                <PrintField label="Caste" value={data.caste} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Date of Birth</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.dob}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Passport No.</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.passportNo || '-'}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-48 font-bold shrink-0">Mother Tongue</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.motherTongue}</span>
+                <PrintField label="Nationality" value={data.nationality} />
+                <PrintField label="Gender" value={data.gender} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Religion</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.religion}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Caste</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.caste}</span>
-                </div>
+                <PrintField label="Community" value={data.community} />
+                <PrintField
+                  label="Does the Child go to play school?"
+                  value={data.goesToPlaySchool ? 'Yes' : 'No'}
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Nationality</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.nationality}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Gender</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.gender}</span>
-                </div>
-              </div>
+              <PrintField
+                label="If yes, Play School Name"
+                value={data.playSchoolName || '-'}
+                labelWidth="w-[280px]"
+              />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Community</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.community}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-64 font-bold shrink-0 leading-tight">Does the Child go to play school?</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.goesToPlaySchool ? 'Yes' : 'No'}</span>
-                </div>
-              </div>
+              <PrintField
+                label="Is the child One of Twins/Triplets/Quadruplets"
+                value={data.isMultipleBirth ? 'Yes' : 'No'}
+                labelWidth="w-[280px]"
+              />
 
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0 leading-tight">If yes, Play School Name</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.playSchoolName || '-'}</span>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-80 font-bold shrink-0">Is the child One of Twins/Triplets/Quadruplets</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.isMultipleBirth ? 'Yes' : 'No'}</span>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-80 font-bold shrink-0">Does the child have any school going Siblings?</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.hasSchoolGoingSiblings ? 'Yes' : 'No'}</span>
-              </div>
+              <PrintField
+                label="Does the child have any school going Siblings?"
+                value={data.hasSchoolGoingSiblings ? 'Yes' : 'No'}
+                labelWidth="w-[280px]"
+              />
             </div>
 
             {/* Sibling Table */}
@@ -210,42 +177,32 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
 
             {/* Health and Parents DOB */}
             <div className="space-y-4 mt-3">
-              <div className="flex items-center">
-                <span className="w-64 font-bold">Is the Child a normal and healthy Child</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.isNormalHealthyChild ? 'Yes' : 'No'}</span>
-              </div>
+              <PrintField
+                label="Is the Child a normal and healthy Child"
+                value={data.isNormalHealthyChild ? 'Yes' : 'No'}
+                labelWidth="w-[280px]"
+              />
 
-              <div className="flex items-start">
-                <span className="w-64 font-bold shrink-0 leading-tight">Specify Major ailment, If any (Past/Present)</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.majorAilment || 'Nil'}</span>
-              </div>
+              <PrintField
+                label="Specify Major ailment, If any (Past/Present)"
+                value={data.majorAilment || 'Nil'}
+                labelWidth="w-[280px]"
+              />
 
               <div className="grid grid-cols-2 gap-4 pt-1">
-                <div className="flex items-center">
-                  <span className="w-36 font-bold shrink-0">Father's Name</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal uppercase">{data.fatherName}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-36 font-bold shrink-0">Mother's Name</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal uppercase">{data.motherName}</span>
-                </div>
+                <PrintField
+                  label="Father's Name"
+                  value={<span className="uppercase">{data.fatherName}</span>}
+                />
+                <PrintField
+                  label="Mother's Name"
+                  value={<span className="uppercase">{data.motherName}</span>}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-36 font-bold shrink-0">Father's DOB</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.fatherDob || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-36 font-bold shrink-0">Mother's DOB</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.motherDob || ''}</span>
-                </div>
+                <PrintField label="Father's DOB" value={data.fatherDob || ''} />
+                <PrintField label="Mother's DOB" value={data.motherDob || ''} />
               </div>
             </div>
           </div>
@@ -266,208 +223,195 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
 
             <div className="space-y-4 pt-1">
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Is Father an Alumnus</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.fatherAlumnus ? 'Yes' : 'No'}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Is Mother an Alumnus</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.motherAlumnus ? 'Yes' : 'No'}</span>
-                </div>
+                <PrintField
+                  label="Is Father an Alumnus"
+                  value={data.fatherAlumnus ? 'Yes' : 'No'}
+                />
+                <PrintField
+                  label="Is Mother an Alumnus"
+                  value={data.motherAlumnus ? 'Yes' : 'No'}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Total No of Years Studied</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.fatherYearsStudied || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Total No of Years Studied</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.motherYearsStudied || ''}</span>
-                </div>
+                <PrintField
+                  label="Total No of Years Studied"
+                  value={data.fatherYearsStudied || ''}
+                />
+                <PrintField
+                  label="Total No of Years Studied"
+                  value={data.motherYearsStudied || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Class Last Studied</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.fatherClassLastStudied || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Class Last Studied</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.motherClassLastStudied || ''}</span>
-                </div>
+                <PrintField
+                  label="Class Last Studied"
+                  value={data.fatherClassLastStudied || ''}
+                />
+                <PrintField
+                  label="Class Last Studied"
+                  value={data.motherClassLastStudied || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Year of leaving / Passing</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.fatherPassingYear || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Year of leaving / Passing</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.motherPassingYear || ''}</span>
-                </div>
+                <PrintField
+                  label="Year of leaving / Passing"
+                  value={data.fatherPassingYear || ''}
+                />
+                <PrintField
+                  label="Year of leaving / Passing"
+                  value={data.motherPassingYear || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Branch</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.fatherBranch || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Branch</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.motherBranch || ''}</span>
-                </div>
+                <PrintField
+                  label="Branch"
+                  value={data.fatherBranch || ''}
+                />
+                <PrintField
+                  label="Branch"
+                  value={data.motherBranch || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Reason of Leaving</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.fatherReasonLeaving || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Reason of Leaving</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.motherReasonLeaving || ''}</span>
-                </div>
+                <PrintField
+                  label="Reason of Leaving"
+                  value={data.fatherReasonLeaving || ''}
+                />
+                <PrintField
+                  label="Reason of Leaving"
+                  value={data.motherReasonLeaving || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Father's Educational<br />Qualification :</span>
-                  <span className="font-normal ml-2">{data.fatherQualification || ''}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Mother's Educational<br />Qualification :</span>
-                  <span className="font-normal ml-2">{data.motherQualification || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Educational Qualification"
+                  value={data.fatherQualification || ''}
+                />
+                <PrintField
+                  label="Mother's Educational Qualification"
+                  value={data.motherQualification || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">University/Institution :</span>
-                  <span className="font-normal ml-2">{data.fatherUniversity || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">University/Institution :</span>
-                  <span className="font-normal ml-2">{data.motherUniversity || ''}</span>
-                </div>
+                <PrintField
+                  label="University/Institution"
+                  value={data.fatherUniversity || ''}
+                />
+                <PrintField
+                  label="University/Institution"
+                  value={data.motherUniversity || ''}
+                />
               </div>
 
               {/* Mother Employed question */}
               <div className="grid grid-cols-2 gap-6">
                 <div></div>
-                <div className="flex items-center">
-                  <span className="w-52 font-bold">Is Mother Employed? :</span>
-                  <span className="font-normal ml-2">{data.isMotherEmployed ? 'Yes' : 'No'}</span>
-                </div>
+                <PrintField
+                  label="Is Mother Employed?"
+                  value={data.isMotherEmployed ? 'Yes' : 'No'}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Father's<br />Occupation :</span>
-                  <span className="font-normal ml-2">{data.fatherOccupation || ''}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Mother's<br />Occupation :</span>
-                  <span className="font-normal ml-2">{data.motherOccupation || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Occupation"
+                  value={data.fatherOccupation || ''}
+                />
+                <PrintField
+                  label="Mother's Occupation"
+                  value={data.motherOccupation || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Father's<br />Employment<br />Category :</span>
-                  <span className="font-normal ml-2">{data.fatherEmploymentCategory || ''}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Mother's<br />Employment<br />Category :</span>
-                  <span className="font-normal ml-2">{data.motherEmploymentCategory || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Employment Category"
+                  value={data.fatherEmploymentCategory || ''}
+                />
+                <PrintField
+                  label="Mother's Employment Category"
+                  value={data.motherEmploymentCategory || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Father's<br />Designation :</span>
-                  <span className="font-normal ml-2">{data.fatherDesignation || ''}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Mother's<br />Designation :</span>
-                  <span className="font-normal ml-2">{data.motherDesignation || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Designation"
+                  value={data.fatherDesignation || ''}
+                />
+                <PrintField
+                  label="Mother's Designation"
+                  value={data.motherDesignation || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Institution<br />/Company<br />Name :</span>
-                  <span className="font-normal ml-2">{data.fatherCompany || ''}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Institution<br />/Company<br />Name :</span>
-                  <span className="font-normal ml-2">{data.motherCompany || ''}</span>
-                </div>
+                <PrintField
+                  label="Institution / Company Name"
+                  value={data.fatherCompany || ''}
+                />
+                <PrintField
+                  label="Institution / Company Name"
+                  value={data.motherCompany || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Father's Office<br />Address :</span>
-                  <span className="font-normal ml-2">{data.fatherOfficeAddress || ''}</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="w-52 font-bold leading-tight">Mother's Office<br />Address :</span>
-                  <span className="font-normal ml-2">{data.motherOfficeAddress || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Office Address"
+                  value={data.fatherOfficeAddress || ''}
+                />
+                <PrintField
+                  label="Mother's Office Address"
+                  value={data.motherOfficeAddress || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Father's Income :</span>
-                  <span className="font-normal ml-2">{data.fatherIncome || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Mother's Income :</span>
-                  <span className="font-normal ml-2">{data.motherIncome || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Income"
+                  value={data.fatherIncome || ''}
+                />
+                <PrintField
+                  label="Mother's Income"
+                  value={data.motherIncome || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Father's Ph. No-Off :</span>
-                  <span className="font-normal ml-2">{data.fatherPhoneOffice || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Mother's Ph. No-Off :</span>
-                  <span className="font-normal ml-2">{data.motherPhoneOffice || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Ph. No-Off"
+                  value={data.fatherPhoneOffice || ''}
+                />
+                <PrintField
+                  label="Mother's Ph. No-Off"
+                  value={data.motherPhoneOffice || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Father's Mobile No :</span>
-                  <span className="font-normal ml-2">{data.fatherMobile || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Mother's Mobile No :</span>
-                  <span className="font-normal ml-2">{data.motherMobile || ''}</span>
-                </div>
+                <PrintField
+                  label="Father's Mobile No"
+                  value={data.fatherMobile || ''}
+                />
+                <PrintField
+                  label="Mother's Mobile No"
+                  value={data.motherMobile || ''}
+                />
               </div>
 
               <div className="pt-1">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Guardian's Name</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal uppercase">{data.guardianName || ''}</span>
-                </div>
+                <PrintField
+                  label="Guardian's Name"
+                  value={<span className="uppercase">{data.guardianName || ''}</span>}
+                />
               </div>
             </div>
           </div>
@@ -489,99 +433,85 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
             {/* Guardian and Residence Details */}
             <div className="space-y-1.5 pt-1">
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Guardian's Gender</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianGender || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Occupation</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianOccupation || ''}</span>
-                </div>
+                <PrintField
+                  label="Guardian's Gender"
+                  value={data.guardianGender || ''}
+                />
+                <PrintField
+                  label="Occupation"
+                  value={data.guardianOccupation || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-start">
-                  <span className="w-48 font-bold shrink-0 leading-tight">Institution / Company Name</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianCompany || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Monthly Income</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianIncome || ''}</span>
-                </div>
+                <PrintField
+                  label="Institution / Company Name"
+                  value={data.guardianCompany || ''}
+                />
+                <PrintField
+                  label="Monthly Income"
+                  value={data.guardianIncome || ''}
+                />
               </div>
 
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0">Office Address</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal break-words">{data.guardianOfficeAddress || ''}</span>
+              <PrintField
+                label="Office Address"
+                value={data.guardianOfficeAddress || ''}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField
+                  label="Guardian's Ph. No-Off"
+                  value={data.guardianPhoneOffice || ''}
+                />
+                <PrintField
+                  label="Guardian's Ph. No-Res"
+                  value={data.guardianPhoneRes || ''}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Guardian's Ph. No-Off</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianPhoneOffice || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Guardian's Ph. No-Res</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianPhoneRes || ''}</span>
-                </div>
+                <PrintField
+                  label="Guardian's Mobile No"
+                  value={data.guardianMobile || ''}
+                />
+                <PrintField
+                  label="Residence Telephone No"
+                  value={data.residenceTelephone || ''}
+                />
               </div>
+
+              <PrintField
+                label="Residential Address"
+                value={data.residentialAddress || ''}
+              />
+
+              <PrintField
+                label="Important land mark"
+                value={data.importantLandmark || ''}
+              />
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Guardian's Mobile No</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.guardianMobile || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Residence Telephone No</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.residenceTelephone || ''}</span>
-                </div>
+                <PrintField
+                  label="Distance from Residence"
+                  value={data.distanceFromResidence || ''}
+                />
+                <PrintField
+                  label="Mode of Transport"
+                  value={data.modeOfTransport || ''}
+                />
               </div>
 
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0">Residential Address</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal break-words">{data.residentialAddress || ''}</span>
-              </div>
+              <PrintField
+                label="Outstanding achievements of parents"
+                value={data.parentAchievements || ''}
+              />
 
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0">Important land mark</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal break-words">{data.importantLandmark || ''}</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold shrink-0">Distance from Residence</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.distanceFromResidence || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold shrink-0">Mode of Transport</span>
-                  <span className="w-4 font-bold text-center shrink-0">:</span>
-                  <span className="font-normal">{data.modeOfTransport || ''}</span>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0 leading-tight">Outstanding achievements of parents</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal break-words">{data.parentAchievements || ''}</span>
-              </div>
-
-              <div className="flex items-start">
-                <span className="w-48 font-bold shrink-0 leading-tight">Is the Parent coming on transfer from outside Chennai / from outside India</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.isTransferParent ? 'Yes' : 'No'}</span>
-              </div>
+              <PrintField
+                label="Is the Parent coming on transfer from outside Chennai / from outside India"
+                value={data.isTransferParent ? 'Yes' : 'No'}
+                labelWidth="w-[280px]"
+              />
             </div>
 
             {/* Declaration Paragraph */}

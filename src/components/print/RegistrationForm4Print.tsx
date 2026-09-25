@@ -1,6 +1,7 @@
 import React from 'react'
 import { PrintDocumentHeader } from './PrintDocumentHeader'
 import { PrintDocumentFooter } from './PrintDocumentFooter'
+import { PrintField } from './PrintField'
 import type { RegistrationFormData } from './printMappers'
 
 export interface RegistrationForm4PrintProps {
@@ -91,99 +92,69 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
 
             {/* Top Registration No & School Applied For */}
             <div className="flex justify-between items-center mt-1 mb-2">
-              <div className="flex items-center">
-                <span className="w-36 font-bold">Registration No.</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
-                  {data.registrationNo}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="font-bold">School Applied For :</span>
-                <span className="font-bold ml-2 uppercase">{data.schoolAppliedFor}</span>
-              </div>
+              <PrintField
+                label="Registration No."
+                value={
+                  <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
+                    {data.registrationNo}
+                  </span>
+                }
+              />
+              <PrintField
+                label="School Applied For"
+                value={<span className="font-bold uppercase">{data.schoolAppliedFor}</span>}
+              />
             </div>
 
             {/* Child Details */}
             <div className="space-y-2.5">
-              <div className="flex items-start">
-                <span className="w-48 font-bold">Name of the Child</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal uppercase">{data.childName}</span>
+              <PrintField
+                label="Name of the Child"
+                value={<span className="uppercase">{data.childName}</span>}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField label="Date of Birth" value={data.dob} />
+                <PrintField label="Passport No." value={data.passportNo || ''} />
+              </div>
+
+              <PrintField label="Mother Tongue" value={data.motherTongue} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField label="Religion" value={data.religion} />
+                <PrintField label="Caste" value={data.caste} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Date of Birth</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.dob}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-28 font-bold">Passport No :</span>
-                  <span className="font-normal ml-2">{data.passportNo || ''}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-48 font-bold">Mother Tongue</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherTongue}</span>
+                <PrintField label="Nationality" value={data.nationality} />
+                <PrintField label="Gender" value={data.gender} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Religion</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.religion}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-28 font-bold">Caste :</span>
-                  <span className="font-normal ml-2">{data.caste}</span>
-                </div>
+                <PrintField label="Community" value={data.community} />
+                <PrintField
+                  label="Does the Child go to any play school?"
+                  value={data.goesToPlaySchool ? 'Yes' : 'No'}
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Nationality</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.nationality}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-28 font-bold">Gender :</span>
-                  <span className="font-normal ml-2">{data.gender}</span>
-                </div>
-              </div>
+              <PrintField
+                label="If yes, Play School Name"
+                value={data.playSchoolName || ''}
+                labelWidth="w-[280px]"
+              />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <span className="w-48 font-bold">Community</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.community}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-48 font-bold leading-tight">Does the Child go to any play school?</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.goesToPlaySchool ? 'Yes' : 'No'}</span>
-                </div>
-              </div>
+              <PrintField
+                label="Is the child One of Twins/Triplets/Quadruplets"
+                value={data.isMultipleBirth ? 'Yes' : 'No'}
+                labelWidth="w-[280px]"
+              />
 
-              <div className="flex items-start">
-                <span className="w-48 font-bold leading-tight">If yes, Play School Name</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.playSchoolName || ''}</span>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-80 font-bold">Is the child One of Twins/Triplets/Quadruplets</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.isMultipleBirth ? 'Yes' : 'No'}</span>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-80 font-bold">Does the child have any school going Siblings?</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.hasSchoolGoingSiblings ? 'Yes' : 'No'}</span>
-              </div>
+              <PrintField
+                label="Does the child have any school going Siblings?"
+                value={data.hasSchoolGoingSiblings ? 'Yes' : 'No'}
+                labelWidth="w-[280px]"
+              />
             </div>
 
             {/* Sibling Table */}
@@ -210,17 +181,29 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
               </tbody>
             </table>
 
-            {/* Health Details */}
-            <div className="space-y-2 mt-2.5">
-              <div className="flex items-center">
-                <span className="w-64 font-bold">Is the Child a normal and healthy Child</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.isNormalHealthyChild ? 'Yes' : 'No'}</span>
-              </div>
-
-              <div className="flex items-start">
-                <span className="w-64 font-bold leading-tight">Specify Major ailment, If any (Past/Present) :</span>
-                <span className="font-normal ml-2">{data.majorAilment || 'Nil'}</span>
+            {/* Health Details Table */}
+            <div className="mt-2.5">
+              <div className="border border-black overflow-hidden">
+                <table className="w-full border-collapse text-[10.5px] leading-tight">
+                  <tbody>
+                    <tr className="border-b border-black">
+                      <td className="w-[72%] px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 leading-tight">
+                        Is the Child a normal and healthy Child
+                      </td>
+                      <td className="w-[28%] px-2 py-1.5 font-normal text-black">
+                        {data.isNormalHealthyChild === 'Yes' ? 'Yes' : (data.isNormalHealthyChild || 'No')}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="w-[72%] px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 leading-tight">
+                        Specify Major ailment, If any (Past/Present)
+                      </td>
+                      <td className="w-[28%] px-2 py-1.5 font-normal text-black break-words">
+                        {data.majorAilment || 'Nil'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -241,7 +224,7 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
 
             {/* ================= SINGLE COMBINED TABLE (3 COLUMNS FOR DETAILS) ================= */}
             <div className="mt-1">
-              <div className="border-b border-black pb-0.5 mb-1.5 text-[11.5px] font-bold uppercase tracking-wide text-black">
+              <div className=" border-black pb-0.5 mb-1.5 text-[11.5px] font-bold uppercase tracking-wide text-black">
                 Parent & Guardian Details
               </div>
               <div className="border border-black overflow-hidden mb-2.5">

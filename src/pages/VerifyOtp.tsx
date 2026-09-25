@@ -1,21 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, ArrowLeft, RotateCw, Loader2, CheckCircle2 } from "lucide-react"
+import { ShieldCheck, ArrowLeft, RotateCw, Loader2, CheckCircle2, Mail } from "lucide-react"
 import { toast } from "@/components/ui/toast"
 import { useAuthStore } from "@/store/useAuthStore"
 import { STATIC_OTP } from "@/services/auth.service"
 import logoImg from "@/assets/images/logo.png"
+import { EmailPreviewModal } from "@/components/EmailPreviewModal"
+import { OtpEmailPreviewModal } from "@/components/OtpEmailPreviewModal"
 
 export const VerifyOtp: React.FC = () => {
   const navigate = useNavigate()
   const { pendingRegistration, verifyRegistrationOtp, clearPendingRegistration } = useAuthStore()
+
+  // Dynamic OTP state (defaults to STATIC_OTP, regenerates on Resend)
+  const [currentOtp, setCurrentOtp] = useState<string>(STATIC_OTP)
+  const [isOtpEmailModalOpen, setIsOtpEmailModalOpen] = useState(false)
 
   // 4 individual digit boxes
   const [digits, setDigits] = useState<string[]>(['', '', '', ''])
   const [error, setError] = useState<string>('')
   const [isVerifying, setIsVerifying] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false)
 
   const inputRefs = [
     useRef<HTMLInputElement>(null),
@@ -76,23 +83,33 @@ export const VerifyOtp: React.FC = () => {
 
     await new Promise(r => setTimeout(r, 600))
 
-    const result = verifyRegistrationOtp(fullOtp)
+    // Support either the dynamic generated OTP or the default STATIC_OTP
+    if (fullOtp === currentOtp || fullOtp === STATIC_OTP) {
+      const result = verifyRegistrationOtp(STATIC_OTP)
 
-    if (result.success) {
-      setIsSuccess(true)
-      toast.success('Account Created Successfully!')
+      if (result.success) {
+        setIsSuccess(true)
+        toast.success('Account Created Successfully!')
+      } else {
+        setError(result.error || `Invalid OTP. Please enter ${currentOtp}`)
+        toast.error(result.error || `Invalid OTP. Enter ${currentOtp}`)
+        setIsVerifying(false)
+      }
     } else {
-      setError(result.error || `Invalid OTP. Please enter ${STATIC_OTP}`)
-      toast.error(result.error || `Invalid OTP. Enter ${STATIC_OTP}`)
+      setError(`Invalid OTP. Please enter ${currentOtp}`)
+      toast.error(`Invalid OTP. Enter ${currentOtp}`)
       setIsVerifying(false)
     }
   }
 
   const handleResend = () => {
+    // Generate a fresh dynamic 4-digit OTP
+    const newOtp = Math.floor(1000 + Math.random() * 9000).toString()
+    setCurrentOtp(newOtp)
     setDigits(['', '', '', ''])
     setError('')
     inputRefs[0].current?.focus()
-    toast.info(`Verification code sent! Use OTP: ${STATIC_OTP}`)
+    toast.info(`Verification code sent! Use OTP: ${newOtp}`)
   }
 
   return (
@@ -128,6 +145,22 @@ export const VerifyOtp: React.FC = () => {
                 <span className="font-bold text-slate-800">PRE-KG (2025-26) ONLINE REGISTRATION.</span>
               </p>
 
+              {/* Email Icon / Preview Button */}
+              <div className="flex justify-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => setIsEmailModalOpen(true)}
+                  title="Preview Confirmation Email"
+                  aria-label="Preview Confirmation Email"
+                  className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/90 font-semibold text-xs sm:text-sm transition-all shadow-2xs hover:shadow-sm active:scale-95 cursor-pointer group"
+                >
+                  <div className="w-6 h-6 rounded-full bg-sky-200/70 text-sky-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Mail className="h-3.5 w-3.5" />
+                  </div>
+                  <span>Preview Confirmation Email</span>
+                </button>
+              </div>
+
               {/* Go to Login Button */}
               <div className="pt-2">
                 <button
@@ -147,7 +180,20 @@ export const VerifyOtp: React.FC = () => {
             /* ================= OTP VERIFICATION FORM ================= */
             <>
               {/* Logo & Header */}
-              <div className="text-center space-y-3">
+              <div className="text-center space-y-3 relative">
+                {/* Email Icon at top right of the card */}
+                <div className="absolute right-0 top-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsOtpEmailModalOpen(true)}
+                    title="Preview OTP Verification Email"
+                    aria-label="Preview OTP Verification Email"
+                    className="p-2.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-600 hover:text-sky-700 border border-sky-200/90 shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer group"
+                  >
+                    <Mail className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                  </button>
+                </div>
+
                 <div className="flex justify-center">
                   <img
                     src={logoImg}
@@ -167,15 +213,30 @@ export const VerifyOtp: React.FC = () => {
                     We've sent a 4-digit verification code to{' '}
                     <span className="font-semibold text-slate-800 block truncate">{targetEmail}</span>
                   </p>
+
+                  {/* Prominent Email Icon Button inside the Verify OTP card */}
+                  <div className="pt-2 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setIsOtpEmailModalOpen(true)}
+                      title="Preview OTP Verification Email"
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/90 font-semibold text-xs transition-all shadow-2xs hover:shadow-sm active:scale-95 cursor-pointer group"
+                    >
+                      <div className="w-5 h-5 rounded-full bg-sky-200/80 text-sky-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Mail className="h-3 w-3" />
+                      </div>
+                      <span>Preview OTP Email</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Demo helper badge */}
               <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-center">
                 <p className="text-xs text-amber-800 font-medium">
-                  Default Static OTP:{' '}
+                  Current Verification OTP:{' '}
                   <span className="font-bold font-mono tracking-widest text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded">
-                    {STATIC_OTP}
+                    {currentOtp}
                   </span>
                 </p>
               </div>
@@ -256,6 +317,22 @@ export const VerifyOtp: React.FC = () => {
 
         </div>
       </div>
+
+      {/* ================= OTP EMAIL PREVIEW MODAL ================= */}
+      <OtpEmailPreviewModal
+        isOpen={isOtpEmailModalOpen}
+        onClose={() => setIsOtpEmailModalOpen(false)}
+        otp={currentOtp}
+        targetEmail={targetEmail}
+        logoUrl={logoImg}
+      />
+
+      {/* ================= CONFIRMATION SUCCESS EMAIL PREVIEW MODAL ================= */}
+      <EmailPreviewModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        logoUrl={logoImg}
+      />
     </div>
   )
 }

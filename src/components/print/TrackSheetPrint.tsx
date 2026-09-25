@@ -1,6 +1,7 @@
 import React from 'react'
 import { PrintDocumentHeader } from './PrintDocumentHeader'
 import { PrintDocumentFooter } from './PrintDocumentFooter'
+import { PrintField } from './PrintField'
 import type { TrackSheetData } from './printMappers'
 
 export interface TrackSheetPrintProps {
@@ -31,57 +32,36 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           {/* Top Section with Registration & Photo Box */}
           <div className="flex justify-between items-start gap-4 mt-1">
             <div className="space-y-2.5 flex-1">
-              <div className="flex items-center">
-                <span className="w-44 font-bold">Registration No.</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
-                  {data.registrationNo}
-                </span>
+              <PrintField
+                label="Registration No."
+                value={
+                  <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
+                    {data.registrationNo}
+                  </span>
+                }
+              />
+
+              <PrintField
+                label="Name of the Child"
+                value={<span className="uppercase">{data.childName}</span>}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField label="Date of Birth" value={data.dob} />
+                <PrintField label="Gender" value={data.gender} />
               </div>
 
-              <div className="flex items-start">
-                <span className="w-44 font-bold">Name of the Child</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal uppercase">{data.childName}</span>
+              <PrintField label="Mother Tongue" value={data.motherTongue} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField label="Religion" value={data.religion} />
+                <PrintField label="Caste" value={data.caste} />
               </div>
 
-              <div className="flex items-center">
-                <div className="flex items-center w-[320px]">
-                  <span className="w-44 font-bold">Date of Birth</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.dob}</span>
-                </div>
-                <div className="flex items-center pl-8">
-                  <span className="w-20 font-bold">Gender</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.gender}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <span className="w-44 font-bold">Mother Tongue</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherTongue}</span>
-              </div>
-
-              <div className="flex items-center">
-                <div className="flex items-center w-[320px]">
-                  <span className="w-44 font-bold">Religion</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.religion}</span>
-                </div>
-                <div className="flex items-center pl-8">
-                  <span className="w-20 font-bold">Caste</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.caste}</span>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0">Residential Address</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal leading-snug">{data.residentialAddress}</span>
-              </div>
+              <PrintField
+                label="Residential Address"
+                value={data.residentialAddress}
+              />
             </div>
 
             {/* Applicant Photo Box */}
@@ -95,39 +75,23 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           {/* Contact & Transport Details */}
           <div className="space-y-2 mt-3">
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-44 font-bold shrink-0">Father's Mobile No</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.fatherMobile}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-44 font-bold shrink-0">Mother's Mobile No</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.motherMobile}</span>
-              </div>
+              <PrintField label="Father's Mobile No" value={data.fatherMobile} />
+              <PrintField label="Mother's Mobile No" value={data.motherMobile} />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-44 font-bold shrink-0">Distance from Residence</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.distanceFromResidence}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-44 font-bold shrink-0">Mode of Transport</span>
-                <span className="w-4 font-bold text-center shrink-0">:</span>
-                <span className="font-normal">{data.modeOfTransport}</span>
-              </div>
+              <PrintField label="Distance from Residence" value={data.distanceFromResidence} />
+              <PrintField label="Mode of Transport" value={data.modeOfTransport} />
             </div>
           </div>
 
           {/* Sibling Details Section */}
           <div className="mt-4 space-y-1.5">
-            <div className="flex items-center">
-              <span className="font-bold">Does the child have any school going Siblings?</span>
-              <span className="font-bold mx-2">:</span>
-              <span className="font-normal">{data.hasSchoolGoingSiblings ? 'Yes' : 'No'}</span>
-            </div>
+            <PrintField
+              label="Does the child have any school going Siblings?"
+              value={data.hasSchoolGoingSiblings ? 'Yes' : 'No'}
+              labelWidth="w-[280px]"
+            />
 
             {/* Sibling Table */}
             <table className="w-full border-collapse border border-black text-[11px] mt-1.5">
@@ -157,55 +121,47 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           {/* Parents Profile Info */}
           <div className="mt-4 space-y-2">
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-44 font-bold shrink-0">Father's Name</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal uppercase">{data.fatherName}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-44 font-bold shrink-0">Mother's Name</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal uppercase">{data.motherName}</span>
-              </div>
+              <PrintField
+                label="Father's Name"
+                value={<span className="uppercase">{data.fatherName}</span>}
+              />
+              <PrintField
+                label="Mother's Name"
+                value={<span className="uppercase">{data.motherName}</span>}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0 leading-tight">Father's Qualification</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal">{data.fatherQualification}</span>
-              </div>
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0 leading-tight">Mother's Qualification</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal">{data.motherQualification}</span>
-              </div>
+              <PrintField
+                label="Father's Qualification"
+                value={data.fatherQualification}
+              />
+              <PrintField
+                label="Mother's Qualification"
+                value={data.motherQualification}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0 leading-tight">Father's Designation</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal">{data.fatherDesignation}</span>
-              </div>
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0 leading-tight">Mother's Designation</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal">{data.motherDesignation}</span>
-              </div>
+              <PrintField
+                label="Father's Designation"
+                value={data.fatherDesignation}
+              />
+              <PrintField
+                label="Mother's Designation"
+                value={data.motherDesignation}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0 leading-tight">Father's Income</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal">{data.fatherIncome}</span>
-              </div>
-              <div className="flex items-start">
-                <span className="w-44 font-bold shrink-0 leading-tight">Mother's Income</span>
-                <span className="w-6 font-bold shrink-0">:</span>
-                <span className="font-normal">{data.motherIncome}</span>
-              </div>
+              <PrintField
+                label="Father's Income"
+                value={data.fatherIncome}
+              />
+              <PrintField
+                label="Mother's Income"
+                value={data.motherIncome}
+              />
             </div>
           </div>
         </div>
@@ -221,103 +177,87 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           <PrintDocumentHeader documentType="track-sheet" student={data} />
 
           {/* Top Alumni Info */}
+          {/* Top Alumni Info */}
           <div className="space-y-2 pt-1">
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Is Father an Alumnus?</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.fatherAlumnus ? 'Yes' : 'No'}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Is Mother an Alumnus?</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherAlumnus ? 'Yes' : 'No'}</span>
-              </div>
+              <PrintField
+                label="Is Father an Alumnus?"
+                value={data.fatherAlumnus ? 'Yes' : 'No'}
+              />
+              <PrintField
+                label="Is Mother an Alumnus?"
+                value={data.motherAlumnus ? 'Yes' : 'No'}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Year of Passing/ Leaving</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.fatherPassingYear || ''}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Year of Passing/ Leaving</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherPassingYear || ''}</span>
-              </div>
+              <PrintField
+                label="Year of Passing/ Leaving"
+                value={data.fatherPassingYear || ''}
+              />
+              <PrintField
+                label="Year of Passing/ Leaving"
+                value={data.motherPassingYear || ''}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-52 font-bold">No of Years Studied</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.fatherYearsStudied || ''}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-52 font-bold">No of Years Studied</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherYearsStudied || ''}</span>
-              </div>
+              <PrintField
+                label="No of Years Studied"
+                value={data.fatherYearsStudied || ''}
+              />
+              <PrintField
+                label="No of Years Studied"
+                value={data.motherYearsStudied || ''}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Class Last Studied</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.fatherClassLastStudied || ''}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Class Last Studied</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherClassLastStudied || ''}</span>
-              </div>
+              <PrintField
+                label="Class Last Studied"
+                value={data.fatherClassLastStudied || ''}
+              />
+              <PrintField
+                label="Class Last Studied"
+                value={data.motherClassLastStudied || ''}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Branch</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.fatherBranch || ''}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Branch</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherBranch || ''}</span>
-              </div>
+              <PrintField
+                label="Branch"
+                value={data.fatherBranch || ''}
+              />
+              <PrintField
+                label="Branch"
+                value={data.motherBranch || ''}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Reason for Leaving</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.fatherReasonLeaving || ''}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-52 font-bold">Reason for Leaving</span>
-                <span className="w-6 font-bold">:</span>
-                <span className="font-normal">{data.motherReasonLeaving || ''}</span>
-              </div>
+              <PrintField
+                label="Reason for Leaving"
+                value={data.fatherReasonLeaving || ''}
+              />
+              <PrintField
+                label="Reason for Leaving"
+                value={data.motherReasonLeaving || ''}
+              />
             </div>
           </div>
 
           {/* Child Health Status */}
           <div className="mt-4 space-y-2">
-            <div className="flex items-center">
-              <span className="w-60 font-bold leading-tight">
-                Is the child a normal healthy child
-              </span>
-              <span className="w-6 font-bold">:</span>
-              <span className="font-normal">{data.isNormalHealthyChild ? 'Yes' : 'No'}</span>
-            </div>
-
-            <div className="flex items-start">
-              <span className="w-60 font-bold leading-tight">
-                Specify Major ailment, If any (Past/Present)
-              </span>
-              <span className="w-6 font-bold">:</span>
-              <span className="font-normal">{data.majorAilment || 'Nil'}</span>
-            </div>
+            <PrintField
+              label="Is the child a normal healthy child"
+              value={data.isNormalHealthyChild ? 'Yes' : 'No'}
+              labelWidth="w-[280px]"
+            />
+            <PrintField
+              label="Specify Major ailment, If any (Past/Present)"
+              value={data.majorAilment || 'Nil'}
+              labelWidth="w-[280px]"
+            />
           </div>
 
           {/* Three Photo Boxes */}
@@ -376,40 +316,42 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
             </div>
 
             <div className="mt-4 text-[11.5px]">
-              <span className="font-bold">Name in BLOCK LETTER :</span>
+              <PrintField label="Name in BLOCK LETTER" value="" labelWidth="w-[165px]" />
             </div>
           </div>
 
           {/* Bottom Submission Box containing Date of Submission, Timings, Reg No., Child's Name */}
-          <div className="mt-4 border border-black p-3 text-[12.5px] select-none text-black">
+          <div className="mt-4 border border-black p-3 text-[12px] select-none text-black">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <div className="flex items-center">
-                  <span className="w-40 font-bold">Date of Submission</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.dateOfSubmission || ''}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-40 font-bold">Timings</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.timings || data.submissionTimings || ''}</span>
-                </div>
+                <PrintField
+                  label="Date of Submission"
+                  value={data.dateOfSubmission || ''}
+                  labelWidth="w-[140px]"
+                />
+                <PrintField
+                  label="Timings"
+                  value={data.timings || data.submissionTimings || ''}
+                  labelWidth="w-[140px]"
+                />
               </div>
               <div className="space-y-2 pl-6">
-                <div className="flex items-center">
-                  <span className="w-28 font-bold">Reg No.</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal">{data.registrationNo}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-28 font-bold">Child's Name</span>
-                  <span className="w-6 font-bold">:</span>
-                  <span className="font-normal uppercase" title={data.childName}>
-                    {data.childName.trim().length > 18
-                      ? `${data.childName.trim().slice(0, 18)}...`
-                      : data.childName.trim()}
-                  </span>
-                </div>
+                <PrintField
+                  label="Reg No."
+                  value={data.registrationNo}
+                  labelWidth="w-[140px]"
+                />
+                <PrintField
+                  label="Child's Name"
+                  value={
+                    <span className="uppercase" title={data.childName}>
+                      {data.childName.trim().length > 18
+                        ? `${data.childName.trim().slice(0, 18)}...`
+                        : data.childName.trim()}
+                    </span>
+                  }
+                  labelWidth="w-[140px]"
+                />
               </div>
             </div>
           </div>

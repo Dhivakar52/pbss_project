@@ -41,10 +41,10 @@ export const PrintDocumentFooter: React.FC<PrintDocumentFooterProps> = ({
   const displayChildName = formatChildName(rawChildName)
 
   return (
-    <div className="print-footer w-full mt-auto pt-3 flex justify-between items-center select-none text-[12px] text-black font-sans">
-      <div>
+    <div className="print-footer w-full mt-auto pt-3 grid grid-cols-3 items-center select-none text-[12px] text-black font-sans">
+      <div className="text-left">
         {pageNumber !== undefined && (
-          <div className="flex items-center gap-1">
+          <div className="inline-flex items-center gap-1">
             <span className="font-bold text-black">Page</span>
             <span className="font-normal text-black">
               {pageNumber}{totalPages ? ` of ${totalPages}` : ''}
@@ -53,20 +53,25 @@ export const PrintDocumentFooter: React.FC<PrintDocumentFooterProps> = ({
         )}
       </div>
 
-      <div className="flex items-center gap-6 whitespace-nowrap">
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-black">Reg No. :</span>
+      <div className="text-center flex justify-center items-center">
+        <div className="inline-flex items-center gap-1.5 whitespace-nowrap">
+          <span className="font-bold text-black">Reg No :</span>
           <span className="font-normal text-black">{displayRegNo}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-black">Child's Name :</span>
-          <span
-            className="font-normal text-black uppercase"
-            title={rawChildName}
-          >
-            {displayChildName}
-          </span>
-        </div>
+      </div>
+
+      <div className="text-right flex justify-end items-center">
+        {rawChildName && (
+          <div className="inline-flex items-center gap-1.5 whitespace-nowrap">
+            <span className="font-bold text-black">Child's Name :</span>
+            <span
+              className="font-normal text-black uppercase"
+              title={rawChildName}
+            >
+              {displayChildName}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   )
