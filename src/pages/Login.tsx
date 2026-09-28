@@ -418,12 +418,12 @@ const Login: React.FC = () => {
 
         {/* ================= AGE ELIGIBILITY FOOTER ================= */}
         <div className="p-4 sm:p-5 bg-[#eaf5f9] border-t border-cyan-100/90 text-slate-700 space-y-2 text-center">
-          <p className="text-xs sm:text-sm font-bold text-[#1b586d]">
+          <p className="text-xs sm:text-sm font-bold text-red-700">
             Age eligibility minimum 3 years as on 1st June 2025
           </p>
           <div className="flex items-start justify-center gap-2 text-[11px] sm:text-xs text-slate-600 leading-snug font-medium text-left">
             <CalendarDays className="h-5 w-5 text-[#24758d] shrink-0 mt-0.5" />
-            <span>
+            <span className='text-red-700'>
               (i.e., Children born between 01/06/2021 and 31/05/2022 – both days inclusive) ONLY are eligible for registration.
             </span>
           </div>
