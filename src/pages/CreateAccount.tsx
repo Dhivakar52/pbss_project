@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { TextField } from "@/components/FormPrimitives"
-import { Loader2, ArrowLeft, User, Mail, Lock, CheckCircle } from "lucide-react"
+import { Loader2, ArrowLeft, User, Mail, Lock, CheckCircle, FileText } from "lucide-react"
 import { toast } from "@/components/ui/toast"
 import { useAuthStore } from "@/store/useAuthStore"
 import { validateRegisterForm, type RegisterFormErrors } from "@/utils/validation"
 import { STATIC_OTP } from "@/services/auth.service"
+import { RegistrationInstructionsModal } from "@/components/RegistrationInstructionsModal"
 
 const CreateAccount: React.FC = () => {
   const navigate = useNavigate()
@@ -20,6 +21,7 @@ const CreateAccount: React.FC = () => {
 
   const [regErrors, setRegErrors] = useState<RegisterFormErrors>({})
   const [isLoading, setIsLoading] = useState(false)
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false)
 
   // Handle Create Account submission
   const handleRegisterSubmit = async (e: React.FormEvent) => {
@@ -87,6 +89,19 @@ const CreateAccount: React.FC = () => {
               <p className="text-xs text-slate-500 mt-1">
                 Enter your details below to register for Pre-KG Online Admission
               </p>
+
+              {/* Complete Instructions Modal Link */}
+              <div className="mt-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsInstructionsOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0284c7] hover:text-[#0369a1] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-1 rounded-sm cursor-pointer transition-colors"
+                  aria-haspopup="dialog"
+                >
+                  <FileText className="h-3.5 w-3.5 shrink-0" />
+                  Click here to read the complete Instructions
+                </button>
+              </div>
             </div>
 
             {/* Registration Form with 4 Required Fields */}
@@ -219,6 +234,12 @@ const CreateAccount: React.FC = () => {
               </div>
 
             </form>
+
+            {/* Complete Instructions Modal */}
+            <RegistrationInstructionsModal
+              isOpen={isInstructionsOpen}
+              onClose={() => setIsInstructionsOpen(false)}
+            />
           </div>
         </div>
       </div>

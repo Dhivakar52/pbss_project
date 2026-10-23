@@ -298,13 +298,13 @@ export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
             </div>
 
             {/* Important Notice Card */}
-            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all overflow-hidden">
+            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40  flex-col md:flex-row md:items-center justify-between gap-4 transition-all overflow-hidden">
               <div className="flex items-start gap-3.5 shrink-0">
                 <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
                   <Bell className="h-5 w-5" />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1  mb-3">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white">Important Notice</h3>
                     <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF7E6] dark:bg-amber-950/60 text-[#D46B08] dark:text-amber-400 uppercase border border-[#FFD591] dark:border-amber-900 shadow-2xs whitespace-nowrap">
