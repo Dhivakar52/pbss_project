@@ -1212,14 +1212,14 @@ export default function HomeModule() {
 
     const childrenList = useMemo(() => {
         if (!isTwins) {
-            return [{ name: childName || 'Child 1', gender }]
+            return [{ name: childName?.trim() || '', gender }]
         }
         const totalCount = parseTwinsCount(twinsNo)
-        const list = [{ name: childName || 'Child 1', gender }]
+        const list = [{ name: childName?.trim() || '', gender }]
         for (let i = 0; i < totalCount - 1; i++) {
             const child = additionalChildren?.[i]
             list.push({
-                name: child?.name || `Child ${i + 2}`,
+                name: child?.name?.trim() || '',
                 gender: child?.gender || gender || '',
             })
         }
@@ -1240,14 +1240,6 @@ export default function HomeModule() {
         ? (selectedPrintChildIndex === 0 ? childName : (additionalChildren[selectedPrintChildIndex - 1]?.name || ''))
         : childName
 
-    // Synchronize editing so changing one child's name does not affect other children
-    const handleUpdateChildName = (val: string) => {
-        if (!isTwins || selectedPrintChildIndex === 0) {
-            setChildName(val)
-        } else {
-            updateAdditionalChild(selectedPrintChildIndex - 1, 'name', val)
-        }
-    }
     const [isHealthy, setIsHealthy] = useState<boolean>(true)
     const [majorAilment, setMajorAilment] = useState('')
     const [childGoesToSchool, setChildGoesToSchool] = useState<boolean>(false)
@@ -1667,15 +1659,7 @@ export default function HomeModule() {
     }
 
     const validateStep5 = () => {
-        if (isTwins) {
-            const totalCount = Math.max(1, Number(twinsNo) || (additionalChildren.length + 1))
-            for (let i = 0; i < totalCount; i++) {
-                if (!childDeclarations[i]) {
-                    const cName = i === 0 ? (childName || 'Child 1') : (additionalChildren[i - 1]?.name || `Child ${i + 1}`)
-                    return { valid: false, error: `Please accept the declaration for ${cName} before submitting.` }
-                }
-            }
-        } else if (!isDeclared) {
+        if (!isDeclared) {
             return { valid: false, error: "Please check and agree to the Declaration terms before submitting." }
         }
         const s1 = validateStep1()
@@ -3222,9 +3206,9 @@ export default function HomeModule() {
                                         onChange={(e) => handleSelectPrintChild(Number(e.target.value))}
                                         className="h-8 px-2.5 text-xs font-bold rounded-lg border border-blue-300 dark:border-blue-700 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
                                     >
-                                        {childrenList.map((_, idx) => (
+                                        {childrenList.map((child, idx) => (
                                             <option key={idx} value={idx}>
-                                                Child {idx + 1}
+                                                {child.name?.trim() ? child.name.trim() : `Child ${idx + 1} (Name not entered)`}
                                             </option>
                                         ))}
                                     </select>
@@ -3252,8 +3236,8 @@ export default function HomeModule() {
                         <div className="lg:col-span-9 space-y-6">
                             {activeStepId === 1 && (
                                 <Step1ApplicantDetails
-                                    childName={activeChildName}
-                                    setChildName={handleUpdateChildName}
+                                    childName={childName}
+                                    setChildName={setChildName}
                                     dob={dob}
                                     setDob={setDob}
                                     gender={gender}
