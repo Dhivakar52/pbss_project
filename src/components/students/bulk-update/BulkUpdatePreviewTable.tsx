@@ -48,7 +48,7 @@ export const BulkUpdatePreviewTable: React.FC<BulkUpdatePreviewTableProps> = ({ 
                   {rec.registrationNumber || rec.id}
                 </td>
                 <td className="py-2 px-3 font-semibold text-slate-900 dark:text-white whitespace-nowrap">
-                  {rec.studentName}
+                  {rec.studentName || '-'}
                 </td>
                 <td className="py-2 px-3 whitespace-nowrap">
                   <span
@@ -64,11 +64,11 @@ export const BulkUpdatePreviewTable: React.FC<BulkUpdatePreviewTableProps> = ({ 
                   >
                     {rec.applicationStatus === 'Declared' && <CheckCircle2 className="h-3 w-3" />}
                     {rec.applicationStatus === 'Pending' && <Clock className="h-3 w-3" />}
-                    {rec.applicationStatus}
+                    {rec.applicationStatus || '-'}
                   </span>
                 </td>
-                <td className="py-2 px-3 whitespace-nowrap">{rec.schoolBranch}</td>
-                <td className="py-2 px-3 whitespace-nowrap">{rec.academicYear}</td>
+                <td className="py-2 px-3 whitespace-nowrap">{rec.schoolBranch || '-'}</td>
+                <td className="py-2 px-3 whitespace-nowrap">{rec.academicYear || '-'}</td>
               </tr>
             ))}
           </tbody>

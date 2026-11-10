@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
-import { X, Mail, Copy, Check, Code, Eye, ShieldCheck } from 'lucide-react'
-import { toast } from '@/components/ui/toast'
+import React from 'react'
+import { X, Mail, ShieldCheck } from 'lucide-react'
 import defaultLogo from '@/assets/images/logo.png'
 
 export interface OtpEmailPreviewModalProps {
@@ -67,7 +66,7 @@ export function getOtpEmailHtml(otp: string, logoUrl: string, targetEmail?: stri
               <!-- Verification Message -->
               <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569; max-width: 440px;">
                 Dear <strong style="color: #1e293b;">${recipientText}</strong>,<br />
-                Thank you for initiating your registration for <strong>PRE-KG (2025-26) Online Admission</strong>. Please use the following One-Time Password (OTP) to verify your account:
+                Thank you for initiating your registration for <strong>PRE-KG (2027-28) Online Admission</strong>. Please use the following One-Time Password (OTP) to verify your account:
               </p>
 
               <!-- Prominent OTP Display Box -->
@@ -99,7 +98,7 @@ export function getOtpEmailHtml(otp: string, logoUrl: string, targetEmail?: stri
           <tr>
             <td align="center" style="background-color: #f8fafc; padding: 20px 24px; border-top: 1px solid #f1f5f9;">
               <p style="margin: 0; font-size: 11px; color: #64748b; line-height: 1.5;">
-                &copy; 2025-2026 Padma Seshadri Bala Bhavan Senior Secondary School.<br />
+                &copy; 2027-2028 Padma Seshadri Bala Bhavan Senior Secondary School.<br />
                 All Rights Reserved.
               </p>
             </td>
@@ -119,23 +118,7 @@ export const OtpEmailPreviewModal: React.FC<OtpEmailPreviewModalProps> = ({
   targetEmail,
   logoUrl = defaultLogo,
 }) => {
-  const [activeTab, setActiveTab] = useState<'preview' | 'html'>('preview')
-  const [copied, setCopied] = useState(false)
-
   if (!isOpen) return null
-
-  const emailHtml = getOtpEmailHtml(otp, logoUrl, targetEmail)
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(emailHtml)
-      setCopied(true)
-      toast.success('Email HTML copied to clipboard!')
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      toast.error('Failed to copy HTML')
-    }
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
@@ -174,51 +157,19 @@ export const OtpEmailPreviewModal: React.FC<OtpEmailPreviewModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* View Mode Toggle */}
-            <div className="flex items-center rounded-lg bg-slate-200/70 dark:bg-slate-800 p-0.5 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => setActiveTab('preview')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
-                  activeTab === 'preview'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Eye className="h-3.5 w-3.5" />
-                <span>Visual</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('html')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
-                  activeTab === 'html'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Code className="h-3.5 w-3.5" />
-                <span>HTML</span>
-              </button>
-            </div>
-
-            {/* Close Button (X) */}
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close modal"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close modal"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100/70 dark:bg-slate-950/70">
-          {activeTab === 'preview' ? (
-            /* ================= VISUAL EMAIL PREVIEW ================= */
+          /* ================= VISUAL EMAIL PREVIEW ================= */
             <div className="max-w-xl mx-auto space-y-3">
               {/* Simulated Email Envelope Header */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3 text-xs space-y-1 text-slate-600 dark:text-slate-300 shadow-2xs">
@@ -310,7 +261,7 @@ export const OtpEmailPreviewModal: React.FC<OtpEmailPreviewModalProps> = ({
                           className="text-slate-600 dark:text-slate-300"
                         >
                           Dear <strong className="text-slate-900 dark:text-white">{targetEmail || 'Applicant'}</strong>,<br />
-                          Thank you for registering for <strong>PRE-KG (2025-26) Online Admission</strong>. Please use the One-Time Password (OTP) below to verify your account:
+                          Thank you for registering for <strong>PRE-KG (2027-28) Online Admission</strong>. Please use the One-Time Password (OTP) below to verify your account:
                         </p>
 
                         {/* Prominent Dynamic OTP Box */}
@@ -392,7 +343,7 @@ export const OtpEmailPreviewModal: React.FC<OtpEmailPreviewModalProps> = ({
                         }}
                       >
                         <p style={{ margin: 0, fontSize: '11px', color: '#64748b', lineHeight: 1.5 }}>
-                          &copy; 2025-2026 Padma Seshadri Bala Bhavan Senior Secondary School.<br />
+                          &copy; 2027-2028 Padma Seshadri Bala Bhavan Senior Secondary School.<br />
                           All Rights Reserved.
                         </p>
                       </td>
@@ -401,37 +352,10 @@ export const OtpEmailPreviewModal: React.FC<OtpEmailPreviewModalProps> = ({
                 </table>
               </div>
             </div>
-          ) : (
-            /* ================= RAW HTML CODE VIEW ================= */
-            <div className="max-w-xl mx-auto space-y-2">
-              <div className="flex items-center justify-between text-xs text-slate-500 pb-1">
-                <span>Complete HTML Source with Dynamic OTP: {otp}</span>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                  {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy Code'}</span>
-                </button>
-              </div>
-              <pre className="p-4 rounded-xl bg-slate-900 text-slate-100 text-xs font-mono overflow-x-auto leading-relaxed border border-slate-800">
-                <code>{emailHtml}</code>
-              </pre>
-            </div>
-          )}
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5 text-slate-500" />}
-            <span>{copied ? 'Copied HTML' : 'Copy HTML'}</span>
-          </button>
+        <div className="flex items-center justify-end px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
 
           <button
             type="button"

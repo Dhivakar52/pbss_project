@@ -6,10 +6,12 @@ interface StepSidebarProps {
   steps: Step[]
   activeStepId: number
   completedStepIds: number[]
-  onBackToDashboard: () => void
+  onBackToDashboard?: () => void
   backLabel?: string
   onStepSelect: (stepId: number) => void
   isFromAdmin?: boolean
+  isReadOnly?: boolean
+  onOpenInstruction?: () => void
 }
 
 export const StepSidebar: React.FC<StepSidebarProps> = ({
@@ -19,19 +21,23 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
   onBackToDashboard,
   backLabel,
   onStepSelect,
-  isFromAdmin = false,
+  isFromAdmin: _isFromAdmin = false,
+  isReadOnly = false,
+  onOpenInstruction,
 }) => {
   const isAllDone = completedStepIds.length === 5
 
   return (
-    <div className="space-y-4">
-      <button
-        type="button"
-        onClick={onBackToDashboard}
-        className="flex items-center gap-1.5 text-xs font-semibold text-[#1677FF] dark:text-blue-400 hover:text-[#0958D9] dark:hover:text-blue-300 transition-colors cursor-pointer"
-      >
-        <ArrowLeft className="h-4 w-4" /> {backLabel || 'Back to Dashboard'}
-      </button>
+    <div className={onBackToDashboard ? "space-y-4" : ""}>
+      {onBackToDashboard && (
+        <button
+          type="button"
+          onClick={onBackToDashboard}
+          className="flex items-center gap-1.5 text-xs font-semibold text-[#1677FF] dark:text-blue-400 hover:text-[#0958D9] dark:hover:text-blue-300 transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="h-4 w-4" /> {backLabel || 'Back to Dashboard'}
+        </button>
+      )}
 
       <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
         {/* Step Counter & Progress Bar */}
@@ -53,7 +59,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
             const isActive = activeStepId === step.id
             const isDone = completedStepIds.includes(step.id)
             const isPrevDone = step.id === 1 || completedStepIds.includes(step.id - 1)
-            const isLocked = !isFromAdmin && !isAllDone && !isPrevDone
+            const isLocked = !isReadOnly && !isAllDone && !isDone && !isPrevDone
 
             return (
               <div
@@ -86,23 +92,19 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                   >
                     {isDone ? (
                       <CheckCircle2 className="h-3.5 w-3.5" />
-                    ) : isLocked ? (
-                      <Lock className="h-3 w-3 text-slate-400" />
                     ) : (
                       step.id
                     )}
                   </div>
                   <span className="text-xs font-medium truncate">
-                    {step.title} {step.id === 3 && <span className="text-slate-400 dark:text-slate-500 font-normal text-[11px]">(Optional)</span>}
+                    {step.title} {step.id === 3 && <span className="text-[#1677FF] dark:text-blue-400 font-normal text-[11px]">(If Applicable)</span>}
                   </span>
                 </div>
                 <div className="shrink-0 flex items-center">
                   {isLocked ? (
                     <Lock className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                  ) : isDone ? (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                   ) : (
-                    <ChevronRight className={`h-3.5 w-3.5 ${isActive ? 'text-[#1677FF] dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                    <ChevronRight className={`h-3.5 w-3.5 ${isActive ? 'text-[#1677FF] dark:text-blue-400' : isDone ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`} />
                   )}
                 </div>
               </div>
@@ -111,14 +113,25 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         </div>
 
         {/* Info Card at bottom */}
-        <div className="p-3.5 rounded-xl bg-[#F0F7FF] dark:bg-blue-950/30 border border-[#BDE0FE] dark:border-blue-900/50 flex items-start gap-3 mt-4">
-          <div className="p-2 rounded-lg bg-[#E6F4FF] dark:bg-blue-900/40 text-[#1677FF] dark:text-blue-400 shrink-0 mt-0.5">
-            <Printer className="h-4 w-4" />
+        <div className="p-3.5 rounded-xl bg-[#F0F7FF] dark:bg-blue-950/30 border border-[#BDE0FE] dark:border-blue-900/50 flex flex-col gap-2.5 mt-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-[#E6F4FF] dark:bg-blue-900/40 text-[#1677FF] dark:text-blue-400 shrink-0 mt-0.5">
+              <Printer className="h-4 w-4" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Please fill up the form carefully.</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">All fields marked with <span className="text-red-500 font-bold">*</span> indicates mandatory.</p>
+            </div>
           </div>
-          <div className="space-y-0.5">
-            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Please fill up the form carefully.</p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">All fields marked with <span className="text-red-500 font-bold">*</span> are mandatory.</p>
-          </div>
+          {onOpenInstruction && (
+            <button
+              type="button"
+              onClick={onOpenInstruction}
+              className="text-[11px] font-semibold text-[#1677FF] dark:text-blue-400 hover:underline text-left cursor-pointer pt-1.5 border-t border-blue-200/60 dark:border-blue-900/40 flex items-center gap-1.5"
+            >
+              <span>📖 Read Online Registration Guidelines</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

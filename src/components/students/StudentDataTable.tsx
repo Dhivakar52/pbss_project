@@ -13,7 +13,6 @@ import {
 import Pagination from '@/common/Pagination'
 import {
   Search,
-  Calendar as CalendarIcon,
   SlidersHorizontal,
   Plus,
   ArrowUpDown,
@@ -26,9 +25,11 @@ import {
   Trash2,
   Filter,
   FileSpreadsheet,
-  Printer,
   FileText,
+  Printer,
   Layers,
+  RotateCcw,
+  X,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -38,8 +39,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { StudentRecord } from '@/data/mockStudents'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
 import { toast } from '@/components/ui/toast'
 import {
   Table,
@@ -65,17 +64,21 @@ export interface StudentDataTableProps {
   onSelectId?: (record: StudentRecord) => void
   showCheckmarkCols?: boolean
   onExportExcel?: () => void
+  onExportPdf?: () => void
   onPrint?: () => void
   onToggleFilterPanel?: () => void
   onPrintTrackSheet?: (record: StudentRecord) => void
   onPrintTrackSheet2?: (record: StudentRecord) => void
   onPrintRegistrationForm?: (record: StudentRecord) => void
   onPrintRegistrationForm5?: (record: StudentRecord) => void
+  activeFilterCount?: number
+  onClearFilters?: () => void
+  activeFilterBadges?: React.ReactNode
 }
 
 export function StudentDataTable({
   title = "Student Applications Master List",
-  subtitle = "Manage registered pre-kg applicants. Click any Reg Number or ID to view complete application details.",
+  subtitle = "Manage registered pre-kg applicants. Click any Reg Number or ID to view complete applicant details.",
   data,
   searchTerm: controlledSearchTerm,
   onSearchChange: controlledOnSearchChange,
@@ -88,12 +91,16 @@ export function StudentDataTable({
   onSelectId,
   showCheckmarkCols = true,
   onExportExcel,
+  onExportPdf,
   onPrint,
   onToggleFilterPanel,
   onPrintTrackSheet,
   onPrintTrackSheet2,
   onPrintRegistrationForm,
   onPrintRegistrationForm5,
+  activeFilterCount = 0,
+  onClearFilters,
+  activeFilterBadges,
 }: StudentDataTableProps) {
   // Search & Filter States
   const [internalSearchTerm, setInternalSearchTerm] = useState('')
@@ -106,15 +113,20 @@ export function StudentDataTable({
     }
   }
 
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined)
-  const [toDate, setToDate] = useState<Date | undefined>(undefined)
   const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(false)
+
+  const hasActiveFilters = activeFilterCount > 0
+  const totalActiveCount = activeFilterCount || 0
+
+  const handleClearAllFilters = () => {
+    if (onClearFilters) onClearFilters()
+  }
 
   // Sorting State for TanStack Table
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  // Filter Data locally by Search & Date Range
+  // Filter Data locally by Search
   const filteredData = useMemo(() => {
     return data.filter((s: StudentRecord) => {
       // Global Search Filter
@@ -140,19 +152,9 @@ export function StudentDataTable({
         }
       }
 
-      // Date Range Filter
-      const dateVal = s.date || (s as Record<string, any>).date_of_submission || (s as Record<string, any>).dob
-      if (dateVal && (fromDate || toDate)) {
-        const itemDate = new Date(dateVal)
-        if (!isNaN(itemDate.getTime())) {
-          if (fromDate && itemDate < fromDate) return false
-          if (toDate && itemDate > toDate) return false
-        }
-      }
-
       return true
     })
-  }, [data, searchTerm, fromDate, toDate])
+  }, [data, searchTerm])
 
   // Column Definitions for TanStack Table
   const columns = useMemo<ColumnDef<StudentRecord>[]>(() => {
@@ -219,7 +221,7 @@ export function StudentDataTable({
                 else if (onView) onView(record)
               }}
               className="hover:underline text-[#1677FF] dark:text-blue-400 font-mono font-bold cursor-pointer text-left inline-flex items-center gap-1.5 group"
-              title={`Click to view application details for ID ${record.id}`}
+              title={`Click to view applicant details for ID ${record.id}`}
             >
               <span className="group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
                 {record.registrationNumber}
@@ -246,8 +248,8 @@ export function StudentDataTable({
           </button>
         ),
         cell: ({ row }) => (
-          <span className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
-            {row.original.studentName}
+          <span className="font-bold text-slate-900 dark:text-white max-w-[200px] truncate inline-block" title={row.original.studentName || '-'}>
+            {row.original.studentName || '-'}
           </span>
         ),
       },
@@ -256,7 +258,7 @@ export function StudentDataTable({
         header: () => <span className="font-semibold text-white">Parent / Guardian</span>,
         cell: ({ row }) => (
           <span className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
-            {row.original.fatherName}
+            {row.original.fatherName || '-'}
           </span>
         ),
       },
@@ -273,17 +275,37 @@ export function StudentDataTable({
           </button>
         ),
         cell: ({ row }) => (
-          <span className="whitespace-nowrap">{row.original.schoolBranch}</span>
+          <span className="whitespace-nowrap">{row.original.schoolBranch || '-'}</span>
         ),
       },
       {
         id: 'areaCity',
         header: () => <span className="font-semibold text-white">Area / City</span>,
-        cell: ({ row }) => (
-          <span className="text-slate-500 whitespace-nowrap">
-            {row.original.area}, {row.original.city}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const area = (row.original.area || '').trim()
+          const city = (row.original.city || '').trim()
+
+          let display = '-'
+          if (area && city) {
+            const lowerArea = area.toLowerCase()
+            const lowerCity = city.toLowerCase()
+            if (lowerArea === lowerCity) {
+              display = city
+            } else if (lowerArea.endsWith(`, ${lowerCity}`) || lowerArea.endsWith(`,${lowerCity}`) || lowerArea.endsWith(` ${lowerCity}`)) {
+              display = area
+            } else {
+              display = `${area}, ${city}`
+            }
+          } else if (area || city) {
+            display = area || city
+          }
+
+          return (
+            <span className="text-slate-500 whitespace-nowrap" title={display}>
+              {display}
+            </span>
+          )
+        },
       },
       {
         accessorKey: 'applicationStatus',
@@ -317,17 +339,27 @@ export function StudentDataTable({
         {
           id: 'trackSheet',
           accessorFn: (row) => row.trackSheet ?? row.status1,
-          header: () => <span title="TrackSheet">✔</span>,
+          header: () => (
+            <span
+              title="Track Sheet Status (✔ Submitted / - Pending)"
+              className="font-semibold text-white whitespace-nowrap"
+            >
+              Track Sheet
+            </span>
+          ),
           cell: ({ row }) => {
             const isChecked = Boolean(row.original.trackSheet ?? row.original.status1)
             return (
               <div className="text-center whitespace-nowrap">
                 {isChecked ? (
-                  <span className="inline-block p-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
+                  <span
+                    className="inline-block p-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold"
+                    title="Track Sheet: Submitted"
+                  >
                     ✔
                   </span>
                 ) : (
-                  <span className="text-slate-300">-</span>
+                  <span className="text-slate-300" title="Track Sheet: Pending">-</span>
                 )}
               </div>
             )
@@ -336,17 +368,27 @@ export function StudentDataTable({
         {
           id: 'registrationForm',
           accessorFn: (row) => row.registrationForm ?? row.status2,
-          header: () => <span title="Registration Form">✔</span>,
+          header: () => (
+            <span
+              title="Certificate / Registration Form Status (✔ Submitted / - Pending)"
+              className="font-semibold text-white whitespace-nowrap"
+            >
+              Reg Form
+            </span>
+          ),
           cell: ({ row }) => {
             const isChecked = Boolean(row.original.registrationForm ?? row.original.status2)
             return (
               <div className="text-center whitespace-nowrap">
                 {isChecked ? (
-                  <span className="inline-block p-1 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
+                  <span
+                    className="inline-block p-1 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 font-bold"
+                    title="Certificate / Registration Form: Submitted"
+                  >
                     ✔
                   </span>
                 ) : (
-                  <span className="text-slate-300">-</span>
+                  <span className="text-slate-300" title="Certificate / Registration Form: Pending">-</span>
                 )}
               </div>
             )
@@ -493,7 +535,7 @@ export function StudentDataTable({
           </div>
         </div>
 
-        {/* Right Controls: Search, Date Range, Filter, Add */}
+        {/* Right Controls: Search, Filter, Add */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Input */}
           <div className="relative flex items-center min-w-[200px] sm:min-w-[220px]">
@@ -507,44 +549,19 @@ export function StudentDataTable({
             />
           </div>
 
-          {/* Date Range Selector: From Date -> To Date */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-1 text-xs">
-            <Popover>
-              <PopoverTrigger
-                render={
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 px-2 py-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 font-medium cursor-pointer"
-                  >
-                    <CalendarIcon className="h-3.5 w-3.5 text-slate-400" />
-                    <span>{fromDate ? format(fromDate, 'dd/MM/yyyy') : 'From Date'}</span>
-                  </button>
-                }
-              />
-              <PopoverContent align="start" className="w-auto p-0 shadow-lg border rounded-xl">
-                <Calendar mode="single" selected={fromDate} onSelect={setFromDate} />
-              </PopoverContent>
-            </Popover>
-
-            <span className="text-slate-400 font-bold">→</span>
-
-            <Popover>
-              <PopoverTrigger
-                render={
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 px-2 py-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 font-medium cursor-pointer"
-                  >
-                    <CalendarIcon className="h-3.5 w-3.5 text-slate-400" />
-                    <span>{toDate ? format(toDate, 'dd/MM/yyyy') : 'To Date'}</span>
-                  </button>
-                }
-              />
-              <PopoverContent align="end" className="w-auto p-0 shadow-lg border rounded-xl">
-                <Calendar mode="single" selected={toDate} onSelect={setToDate} />
-              </PopoverContent>
-            </Popover>
-          </div>
+          {/* Active filter chip if filters are applied */}
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={handleClearAllFilters}
+              className="h-8 px-2.5 rounded-lg text-xs font-bold bg-blue-50 hover:bg-rose-50 text-blue-700 hover:text-rose-700 border border-blue-200 hover:border-rose-300 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-rose-950/60 dark:hover:text-rose-300 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs group"
+              title="Filters are applied. Click to remove all filters."
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-600 group-hover:bg-rose-600"></span>
+              <span>{totalActiveCount} Filter{totalActiveCount > 1 ? 's' : ''}</span>
+              <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+            </button>
+          )}
 
           {/* Filter Popover Button */}
           <Popover>
@@ -553,12 +570,20 @@ export function StudentDataTable({
                 <button
                   type="button"
                   title="Filter & Export Options"
-                  className={`h-9 w-9 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${isFilterPanelVisible
-                    ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                  className={`relative h-9 w-9 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
+                    hasActiveFilters
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 ring-2 ring-blue-500/20 dark:bg-blue-950 dark:text-blue-400'
+                      : isFilterPanelVisible
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
+                  {hasActiveFilters && (
+                    <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                      {totalActiveCount}
+                    </span>
+                  )}
                 </button>
               }
             />
@@ -578,12 +603,16 @@ export function StudentDataTable({
                     }
                   }}
                   title="Toggle Custom Filters"
-                  className={`p-2 rounded-xl transition-all cursor-pointer ${isFilterPanelVisible
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                    }`}
+                  className={`relative p-2 rounded-xl transition-all cursor-pointer ${
+                    hasActiveFilters || isFilterPanelVisible
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                  }`}
                 >
                   <Filter className="h-4 w-4" />
+                  {hasActiveFilters && (
+                    <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-600"></span>
+                  )}
                 </button>
 
                 {/* 2. Export Excel Icon */}
@@ -599,18 +628,30 @@ export function StudentDataTable({
                   <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
                 </button>
 
-                {/* 3. Print Icon */}
+                {/* 3. Download PDF Icon */}
                 <button
                   type="button"
                   onClick={() => {
-                    if (onPrint) onPrint()
-                    else window.print()
+                    if (onExportPdf) onExportPdf()
+                    else if (onPrint) onPrint()
                   }}
-                  title="Print Report"
+                  title="Download PDF"
                   className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
                 >
-                  <Printer className="h-4 w-4 text-purple-600" />
+                  <FileText className="h-4 w-4 text-rose-600" />
                 </button>
+
+                {/* 4. Reset Filters if active */}
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={handleClearAllFilters}
+                    title="Reset All Filters"
+                    className="p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 transition-all cursor-pointer border-l border-slate-200 dark:border-slate-800 ml-1 pl-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </PopoverContent>
           </Popover>
@@ -642,6 +683,9 @@ export function StudentDataTable({
         </div>
       </div>
 
+      {/* Active Filter Badges */}
+      {activeFilterBadges}
+
       {/* ================= DATA TABLE CONTAINER & SHADCN TABLE ================= */}
       <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
         <div className="overflow-x-auto max-w-full">
@@ -664,10 +708,9 @@ export function StudentDataTable({
                     return (
                       <TableHead
                         key={header.id}
-                        className={`py-3 px-4 border-white/20 text-white font-semibold uppercase tracking-wider whitespace-nowrap h-auto ${isSelect ? 'text-center w-10 px-2' : ''
-                          } ${isStatus1 ? 'bg-red-900/60 text-center w-12 px-2' : ''
-                          } ${isStatus2 ? 'bg-purple-900/60 text-center w-12 px-2' : ''} ${isSlNo || isStatus || isActions ? 'text-center' : ''
-                          }`}
+                        className={`py-3 px-4 border-r border-white/20 text-white font-semibold uppercase tracking-wider whitespace-nowrap h-auto select-none ${
+                          isSelect ? 'text-center w-10 px-2' : ''
+                        } ${isSlNo || isStatus || isActions || isStatus1 || isStatus2 ? 'text-center' : ''}`}
                       >
                         {header.isPlaceholder
                           ? null

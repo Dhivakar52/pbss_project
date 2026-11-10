@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import Pagination from '@/common/Pagination'
 import {
   Search,
-  Calendar as CalendarIcon,
   SlidersHorizontal,
   Plus,
   ArrowUpDown,
@@ -18,6 +17,8 @@ import {
   Printer,
   FileText,
   Layers,
+  X,
+  RotateCcw,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -27,8 +28,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { StudentRecord } from '@/data/mockStudents'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
 import { toast } from '@/components/ui/toast'
 import { isDateField, formatDateToDDMMYYYY } from '@/utils/exportToExcel'
 
@@ -58,10 +57,15 @@ export interface AdminDataTableProps<T = any> {
   onBulkUpdate?: () => void
   onSelectId?: (record: T) => void
   showCheckmarkCols?: boolean
+  showApplicationAndStudentCols?: boolean
+  showActions?: boolean
   customFilterPanel?: React.ReactNode
   onExportExcel?: () => void
+  onExportPdf?: () => void
   onPrint?: () => void
   onToggleFilterPanel?: () => void
+  activeFilterCount?: number
+  onClearFilters?: () => void
   onPrintTrackSheet?: (record: T) => void
   onPrintTrackSheet2?: (record: T) => void
   onPrintRegistrationForm?: (record: T) => void
@@ -95,10 +99,15 @@ export function AdminDataTable<T extends Record<string, any>>({
   onBulkUpdate,
   onSelectId,
   showCheckmarkCols = true,
+  showApplicationAndStudentCols = true,
+  showActions = true,
   customFilterPanel,
   onExportExcel,
+  onExportPdf,
   onPrint,
   onToggleFilterPanel,
+  activeFilterCount = 0,
+  onClearFilters,
   onPrintTrackSheet,
   onPrintTrackSheet2,
   onPrintRegistrationForm,
@@ -116,8 +125,6 @@ export function AdminDataTable<T extends Record<string, any>>({
     setCurrentPage(1)
   }
 
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined)
-  const [toDate, setToDate] = useState<Date | undefined>(undefined)
   const [isFilterPanelVisible, setIsFilterPanelVisible] = useState(false)
 
   // Pagination States
@@ -137,39 +144,50 @@ export function AdminDataTable<T extends Record<string, any>>({
     }
   }
 
-  // De-duplicate columns: remove application_number and student_name from middle scrollable area
+  // De-duplicate columns: remove application_number, student_name, s.no, applicant id from middle scrollable area
   const scrollableColumns = useMemo(() => {
     if (!columns) return []
     return columns.filter((col) => {
-      const lower = col.key.toLowerCase()
-      return (
-        lower !== 'application_number' &&
-        lower !== 'student_name' &&
-        lower !== 'slno' &&
-        lower !== 'id'
-      )
+      const lower = col.key.toLowerCase().replace(/[^a-z0-9]/g, '')
+      // Always exclude S.No because S.No is already rendered as frozen column 1
+      if (lower === 'slno' || lower === 'sno') return false
+      // Always exclude Applicant ID (Requirement 3)
+      if (lower === 'applicantid' || lower === 'appdeclaredid' || lower === 'applicant' || lower === 'id') return false
+      // Exclude row counts
+      if (lower === 'totalrowcount' || lower === 'rowcount') return false
+      // Exclude Application No and Student Name
+      if (
+        lower === 'applicationnumber' ||
+        lower === 'applicationno' ||
+        lower === 'registrationnumber' ||
+        lower === 'studentname' ||
+        lower === 'childname' ||
+        lower === 'fullname' ||
+        lower === 'name'
+      ) {
+        return false
+      }
+      return true
     })
   }, [columns])
 
   // Keys used for sorting frozen columns across lowercase and uppercase schemas
   const appNumberSortKey = useMemo(() => {
-    if (!columns || columns.length === 0) return 'registrationNumber'
-    const found = columns.find(
-      (c) =>
-        c.key.toLowerCase() === 'application_number' ||
-        c.key.toLowerCase() === 'registrationnumber'
-    )
-    return found ? found.key : 'application_number'
+    if (!columns || columns.length === 0) return 'ApplicationNo'
+    const found = columns.find((c) => {
+      const k = c.key.toLowerCase().replace(/[^a-z0-9]/g, '')
+      return k === 'applicationno' || k === 'applicationnumber' || k === 'registrationnumber'
+    })
+    return found ? found.key : 'ApplicationNo'
   }, [columns])
 
   const studentNameSortKey = useMemo(() => {
-    if (!columns || columns.length === 0) return 'studentName'
-    const found = columns.find(
-      (c) =>
-        c.key.toLowerCase() === 'student_name' ||
-        c.key.toLowerCase() === 'studentname'
-    )
-    return found ? found.key : 'student_name'
+    if (!columns || columns.length === 0) return 'ChildName'
+    const found = columns.find((c) => {
+      const k = c.key.toLowerCase().replace(/[^a-z0-9]/g, '')
+      return k === 'childname' || k === 'studentname' || k === 'fullname' || k === 'name'
+    })
+    return found ? found.key : 'ChildName'
   }, [columns])
 
   // Filtered and Sorted Data
@@ -180,15 +198,15 @@ export function AdminDataTable<T extends Record<string, any>>({
         const q = searchTerm.toLowerCase()
         if (columns && columns.length > 0) {
           // Check application number and student name
-          const appNo = item.application_number || item.APPLICATION_NUMBER || item.registrationNumber || ''
-          const name = item.student_name || item.STUDENT_NAME || item.name || ''
+          const appNo = item.ApplicationNo || item.application_number || item.APPLICATION_NUMBER || item.registrationNumber || ''
+          const name = item.ChildName || item.student_name || item.STUDENT_NAME || item.studentName || item.name || ''
           if (String(appNo).toLowerCase().includes(q) || String(name).toLowerCase().includes(q)) {
             return true
           }
 
           // Check all remaining columns
           const matchesCol = scrollableColumns.some((col) => {
-            const val = item[col.key]
+            const val = item[col.key] !== undefined ? item[col.key] : Object.entries(item).find(([k]) => k.toLowerCase() === col.key.toLowerCase())?.[1]
             if (val === undefined || val === null) return false
             return String(val).toLowerCase().includes(q)
           })
@@ -208,39 +226,34 @@ export function AdminDataTable<T extends Record<string, any>>({
         }
       }
 
-      // Date Range filter
-      const dateVal =
-        item.date ||
-        item.date_of_submission ||
-        item.DATE_OF_SUBMISSION ||
-        item.dob ||
-        item.DOB
-
-      if (dateVal && (fromDate || toDate)) {
-        const itemDate = new Date(dateVal)
-        if (!isNaN(itemDate.getTime())) {
-          if (fromDate && itemDate < fromDate) return false
-          if (toDate && itemDate > toDate) return false
-        }
-      }
-
       return true
     }).sort((a: any, b: any) => {
       let valA = a[sortField]
       let valB = b[sortField]
 
+      // Case-insensitive key lookup if undefined
+      if (valA === undefined) {
+        const matchKeyA = Object.keys(a).find((k) => k.toLowerCase() === sortField.toLowerCase())
+        if (matchKeyA) valA = a[matchKeyA]
+      }
+      if (valB === undefined) {
+        const matchKeyB = Object.keys(b).find((k) => k.toLowerCase() === sortField.toLowerCase())
+        if (matchKeyB) valB = b[matchKeyB]
+      }
+
       // Fallback aliases for sorting
-      if (valA === undefined && sortField.toLowerCase() === 'application_number') {
-        valA = a.application_number || a.APPLICATION_NUMBER || a.registrationNumber
+      const sortLower = sortField.toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (valA === undefined && (sortLower === 'applicationnumber' || sortLower === 'applicationno' || sortLower === 'registrationnumber')) {
+        valA = a.ApplicationNo || a.application_number || a.APPLICATION_NUMBER || a.registrationNumber
       }
-      if (valB === undefined && sortField.toLowerCase() === 'application_number') {
-        valB = b.application_number || b.APPLICATION_NUMBER || b.registrationNumber
+      if (valB === undefined && (sortLower === 'applicationnumber' || sortLower === 'applicationno' || sortLower === 'registrationnumber')) {
+        valB = b.ApplicationNo || b.application_number || b.APPLICATION_NUMBER || b.registrationNumber
       }
-      if (valA === undefined && sortField.toLowerCase() === 'student_name') {
-        valA = a.student_name || a.STUDENT_NAME || a.studentName
+      if (valA === undefined && (sortLower === 'studentname' || sortLower === 'childname')) {
+        valA = a.ChildName || a.student_name || a.STUDENT_NAME || a.studentName || a.FullName
       }
-      if (valB === undefined && sortField.toLowerCase() === 'student_name') {
-        valB = b.student_name || b.STUDENT_NAME || b.studentName
+      if (valB === undefined && (sortLower === 'studentname' || sortLower === 'childname')) {
+        valB = b.ChildName || b.student_name || b.STUDENT_NAME || b.studentName || b.FullName
       }
 
       if (valA === undefined || valA === null) return 1
@@ -256,7 +269,7 @@ export function AdminDataTable<T extends Record<string, any>>({
       if (strA > strB) return sortOrder === 'asc' ? 1 : -1
       return 0
     })
-  }, [data, searchTerm, fromDate, toDate, sortField, sortOrder, columns, scrollableColumns])
+  }, [data, searchTerm, sortField, sortOrder, columns, scrollableColumns])
 
   // Pagination calculation
   const totalRecords = filteredData.length
@@ -284,7 +297,11 @@ export function AdminDataTable<T extends Record<string, any>>({
 
   // Cell formatting helper
   const renderCellContent = (row: any, key: string) => {
-    const val = row[key]
+    let val = row[key]
+    if (val === undefined) {
+      const matchKey = Object.keys(row).find((k) => k.toLowerCase() === key.toLowerCase())
+      if (matchKey) val = row[matchKey]
+    }
     if (val === undefined || val === null || val === '') return '-'
 
     const lowerKey = key.toLowerCase()
@@ -373,52 +390,19 @@ export function AdminDataTable<T extends Record<string, any>>({
           {/* Report Type Dropdown next to the Search field */}
           {searchExtra}
 
-          {/* Date Range Selector: From Date -> To Date */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-1 text-xs">
-            <Popover>
-              <PopoverTrigger
-                render={
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 px-2 py-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 font-medium cursor-pointer"
-                  >
-                    <CalendarIcon className="h-3.5 w-3.5 text-slate-400" />
-                    <span>{fromDate ? format(fromDate, 'dd/MM/yyyy') : 'From Date'}</span>
-                  </button>
-                }
-              />
-              <PopoverContent align="start" className="w-auto p-0 shadow-lg border rounded-xl">
-                <Calendar
-                  mode="single"
-                  selected={fromDate}
-                  onSelect={setFromDate}
-                />
-              </PopoverContent>
-            </Popover>
-
-            <span className="text-slate-400 font-bold">→</span>
-
-            <Popover>
-              <PopoverTrigger
-                render={
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 px-2 py-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 font-medium cursor-pointer"
-                  >
-                    <CalendarIcon className="h-3.5 w-3.5 text-slate-400" />
-                    <span>{toDate ? format(toDate, 'dd/MM/yyyy') : 'To Date'}</span>
-                  </button>
-                }
-              />
-              <PopoverContent align="end" className="w-auto p-0 shadow-lg border rounded-xl">
-                <Calendar
-                  mode="single"
-                  selected={toDate}
-                  onSelect={setToDate}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+          {/* Active filter chip if filters are applied */}
+          {activeFilterCount > 0 && onClearFilters && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="h-8 px-2.5 rounded-lg text-xs font-bold bg-blue-50 hover:bg-rose-50 text-blue-700 hover:text-rose-700 border border-blue-200 hover:border-rose-300 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-rose-950/60 dark:hover:text-rose-300 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs group"
+              title="Filters are applied. Click to remove all filters."
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-600 group-hover:bg-rose-600"></span>
+              <span>{activeFilterCount} Filter{activeFilterCount > 1 ? 's' : ''}</span>
+              <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+            </button>
+          )}
 
           {/* Filter Popover Button */}
           <Popover>
@@ -427,12 +411,20 @@ export function AdminDataTable<T extends Record<string, any>>({
                 <button
                   type="button"
                   title="Filter & Export Options"
-                  className={`h-9 w-9 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${isFilterPanelVisible
-                    ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                  className={`relative h-9 w-9 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
+                    activeFilterCount > 0
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 ring-2 ring-blue-500/20 dark:bg-blue-950 dark:text-blue-400'
+                      : isFilterPanelVisible
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
+                  {activeFilterCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </button>
               }
             />
@@ -449,12 +441,16 @@ export function AdminDataTable<T extends Record<string, any>>({
                     }
                   }}
                   title="Toggle Custom Filters"
-                  className={`p-2 rounded-xl transition-all cursor-pointer ${isFilterPanelVisible
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                    }`}
+                  className={`relative p-2 rounded-xl transition-all cursor-pointer ${
+                    activeFilterCount > 0 || isFilterPanelVisible
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                  }`}
                 >
                   <Filter className="h-4 w-4" />
+                  {activeFilterCount > 0 && (
+                    <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-600"></span>
+                  )}
                 </button>
 
                 {/* 2. Export Excel Icon */}
@@ -470,18 +466,30 @@ export function AdminDataTable<T extends Record<string, any>>({
                   <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
                 </button>
 
-                {/* 3. Print Icon */}
+                {/* 3. Download PDF Icon */}
                 <button
                   type="button"
                   onClick={() => {
-                    if (onPrint) onPrint()
-                    else window.print()
+                    if (onExportPdf) onExportPdf()
+                    else if (onPrint) onPrint()
                   }}
-                  title="Print Report"
+                  title="Download PDF"
                   className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
                 >
-                  <Printer className="h-4 w-4 text-purple-600" />
+                  <FileText className="h-4 w-4 text-rose-600" />
                 </button>
+
+                {/* 4. Reset Filters if active */}
+                {activeFilterCount > 0 && onClearFilters && (
+                  <button
+                    type="button"
+                    onClick={onClearFilters}
+                    title="Reset All Filters"
+                    className="p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 transition-all cursor-pointer border-l border-slate-200 dark:border-slate-800 ml-1 pl-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </PopoverContent>
           </Popover>
@@ -546,41 +554,44 @@ export function AdminDataTable<T extends Record<string, any>>({
                       S.No
                     </th>
 
-                    {/* FROZEN LEFT 2: Application Number */}
-                    <th
-                      onClick={() => handleSort(appNumberSortKey)}
-                      className="py-3 px-4 border-r border-white/20 cursor-pointer hover:bg-white/10 transition-colors select-none sticky z-30"
-                      style={{
-                        minWidth: `${APP_NO_WIDTH}px`,
-                        maxWidth: `${APP_NO_WIDTH}px`,
-                        width: `${APP_NO_WIDTH}px`,
-                        left: `${APP_NO_LEFT}px`,
-                        background: "var(--table-header-bg, #13729d)",
-                      }}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span>Application No</span>
-                        <ArrowUpDown className="h-3 w-3 opacity-70" />
-                      </div>
-                    </th>
+                    {/* FROZEN LEFT 2 & 3: Application Number & Student Name (Hidden for summary reports) */}
+                    {showApplicationAndStudentCols && (
+                      <>
+                        <th
+                          onClick={() => handleSort(appNumberSortKey)}
+                          className="py-3 px-4 border-r border-white/20 cursor-pointer hover:bg-white/10 transition-colors select-none sticky z-30"
+                          style={{
+                            minWidth: `${APP_NO_WIDTH}px`,
+                            maxWidth: `${APP_NO_WIDTH}px`,
+                            width: `${APP_NO_WIDTH}px`,
+                            left: `${APP_NO_LEFT}px`,
+                            background: "var(--table-header-bg, #13729d)",
+                          }}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span>Application No</span>
+                            <ArrowUpDown className="h-3 w-3 opacity-70" />
+                          </div>
+                        </th>
 
-                    {/* FROZEN LEFT 3: Student Name */}
-                    <th
-                      onClick={() => handleSort(studentNameSortKey)}
-                      className="py-3 px-4 border-r border-white/30 cursor-pointer hover:bg-white/10 transition-colors select-none sticky z-30 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.18)]"
-                      style={{
-                        minWidth: `${STUDENT_NAME_WIDTH}px`,
-                        maxWidth: `${STUDENT_NAME_WIDTH}px`,
-                        width: `${STUDENT_NAME_WIDTH}px`,
-                        left: `${STUDENT_NAME_LEFT}px`,
-                        background: "var(--table-header-bg, #13729d)",
-                      }}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span>Student Name</span>
-                        <ArrowUpDown className="h-3 w-3 opacity-70" />
-                      </div>
-                    </th>
+                        <th
+                          onClick={() => handleSort(studentNameSortKey)}
+                          className="py-3 px-4 border-r border-white/30 cursor-pointer hover:bg-white/10 transition-colors select-none sticky z-30 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.18)]"
+                          style={{
+                            minWidth: `${STUDENT_NAME_WIDTH}px`,
+                            maxWidth: `${STUDENT_NAME_WIDTH}px`,
+                            width: `${STUDENT_NAME_WIDTH}px`,
+                            left: `${STUDENT_NAME_LEFT}px`,
+                            background: "var(--table-header-bg, #13729d)",
+                          }}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span>Student Name</span>
+                            <ArrowUpDown className="h-3 w-3 opacity-70" />
+                          </div>
+                        </th>
+                      </>
+                    )}
 
                     {/* MIDDLE SCROLLABLE COLUMNS */}
                     {scrollableColumns.map((col) => (
@@ -599,18 +610,20 @@ export function AdminDataTable<T extends Record<string, any>>({
                     ))}
 
                     {/* FROZEN RIGHT: Actions */}
-                    <th
-                      className="py-3 px-4 text-center border-l border-white/30 sticky right-0 z-30 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.18)] select-none"
-                      style={{
-                        minWidth: `${ACTIONS_WIDTH}px`,
-                        maxWidth: `${ACTIONS_WIDTH}px`,
-                        width: `${ACTIONS_WIDTH}px`,
-                        right: 0,
-                        background: "var(--table-header-bg, #13729d)",
-                      }}
-                    >
-                      Actions
-                    </th>
+                    {showActions && (
+                      <th
+                        className="py-3 px-4 text-center border-l border-white/30 sticky right-0 z-30 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.18)] select-none"
+                        style={{
+                          minWidth: `${ACTIONS_WIDTH}px`,
+                          maxWidth: `${ACTIONS_WIDTH}px`,
+                          width: `${ACTIONS_WIDTH}px`,
+                          right: 0,
+                          background: "var(--table-header-bg, #13729d)",
+                        }}
+                      >
+                        Actions
+                      </th>
+                    )}
                   </>
                 ) : (
                   /* Legacy non-dynamic fallback columns for AdminStudents */
@@ -665,7 +678,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                   <td
                     colSpan={
                       isDynamicMode
-                        ? scrollableColumns.length + 4
+                        ? scrollableColumns.length + 1 + (showApplicationAndStudentCols ? 2 : 0) + (showActions ? 1 : 0)
                         : showCheckmarkCols
                           ? 9
                           : 7
@@ -683,12 +696,16 @@ export function AdminDataTable<T extends Record<string, any>>({
                 paginatedData.map((row: any, idx: number) => {
                   const rowKey =
                     row.id ||
+                    row.ApplicationNo ||
+                    row.ApplicationNumber ||
                     row.application_number ||
                     row.APPLICATION_NUMBER ||
                     row.registrationNumber ||
                     `row-${startIndex + idx}`
 
                   const appNo =
+                    row.ApplicationNo ||
+                    row.ApplicationNumber ||
                     row.application_number ||
                     row.APPLICATION_NUMBER ||
                     row.registrationNumber ||
@@ -696,9 +713,13 @@ export function AdminDataTable<T extends Record<string, any>>({
                     '-'
 
                   const studentName =
+                    row.ChildName ||
+                    row.StudentName ||
                     row.student_name ||
                     row.STUDENT_NAME ||
                     row.studentName ||
+                    row.FullName ||
+                    row.name ||
                     '-'
 
                   return (
@@ -721,48 +742,47 @@ export function AdminDataTable<T extends Record<string, any>>({
                             {startIndex + idx + 1}
                           </td>
 
-                          {/* FROZEN LEFT 2: Application Number */}
-                          <td
-                            className="py-3 px-4 font-mono font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap sticky z-20 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors border-r border-slate-100 dark:border-slate-800"
-                            style={{
-                              minWidth: `${APP_NO_WIDTH}px`,
-                              maxWidth: `${APP_NO_WIDTH}px`,
-                              width: `${APP_NO_WIDTH}px`,
-                              left: `${APP_NO_LEFT}px`,
-                            }}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (onSelectId) onSelectId(row)
-                                else if (onView) onView?.(row)
-                              }}
-                              className="hover:underline text-[#1677FF] dark:text-blue-400 font-mono font-bold cursor-pointer text-left inline-flex items-center gap-1.5 group/btn"
-                              title={`Click to view application details for ${appNo}`}
-                            >
-                              <span className="group-hover/btn:text-blue-700 dark:group-hover/btn:text-blue-300 transition-colors">
-                                {appNo}
-                              </span>
-                              {row.id && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 font-mono font-semibold">
-                                  {row.id}
-                                </span>
-                              )}
-                            </button>
-                          </td>
+                          {/* FROZEN LEFT 2 & 3: Application Number & Student Name (Hidden for summary reports) */}
+                          {showApplicationAndStudentCols && (
+                            <>
+                              <td
+                                className="py-3 px-4 font-mono font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap sticky z-20 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors border-r border-slate-100 dark:border-slate-800"
+                                style={{
+                                  minWidth: `${APP_NO_WIDTH}px`,
+                                  maxWidth: `${APP_NO_WIDTH}px`,
+                                  width: `${APP_NO_WIDTH}px`,
+                                  left: `${APP_NO_LEFT}px`,
+                                }}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (onSelectId) onSelectId(row)
+                                    else if (onView) onView?.(row)
+                                  }}
+                                  className="hover:underline text-[#1677FF] dark:text-blue-400 font-mono font-bold cursor-pointer text-left inline-flex items-center gap-1.5 group/btn"
+                                  title={`Click to view applicant details for ${appNo}`}
+                                >
+                                  <span className="group-hover/btn:text-blue-700 dark:group-hover/btn:text-blue-300 transition-colors">
+                                    {appNo}
+                                  </span>
+                                </button>
+                              </td>
 
-                          {/* FROZEN LEFT 3: Student Name */}
-                          <td
-                            className="py-3 px-4 font-bold text-slate-900 dark:text-white whitespace-nowrap sticky z-20 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors border-r border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]"
-                            style={{
-                              minWidth: `${STUDENT_NAME_WIDTH}px`,
-                              maxWidth: `${STUDENT_NAME_WIDTH}px`,
-                              width: `${STUDENT_NAME_WIDTH}px`,
-                              left: `${STUDENT_NAME_LEFT}px`,
-                            }}
-                          >
-                            {studentName}
-                          </td>
+                              <td
+                                className="py-3 px-4 font-bold text-slate-900 dark:text-white truncate sticky z-20 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors border-r border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]"
+                                style={{
+                                  minWidth: `${STUDENT_NAME_WIDTH}px`,
+                                  maxWidth: `${STUDENT_NAME_WIDTH}px`,
+                                  width: `${STUDENT_NAME_WIDTH}px`,
+                                  left: `${STUDENT_NAME_LEFT}px`,
+                                }}
+                                title={studentName}
+                              >
+                                {studentName}
+                              </td>
+                            </>
+                          )}
 
                           {/* MIDDLE SCROLLABLE COLUMNS */}
                           {scrollableColumns.map((col) => (
@@ -779,90 +799,92 @@ export function AdminDataTable<T extends Record<string, any>>({
                           ))}
 
                           {/* FROZEN RIGHT: Actions */}
-                          <td
-                            className="py-3 px-4 text-center whitespace-nowrap sticky right-0 z-20 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors border-l border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]"
-                            style={{
-                              minWidth: `${ACTIONS_WIDTH}px`,
-                              maxWidth: `${ACTIONS_WIDTH}px`,
-                              width: `${ACTIONS_WIDTH}px`,
-                              right: 0,
-                            }}
-                          >
-                            <DropdownMenu>
-                              <DropdownMenuTrigger
-                                render={
-                                  <button
-                                    type="button"
-                                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
-                                    aria-label="Actions Menu"
-                                  >
-                                    <Menu className="h-4 w-4" />
-                                  </button>
-                                }
-                              />
-                              <DropdownMenuContent align="end" className="w-56 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl text-xs">
-                                {onView && (
-                                  <DropdownMenuItem
-                                    onClick={() => onView(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Eye className="h-3.5 w-3.5 text-blue-600" /> View
-                                  </DropdownMenuItem>
-                                )}
-                                {(onEdit || onModify) && (
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      if (onEdit) onEdit(row)
-                                      else if (onModify) onModify(row)
-                                    }}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Edit3 className="h-3.5 w-3.5 text-emerald-600" /> Edit
-                                  </DropdownMenuItem>
-                                )}
-                                {onPrintTrackSheet && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintTrackSheet(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet
-                                  </DropdownMenuItem>
-                                )}
-                                {onPrintTrackSheet2 && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintTrackSheet2(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <FileText className="h-3.5 w-3.5 text-cyan-600" /> Print Track Sheet V2
-                                  </DropdownMenuItem>
-                                )}
-                                {onPrintRegistrationForm && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintRegistrationForm(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form
-                                  </DropdownMenuItem>
-                                )}
-                                {onPrintRegistrationForm5 && (
-                                  <DropdownMenuItem
-                                    onClick={() => onPrintRegistrationForm5(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                  >
-                                    <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form V2
-                                  </DropdownMenuItem>
-                                )}
-                                {onDelete && (
-                                  <DropdownMenuItem
-                                    onClick={() => onDelete(row)}
-                                    className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5 text-rose-600" /> Delete
-                                  </DropdownMenuItem>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </td>
+                          {showActions && (
+                            <td
+                              className="py-3 px-4 text-center whitespace-nowrap sticky right-0 z-20 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors border-l border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]"
+                              style={{
+                                minWidth: `${ACTIONS_WIDTH}px`,
+                                maxWidth: `${ACTIONS_WIDTH}px`,
+                                width: `${ACTIONS_WIDTH}px`,
+                                right: 0,
+                              }}
+                            >
+                              <DropdownMenu>
+                                <DropdownMenuTrigger
+                                  render={
+                                    <button
+                                      type="button"
+                                      className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                                      aria-label="Actions Menu"
+                                    >
+                                      <Menu className="h-4 w-4" />
+                                    </button>
+                                  }
+                                />
+                                <DropdownMenuContent align="end" className="w-56 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl text-xs">
+                                  {onView && (
+                                    <DropdownMenuItem
+                                      onClick={() => onView(row)}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                      <Eye className="h-3.5 w-3.5 text-blue-600" /> View
+                                    </DropdownMenuItem>
+                                  )}
+                                  {(onEdit || onModify) && (
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        if (onEdit) onEdit(row)
+                                        else if (onModify) onModify(row)
+                                      }}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                      <Edit3 className="h-3.5 w-3.5 text-emerald-600" /> Edit
+                                    </DropdownMenuItem>
+                                  )}
+                                  {onPrintTrackSheet && (
+                                    <DropdownMenuItem
+                                      onClick={() => onPrintTrackSheet(row)}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                      <FileText className="h-3.5 w-3.5 text-indigo-600" /> Print Track Sheet
+                                    </DropdownMenuItem>
+                                  )}
+                                  {onPrintTrackSheet2 && (
+                                    <DropdownMenuItem
+                                      onClick={() => onPrintTrackSheet2(row)}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                      <FileText className="h-3.5 w-3.5 text-cyan-600" /> Print Track Sheet V2
+                                    </DropdownMenuItem>
+                                  )}
+                                  {onPrintRegistrationForm && (
+                                    <DropdownMenuItem
+                                      onClick={() => onPrintRegistrationForm(row)}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                      <Printer className="h-3.5 w-3.5 text-amber-600" /> Print Registration Form
+                                    </DropdownMenuItem>
+                                  )}
+                                  {onPrintRegistrationForm5 && (
+                                    <DropdownMenuItem
+                                      onClick={() => onPrintRegistrationForm5(row)}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                      <Printer className="h-3.5 w-3.5 text-teal-600" /> Print Registration Form V2
+                                    </DropdownMenuItem>
+                                  )}
+                                  {onDelete && (
+                                    <DropdownMenuItem
+                                      onClick={() => onDelete(row)}
+                                      className="cursor-pointer py-2 px-2.5 rounded-lg flex items-center gap-2 font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5 text-rose-600" /> Delete
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          )}
                         </>
                       ) : (
                         /* Legacy fallback cells for AdminStudents */
@@ -878,7 +900,7 @@ export function AdminDataTable<T extends Record<string, any>>({
                                 else if (onView) onView?.(row)
                               }}
                               className="hover:underline text-[#1677FF] dark:text-blue-400 font-mono font-bold cursor-pointer text-left inline-flex items-center gap-1.5 group"
-                              title={`Click to view application details for ID ${row.id}`}
+                              title={`Click to view applicant details for ID ${row.id}`}
                             >
                               <span className="group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
                                 {row.registrationNumber}
@@ -888,10 +910,23 @@ export function AdminDataTable<T extends Record<string, any>>({
                               </span>
                             </button>
                           </td>
-                          <td className="py-3 px-4 font-bold text-slate-900 dark:text-white whitespace-nowrap">{row.studentName}</td>
+                          <td className="py-3 px-4 font-bold text-slate-900 dark:text-white max-w-[200px] truncate" title={row.studentName}>{row.studentName}</td>
                           <td className="py-3 px-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">{row.fatherName}</td>
                           <td className="py-3 px-4 whitespace-nowrap">{row.schoolBranch}</td>
-                          <td className="py-3 px-4 text-slate-500 whitespace-nowrap">{row.area}, {row.city}</td>
+                          <td className="py-3 px-4 text-slate-500 whitespace-nowrap">
+                            {(() => {
+                              const area = (row.area || '').trim()
+                              const city = (row.city || '').trim()
+                              if (area && city) {
+                                const lowerArea = area.toLowerCase()
+                                const lowerCity = city.toLowerCase()
+                                if (lowerArea === lowerCity) return city
+                                if (lowerArea.endsWith(`, ${lowerCity}`) || lowerArea.endsWith(`,${lowerCity}`) || lowerArea.endsWith(` ${lowerCity}`)) return area
+                                return `${area}, ${city}`
+                              }
+                              return area || city || '-'
+                            })()}
+                          </td>
                           <td className="py-3 px-4 text-center whitespace-nowrap">
                             <span
                               className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${row.applicationStatus === 'Declared'

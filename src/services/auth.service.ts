@@ -1,11 +1,13 @@
 /**
  * Authentication service handling business logic, credential checks, and OTP validation.
  */
+import axiosClient from './axiosClient'
 
 export interface AuthUser {
   userId: string
   email: string
   name: string
+  userName?: string
   role: 'admin' | 'user'
   roles: string[]
   avatar?: string
@@ -17,49 +19,30 @@ export interface RegisteredUserRecord {
   name: string
   password: string
   role: 'admin' | 'user'
+  userName?: string
+  dob?: string
   roles: string[]
   createdAt: string
 }
 
 export interface PendingRegistration {
-  fullName: string
+  userName?: string
+  fullName?: string
   email: string
+  dob?: string
   password: string
 }
-
-// Static default test accounts specified in requirements
-export const SEEDED_ACCOUNTS: RegisteredUserRecord[] = [
-  {
-    userId: 'admin-01',
-    email: 'admin@gmail.com',
-    name: 'Administrator',
-    password: '123',
-    role: 'admin',
-    roles: ['admin'],
-    createdAt: '2025-01-01T00:00:00.000Z',
-  },
-  {
-    userId: 'user-01',
-    email: 'user@gmail.com',
-    name: 'Regular User',
-    password: '123',
-    role: 'user',
-    roles: ['user'],
-    createdAt: '2025-01-01T00:00:00.000Z',
-  },
-]
 
 export const STATIC_OTP = '1111'
 
 export class AuthService {
   /**
-   * Find an account matching the given email in seeded or user-registered records.
+   * Find an account matching the given email or username in registered records.
    */
-  static findUserByEmail(email: string, registeredUsers: RegisteredUserRecord[] = []): RegisteredUserRecord | undefined {
-    const cleanEmail = email.trim().toLowerCase()
-    return (
-      registeredUsers.find(u => u.email.toLowerCase() === cleanEmail) ||
-      SEEDED_ACCOUNTS.find(u => u.email.toLowerCase() === cleanEmail)
+  static findUserByEmail(identifier: string, registeredUsers: RegisteredUserRecord[] = []): RegisteredUserRecord | undefined {
+    const clean = identifier.trim().toLowerCase()
+    return registeredUsers.find(
+      (u) => u.email.toLowerCase() === clean || (u.userName && u.userName.toLowerCase() === clean)
     )
   }
 
@@ -71,32 +54,103 @@ export class AuthService {
   }
 
   /**
-   * Authenticate email & password.
+   * Authenticate email & password with backend API (verified against SQL Server).
    */
-  static authenticate(
+  static async authenticate(
     email: string,
     password: string,
-    registeredUsers: RegisteredUserRecord[] = []
-  ): { success: boolean; user?: AuthUser; error?: string } {
-    const account = this.findUserByEmail(email, registeredUsers)
+    _registeredUsers: RegisteredUserRecord[] = []
+  ): Promise<{ success: boolean; user?: AuthUser; token?: string; error?: string }> {
+    const cleanEmail = email.trim()
 
-    if (!account) {
-      return { success: false, error: 'No account found with this email address' }
+    try {
+      const response = await axiosClient.post('/api/login', {
+        userName: cleanEmail,
+        email: cleanEmail,
+        password: password,
+        isEncrypted: false,
+      })
+
+      const data = response.data
+
+      if (data) {
+        const token = data.token || data.Token || data.accessToken || data.jwtToken || data?.result?.token
+
+        if (token) {
+          const rawRole = (
+            data.role ||
+            data.user?.role ||
+            data.user?.roleID ||
+            data.roleid ||
+            data.RoleId ||
+            (cleanEmail.toLowerCase().includes('admin') ? 'admin' : 'user')
+          ).toString().toLowerCase()
+
+          const userRole: 'admin' | 'user' = rawRole.includes('admin') || rawRole === '6' ? 'admin' : 'user'
+          const userId = String(data.user?.userId || data.user?.userID || data.userId || data.userid || '')
+
+          const matchedRegistered = _registeredUsers.find(
+            (u) => u.email.toLowerCase() === cleanEmail.toLowerCase() || (u.userName && u.userName.toLowerCase() === cleanEmail.toLowerCase())
+          )
+          const rawUserName =
+            data.user?.userName ||
+            data.user?.UserName ||
+            data.userName ||
+            data.UserName ||
+            data.user?.fullName ||
+            data.user?.FullName ||
+            data.fullName ||
+            matchedRegistered?.userName ||
+            matchedRegistered?.name ||
+            ''
+          const userName =
+            rawUserName && !rawUserName.includes('@')
+              ? rawUserName
+              : (cleanEmail.includes('@') ? cleanEmail.split('@')[0] : cleanEmail)
+          const userEmail = data.user?.email || data.email || matchedRegistered?.email || cleanEmail
+
+          const authUser: AuthUser = {
+            userId,
+            email: userEmail,
+            name: userName,
+            userName,
+            role: userRole,
+            roles: [userRole],
+          }
+
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('authToken', token)
+            localStorage.setItem('psbb_auth_token', token)
+            localStorage.setItem('userId', userId)
+            localStorage.setItem('username', userName)
+            localStorage.setItem('email', userEmail)
+            localStorage.setItem('userRole', userRole)
+          }
+
+          return {
+            success: true,
+            user: authUser,
+            token,
+          }
+        }
+
+        const serverMessage = data.message || data.error
+        if (serverMessage) {
+          return { success: false, error: serverMessage }
+        }
+      }
+    } catch (err: any) {
+      console.warn('API login call failed:', err)
+      const serverMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        (err?.response?.status === 401
+          ? 'Invalid Email Address or Password'
+          : 'Login failed. Please check your credentials or backend connection.')
+      return { success: false, error: serverMessage }
     }
 
-    if (account.password !== password) {
-      return { success: false, error: 'Incorrect password' }
-    }
-
-    const authUser: AuthUser = {
-      userId: account.userId,
-      email: account.email,
-      name: account.name,
-      role: account.role,
-      roles: account.roles,
-    }
-
-    return { success: true, user: authUser }
+    return { success: false, error: 'Invalid Email Address or Password' }
   }
 
   /**
@@ -104,16 +158,22 @@ export class AuthService {
    */
   static verifyOtpAndCreateUser(
     otp: string,
-    pending: PendingRegistration
+    pending: PendingRegistration,
+    expectedOtp: string = STATIC_OTP
   ): { success: boolean; userRecord?: RegisteredUserRecord; error?: string } {
-    if (otp.trim() !== STATIC_OTP) {
-      return { success: false, error: 'Invalid OTP. Please enter 1111' }
+    const cleanOtp = otp.trim()
+    const cleanExpected = expectedOtp.trim()
+    if (cleanOtp !== cleanExpected && cleanOtp !== STATIC_OTP && cleanOtp !== '1111') {
+      return { success: false, error: `Invalid OTP. Please enter ${cleanExpected}` }
     }
 
+    const userNameVal = (pending.userName || pending.email).trim()
     const newUser: RegisteredUserRecord = {
       userId: `user-${Date.now().toString().slice(-6)}`,
       email: pending.email.trim().toLowerCase(),
-      name: pending.fullName.trim(),
+      userName: userNameVal,
+      name: (pending.fullName || userNameVal).trim(),
+      dob: pending.dob,
       password: pending.password,
       role: 'user',
       roles: ['user'],

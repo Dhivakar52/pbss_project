@@ -65,11 +65,13 @@ export function TextField({
   value,
   defaultValue,
   onChange,
+  onBlur,
   error,
   className,
   leftIcon,
   showPasswordToggle,
   autoComplete,
+  maxLength,
 }: {
   id?: string;
   type?: string;
@@ -78,11 +80,13 @@ export function TextField({
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: boolean;
   className?: string;
   leftIcon?: React.ReactNode;
   showPasswordToggle?: boolean;
   autoComplete?: string;
+  maxLength?: number;
 }) {
   const [showPass, setShowPass] = React.useState(false);
   const actualType = showPasswordToggle ? (showPass ? "text" : "password") : type;
@@ -102,7 +106,9 @@ export function TextField({
         value={value}
         defaultValue={defaultValue}
         onChange={(e) => onChange?.(e.target.value)}
+        onBlur={onBlur}
         autoComplete={autoComplete}
+        maxLength={maxLength}
         className={cn(
           "h-9 text-[13px] rounded-[4px]",
           leftIcon && "pl-9",
@@ -131,6 +137,7 @@ export function SelectField({
   placeholder = "Select",
   value,
   onChange,
+  onBlur,
   disabled,
   error,
   className,
@@ -139,6 +146,7 @@ export function SelectField({
   placeholder?: string;
   value?: string;
   onChange?: (value: string) => void;
+  onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
   disabled?: boolean;
   error?: boolean;
   className?: string;
@@ -147,6 +155,7 @@ export function SelectField({
     <NativeSelect
       value={value ?? ""}
       onChange={(e) => onChange?.(e.target.value)}
+      onBlur={onBlur}
       disabled={disabled}
       className={cn(
         "h-9 text-[13px] w-full",
@@ -174,6 +183,7 @@ export function DateField({
   defaultLabel,
   value,
   onChange,
+  onBlur,
   disabled,
   disabledDays,
   minDate,
@@ -184,6 +194,7 @@ export function DateField({
   defaultLabel?: string;
   value?: Date;
   onChange?: (date: Date | undefined) => void;
+  onBlur?: (e: React.FocusEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   disabledDays?: (date: Date) => boolean;
   minDate?: Date;
@@ -223,6 +234,7 @@ export function DateField({
         <Button
           variant="outline"
           disabled={disabled}
+          onBlur={onBlur}
           className={cn(
             "h-9 w-full justify-start px-3 text-left text-[13px] font-normal text-slate-700 rounded-[4px]",
             !date && !defaultLabel && "text-slate-400",
@@ -230,7 +242,7 @@ export function DateField({
           )}
         >
           <CalendarIcon className="mr-2 h-3.5 w-3.5 shrink-0" />
-          {date ? format(date, "dd-MM-yyyy") : defaultLabel ?? placeholder}
+          {date ? format(date, "dd/MM/yyyy") : defaultLabel ?? placeholder}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -240,59 +252,155 @@ export function DateField({
   );
 }
 
-// ✅ Controlled DobDateField - Month & Year dropdown caption layout for Date of Birth selection
-export function DobDateField({
-  placeholder = "Select Date of Birth",
-  value,
-  onChange,
-  disabled,
-  error,
-}: {
+function parseDobValue(value: Date | string | null | undefined): Date | undefined {
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? undefined : new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+  if (typeof value !== "string" || !value.trim()) return undefined;
+
+  const trimmed = value.trim();
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:T.*)?$/.exec(trimmed);
+  const dayFirst = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/.exec(trimmed);
+  if (!iso && !dayFirst) return undefined;
+
+  const isValidDate = (year: number, month: number, day: number): Date | undefined => {
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+      ? date
+      : undefined;
+  };
+  if (iso) return isValidDate(Number(iso[1]), Number(iso[2]), Number(iso[3]));
+  if (!dayFirst) return undefined;
+
+  const year = Number(dayFirst[3]);
+  return isValidDate(year, Number(dayFirst[2]), Number(dayFirst[1]))
+    ?? isValidDate(year, Number(dayFirst[1]), Number(dayFirst[2]));
+}
+
+function formatDobValue(value: Date | string | null | undefined): string {
+  const date = parseDobValue(value);
+  return date ? format(date, "dd/MM/yyyy") : (typeof value === "string" ? value : "");
+}
+
+// ✅ Controlled Unified Date Control (HTML5 native date picker matching Forgot Password)
+export interface DobDateFieldProps {
+  id?: string;
   placeholder?: string;
-  value?: Date;
-  onChange?: (date: Date | undefined) => void;
+  value?: Date | string | null;
+  onChange?: ((val: string) => void) | ((date: Date | undefined) => void) | any;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   error?: boolean;
-}) {
-  const [internalDate, setInternalDate] = React.useState<Date | undefined>();
-  const date = value !== undefined ? value : internalDate;
-  const currentYear = new Date().getFullYear();
+  className?: string;
+  min?: string;
+  max?: string;
+}
 
-  const handleSelect = (d: Date | undefined) => {
-    if (onChange) {
-      onChange(d);
-    } else {
-      setInternalDate(d);
+export function DobDateField({
+  id,
+  placeholder = "dd/mm/yyyy",
+  value,
+  onChange,
+  onBlur,
+  disabled = false,
+  error = false,
+  className,
+  min,
+  max,
+}: DobDateFieldProps) {
+  const [displayValue, setDisplayValue] = React.useState(() => formatDobValue(value));
+  const lastValueRef = React.useRef(value);
+  const dateInputRef = React.useRef<HTMLInputElement>(null);
+  const selectedDate = parseDobValue(value);
+  const minDate = parseDobValue(min);
+  const maxDate = parseDobValue(max) ?? new Date();
+
+  React.useEffect(() => {
+    if (value !== lastValueRef.current) {
+      lastValueRef.current = value;
+      setDisplayValue(formatDobValue(value));
     }
+  }, [value]);
+
+  const handleNativeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = parseDobValue(e.target.value);
+    if (!date) return;
+    const nextValue = format(date, "yyyy-MM-dd");
+    setDisplayValue(format(date, "dd/MM/yyyy"));
+    lastValueRef.current = nextValue;
+    onChange?.(nextValue);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (displayValue && !parseDobValue(displayValue)) {
+      setDisplayValue(formatDobValue(value));
+    }
+    onBlur?.(e);
   };
 
   return (
-    <Popover>
-      <PopoverTrigger disabled={disabled} className="w-full">
-        <Button
-          variant="outline"
-          disabled={disabled}
-          className={cn(
-            "h-9 w-full justify-start px-3 text-left text-[13px] font-normal text-slate-700 rounded-[4px]",
-            !date && "text-slate-400",
-            error && "border-rose-500 focus-visible:ring-rose-500"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-3.5 w-3.5 shrink-0" />
-          {date ? format(date, "dd-MM-yyyy") : placeholder}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleSelect}
-          captionLayout="dropdown"
-          startMonth={new Date(1920, 0)}
-          endMonth={new Date(currentYear, 11)}
-          disabled={(d) => d > new Date()}
-        />
-      </PopoverContent>
-    </Popover>
+    <div className="relative w-full">
+      <Input
+        id={id}
+        type="text"
+        inputMode="none"
+        readOnly
+        autoComplete="off"
+        maxLength={10}
+        value={displayValue}
+        onChange={(e) => {
+          e.preventDefault()
+        }}
+        onKeyDown={(e) => {
+          e.preventDefault()
+        }}
+        onPaste={(e) => {
+          e.preventDefault()
+        }}
+        onDrop={(e) => {
+          e.preventDefault()
+        }}
+        onBlur={handleBlur}
+        disabled={disabled}
+        placeholder={placeholder}
+        aria-invalid={error}
+        aria-label="Date of birth in day-month-year format"
+        className={cn(
+          "h-9 w-full pr-10 text-[13px] text-slate-800 font-sans transition-all",
+          error && "border-rose-500 focus-visible:border-rose-500 focus-visible:ring-rose-500",
+          disabled && "bg-slate-100 text-slate-400 cursor-not-allowed",
+          className
+        )}
+      />
+      <button
+        type="button"
+        onClick={() => {
+          const dateInput = dateInputRef.current;
+          if (!dateInput) return;
+          try {
+            dateInput.showPicker();
+          } catch {
+            dateInput.click();
+          }
+        }}
+        disabled={disabled}
+        aria-label="Open date picker"
+        className="absolute right-0 top-0 flex h-full w-10 items-center justify-center rounded-r-[4px] text-slate-600 hover:text-slate-900 disabled:cursor-not-allowed"
+      >
+        <CalendarIcon className="h-4 w-4" />
+      </button>
+      <input
+        ref={dateInputRef}
+        type="date"
+        tabIndex={-1}
+        aria-hidden="true"
+        value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""}
+        onChange={handleNativeDateChange}
+        disabled={disabled}
+        min={minDate ? format(minDate, "yyyy-MM-dd") : undefined}
+        max={maxDate ? format(maxDate, "yyyy-MM-dd") : undefined}
+        className="pointer-events-none absolute right-0 top-0 h-9 w-10 opacity-0"
+      />
+    </div>
   );
 }

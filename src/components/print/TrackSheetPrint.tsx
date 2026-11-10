@@ -6,9 +6,12 @@ import type { TrackSheetData } from './printMappers'
 
 export interface TrackSheetPrintProps {
   data: TrackSheetData
+  pageOnly?: 1 | 2 | 3
+  logoSrc?: string
 }
 
-export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
+export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data, pageOnly, logoSrc }) => {
+  const effectiveLogoSrc = logoSrc || (data as any)?.logoSrc
   const siblings = data.siblings || []
   const siblingRows = [...siblings]
   while (siblingRows.length < 4) {
@@ -21,25 +24,28 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
     })
   }
 
+  const pageBorderClass = pageOnly ? 'border-none shadow-none' : 'border border-slate-300 shadow-md'
+
   return (
     <div className="track-sheet-document font-sans text-black bg-white select-none">
       {/* ================= PAGE 1 ================= */}
-      <div className="print-page w-[210mm] min-h-[297mm] p-8 mx-auto bg-white flex flex-col justify-between box-border border border-slate-300 shadow-md print:border-none print:shadow-none print:p-6 print:m-0 break-after-page text-[12.5px] leading-relaxed">
-        <div>
-          {/* Header */}
-          <PrintDocumentHeader documentType="track-sheet" student={data} />
+      {(!pageOnly || pageOnly === 1) && (
+        <div className={`print-page w-[210mm] min-h-[297mm] p-8 mx-auto bg-white flex flex-col justify-between box-border ${pageBorderClass} print:border-none print:shadow-none print:p-6 print:m-0 break-after-page text-[12.5px] leading-relaxed`}>
+          <div>
+            {/* Header */}
+            <PrintDocumentHeader documentType="track-sheet" student={data} logoSrc={effectiveLogoSrc} />
 
-          {/* Top Section with Registration & Photo Box */}
-          <div className="flex justify-between items-start gap-4 mt-1">
-            <div className="space-y-2.5 flex-1">
-              <PrintField
-                label="Registration No."
-                value={
-                  <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
-                    {data.registrationNo}
-                  </span>
-                }
-              />
+            {/* Top Section with Registration & Photo Box */}
+            <div className="flex justify-between items-start gap-4 mt-1">
+              <div className="space-y-2.5 flex-1">
+                <PrintField
+                  label="Registration No."
+                  value={
+                    <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] min-h-[26px] text-center">
+                      {data.registrationNo || '\u00A0'}
+                    </span>
+                  }
+                />
 
               <PrintField
                 label="Name of the Child"
@@ -78,6 +84,8 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
               <PrintField label="Father's Mobile No" value={data.fatherMobile} />
               <PrintField label="Mother's Mobile No" value={data.motherMobile} />
             </div>
+
+            <PrintField label="Preferred Email ID for Communication" value={data.preferredEmail || (data as any).fatherEmail || (data as any).motherEmail || '-'} />
 
             <div className="grid grid-cols-2 gap-6">
               <PrintField label="Distance from Residence" value={data.distanceFromResidence} />
@@ -169,14 +177,15 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
         {/* Footer Page 1 */}
         <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={1} totalPages={3} />
       </div>
+      )}
 
       {/* ================= PAGE 2 ================= */}
-      <div className="print-page w-[210mm] min-h-[297mm] p-8 mx-auto bg-white flex flex-col justify-between box-border border border-slate-300 shadow-md print:border-none print:shadow-none print:p-6 print:m-0 break-after-page text-[12px] leading-relaxed">
+      {(!pageOnly || pageOnly === 2) && (
+      <div className={`print-page w-[210mm] min-h-[297mm] p-8 mx-auto bg-white flex flex-col justify-between box-border ${pageBorderClass} print:border-none print:shadow-none print:p-6 print:m-0 break-after-page text-[12px] leading-relaxed`}>
         <div>
           {/* Common Header on Page 2 */}
-          <PrintDocumentHeader documentType="track-sheet" student={data} />
+          <PrintDocumentHeader documentType="track-sheet" student={data} logoSrc={effectiveLogoSrc} />
 
-          {/* Top Alumni Info */}
           {/* Top Alumni Info */}
           <div className="space-y-2 pt-1">
             <div className="grid grid-cols-2 gap-6">
@@ -255,7 +264,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
             />
             <PrintField
               label="Specify Major ailment, If any (Past/Present)"
-              value={data.majorAilment || 'Nil'}
+              value={data.majorAilment || ''}
               labelWidth="w-[280px]"
             />
           </div>
@@ -286,7 +295,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
             <p>
               We, the parents (father & mother) / guardian of{' '}
               <span className="underline font-bold uppercase inline-block min-w-[180px] text-center">
-                {data.childName}
+                {data.childName || '\u00A0'}
               </span>{' '}
               seeking his / her admission to Pre-KG hereby solemnly declare that the information
               furnished above is absolutely true and that if found factually incorrect at any time
@@ -300,7 +309,9 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
           {/* Signatures Row - Dedicated Signing Height */}
           <div className="mt-6 pt-2">
             <div className="flex justify-between items-start text-[12px] font-bold min-h-[85px] pt-14">
-              <div className="pt-1.5 font-bold shrink-0">Date :</div>
+              <div className="pt-1.5 font-bold shrink-0">
+                Date : <span className="font-normal ml-1">{data.dateOfSubmission || ''}</span>
+              </div>
               <div className="flex justify-end gap-6 flex-1">
                 <div className="text-center border-t border-black pt-1.5 px-2 w-[150px]">
                   Signature of Father
@@ -338,17 +349,17 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
               <div className="space-y-2 pl-6">
                 <PrintField
                   label="Reg No."
-                  value={data.registrationNo}
+                  value={data.registrationNo || ''}
                   labelWidth="w-[140px]"
                 />
                 <PrintField
                   label="Child's Name"
                   value={
-                    <span className="uppercase" title={data.childName}>
-                      {data.childName.trim().length > 18
-                        ? `${data.childName.trim().slice(0, 18)}...`
-                        : data.childName.trim()}
-                    </span>
+                    data.childName ? (
+                      <span className="uppercase" title={data.childName}>
+                        {data.childName.trim()}
+                      </span>
+                    ) : ''
                   }
                   labelWidth="w-[140px]"
                 />
@@ -360,12 +371,14 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
         {/* Footer Page 2 */}
         <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={2} totalPages={3} />
       </div>
+      )}
 
       {/* ================= PAGE 3 ================= */}
-      <div className="print-page w-[210mm] min-h-[297mm] p-8 mx-auto bg-white flex flex-col justify-between box-border border border-slate-300 shadow-md print:border-none print:shadow-none print:p-6 print:m-0 break-after-page text-[12.5px] leading-relaxed">
+      {(!pageOnly || pageOnly === 3) && (
+      <div className={`print-page w-[210mm] min-h-[297mm] p-8 mx-auto bg-white flex flex-col justify-between box-border ${pageBorderClass} print:border-none print:shadow-none print:p-6 print:m-0 break-after-page text-[12.5px] leading-relaxed`}>
         <div>
           {/* Common Header on Page 3 */}
-          <PrintDocumentHeader documentType="track-sheet" student={data} />
+          <PrintDocumentHeader documentType="track-sheet" student={data} logoSrc={effectiveLogoSrc} />
 
           <div className="space-y-4 pt-4 px-2">
             <h3 className="font-bold text-[14px]">Instruction:</h3>
@@ -386,7 +399,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
                   </p>
                   <p>2. Birth Certificate of Child - COPY</p>
                   <p>3. Passport size photographs of both parents with Reg No. written at the back.</p>
-                  <p>4. Address proof of parents - COPY</p>
+                  <p>4. Address proof for both parents - COPY</p>
                 </div>
               </li>
               <li>
@@ -407,6 +420,7 @@ export const TrackSheetPrint: React.FC<TrackSheetPrintProps> = ({ data }) => {
         {/* Common Footer on Page 3 */}
         <PrintDocumentFooter regNo={data.registrationNo} childName={data.childName} pageNumber={3} totalPages={3} />
       </div>
+      )}
     </div>
   )
 }

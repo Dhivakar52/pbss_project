@@ -17,6 +17,7 @@ interface TopStepWizardProps {
   completedStepIds: number[]
   onBackToDashboard: () => void
   onStepSelect: (stepId: number) => void
+  backLabel?: string
 }
 
 export const TopStepWizard: React.FC<TopStepWizardProps> = ({
@@ -25,6 +26,7 @@ export const TopStepWizard: React.FC<TopStepWizardProps> = ({
   completedStepIds,
   onBackToDashboard,
   onStepSelect,
+  backLabel,
 }) => {
   const completedCount = completedStepIds.length
   const progressPercent = Math.round((completedCount / 5) * 100)
@@ -57,7 +59,7 @@ export const TopStepWizard: React.FC<TopStepWizardProps> = ({
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-[#1677FF] dark:hover:text-blue-400 transition-colors cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Dashboard</span>
+          <span>{backLabel || 'Back to Dashboard'}</span>
         </button>
 
         <div className="flex items-center gap-3">
@@ -86,29 +88,39 @@ export const TopStepWizard: React.FC<TopStepWizardProps> = ({
             const isCompleted = completedStepIds.includes(step.id)
             const isActive = activeStepId === step.id
             const isLast = index === steps.length - 1
+            const isPrevDone = step.id === 1 || completedStepIds.includes(step.id - 1)
+            const isLocked = !isCompleted && !isPrevDone
             const StepIcon = getStepIcon(step.id)
 
             return (
               <div
                 key={step.id}
-                className="flex-1 flex flex-col items-start relative select-none pr-3"
+                className={`flex-1 flex flex-col items-start relative select-none pr-3 ${isLocked ? 'opacity-60' : ''}`}
               >
                 {/* Top Row: Circle Icon + Connecting Line to next step */}
                 <div className="flex items-center w-full">
                   {/* Step Circle Button */}
                   <button
                     type="button"
-                    onClick={() => onStepSelect(step.id)}
-                    title={`Click to go to Step ${step.id}: ${step.title}`}
-                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-xs z-10 ${isCompleted
-                        ? 'bg-emerald-500 text-white hover:bg-emerald-600 ring-4 ring-emerald-50 dark:ring-emerald-950/40'
+                    disabled={isLocked}
+                    onClick={() => {
+                      if (!isLocked) onStepSelect(step.id)
+                    }}
+                    title={isLocked ? `Step ${step.id} is locked. Complete previous steps first.` : `Click to go to Step ${step.id}: ${step.title}`}
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all shrink-0 shadow-xs z-10 ${
+                      isLocked
+                        ? 'border-2 border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                        : isCompleted
+                        ? 'bg-emerald-500 text-white hover:bg-emerald-600 ring-4 ring-emerald-50 dark:ring-emerald-950/40 cursor-pointer'
                         : isActive
-                          ? 'bg-[#1677FF] text-white ring-4 ring-blue-100 dark:ring-blue-900/60 shadow-md shadow-blue-500/20'
-                          : 'border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:border-slate-400'
-                      }`}
+                        ? 'bg-[#1677FF] text-white ring-4 ring-blue-100 dark:ring-blue-900/60 shadow-md shadow-blue-500/20 cursor-pointer'
+                        : 'border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:border-slate-400 cursor-pointer'
+                    }`}
                   >
                     {isCompleted ? (
                       <Check className="h-5 w-5 stroke-[2.5]" />
+                    ) : isLocked ? (
+                      <Lock className="h-4 w-4" />
                     ) : (
                       <StepIcon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : ''}`} />
                     )}
@@ -141,18 +153,23 @@ export const TopStepWizard: React.FC<TopStepWizardProps> = ({
 
                   {/* Line 2: Step Title */}
                   <h3
-                    onClick={() => onStepSelect(step.id)}
-                    className={`text-sm sm:text-base font-bold leading-tight cursor-pointer transition-colors ${isActive
-                        ? 'text-[#1677FF] dark:text-blue-400 font-extrabold'
+                    onClick={() => {
+                      if (!isLocked) onStepSelect(step.id)
+                    }}
+                    className={`text-sm sm:text-base font-bold leading-tight transition-colors ${
+                      isLocked
+                        ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                        : isActive
+                        ? 'text-[#1677FF] dark:text-blue-400 font-extrabold cursor-pointer'
                         : isCompleted
-                          ? 'text-slate-800 dark:text-slate-200'
-                          : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-700'
-                      }`}
+                        ? 'text-slate-800 dark:text-slate-200 cursor-pointer'
+                        : 'text-slate-500 dark:text-slate-400 cursor-pointer'
+                    }`}
                   >
                     {step.title}
                   </h3>
 
-                  {/* Line 3: Badge (Completed = Green / In Progress = Warning / Pending = Warning) */}
+                  {/* Line 3: Badge (Completed = Green / In Progress = Warning / Pending = Warning / Locked) */}
                   <div className="pt-1">
                     {isCompleted ? (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-2xs">
@@ -161,6 +178,10 @@ export const TopStepWizard: React.FC<TopStepWizardProps> = ({
                     ) : isActive ? (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shadow-2xs">
                         In Progress
+                      </span>
+                    ) : isLocked ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        <Lock className="h-3 w-3" /> Locked
                       </span>
                     ) : (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50/70 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/60">

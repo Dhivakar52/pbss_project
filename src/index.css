@@ -60,47 +60,47 @@
   --sidebar-top-bg: var(--app-gradient);
   --table-header-bg: #13729d;
   --medical-color: #0a6f9c;
-  --bg-white: white;
+  --bg-white: #ffffff;
   --layer-bg: #f8fafc;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: #ef4444;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #a1a1aa;
+  --chart-1: #d4d4d8;
+  --chart-2: #71717a;
+  --chart-3: #52525b;
+  --chart-4: #3f3f46;
+  --chart-5: #27272a;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #fafafa;
+  --sidebar-foreground: #09090b;
+  --sidebar-primary: #18181b;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #a1a1aa;
 }
 
 .bg-app-gradient {
   background: var(--app-gradient) !important;
 }
 
-@keyframes marquee {
+/* @keyframes marquee {
   0% {
     transform: translateX(100%);
   }
@@ -108,15 +108,79 @@
   100% {
     transform: translateX(-100%);
   }
+} */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+ 
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-.animate-marquee {
+/* Subtle floating animation for Application Form Loader icon */
+@keyframes formFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+.animate-form-float {
+  animation: formFloat 2.6s ease-in-out infinite;
+}
+
+/* Smooth indeterminate bar animation for Application Form Loader */
+@keyframes formBar {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(35%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-form-bar {
+  animation: formBar 1.8s ease-in-out infinite;
+}
+
+/* .animate-marquee {
   display: flex;
   white-space: nowrap;
   will-change: transform;
   animation: marquee 100s linear infinite;
 }
 
+.animate-marquee:hover {
+  animation-play-state: paused;
+} */
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 30s linear infinite;
+}
+ 
+.animate-marquee > span {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+ 
 .animate-marquee:hover {
   animation-play-state: paused;
 }
@@ -131,40 +195,39 @@
 }
 
 .dark {
-  --layer-bg: oklch(0.145 0 0);
+  --layer-bg: #09090b;
   --medical-color: #147fc3;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #71717a;
+  --chart-1: #d4d4d8;
+  --chart-2: #71717a;
+  --chart-3: #52525b;
+  --chart-4: #3f3f46;
+  --chart-5: #27272a;
+  --sidebar: #18181b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #71717a;
 }
 
 .layerBg {
@@ -214,6 +277,26 @@ button[role="combobox"] {
 /* Ensure dropdown menu has high z-index */
 [data-radix-popper-content-wrapper] {
   z-index: 9999 !important;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    color: #6521bd;
+    background-color: #F3E8FF;
+  }
+
+  50% {
+    color: #02b9f6;
+    background-color: #E0F7FF;
+  }
+}
+
+.blink {
+  animation: blink 1s ease-in-out infinite;
+  padding: 3px 8px;
+  border-radius: 6px;
 }
 
 /* For custom dropdown */
@@ -324,4 +407,70 @@ button[role="combobox"] {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
+}
+
+/* =========================================================================
+   CROSS-BROWSER COMPATIBILITY RESETS (EDGE, CHROME, FIREFOX, SAFARI)
+   ========================================================================= */
+
+/* 1. Prevent Edge duplicate password reveal and text clear buttons */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 2. Prevent Edge native dropdown arrow duplicate over custom icons */
+select::-ms-expand {
+  display: none !important;
+}
+
+/* 3. Cross-browser appearance normalization for select */
+select.appearance-none,
+[data-slot="native-select"] {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* 4. Prevent WebKit / Safari search input cancel / decoration buttons */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: none !important;
+}
+
+/* 5. Date inputs consistency across Edge, Chrome, Safari, Firefox */
+input[type="date"] {
+  -webkit-align-items: center;
+  display: -webkit-inline-flex;
+  font-family: inherit;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* 6. Font smoothing across browsers */
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 7. Blur overlay fallback for Safari and older WebKit */
+.backdrop-blur-xs,
+[class*="backdrop-blur"] {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* 8. Consistent SVG vertical alignment */
+svg {
+  vertical-align: middle;
 }

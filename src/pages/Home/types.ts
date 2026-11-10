@@ -8,14 +8,21 @@ export interface Step {
 export interface Sibling {
   name: string
   school: string
+  schoolId?: number
+  schoolName?: string
   leftStudent: string
   usn: string
   classSec: string
+  classId?: number
+  section?: string
+  sectionId?: number
   yearLeaving: string
+  SiblingsID?: number
 }
 
 export interface FatherDetailsState {
   title: string
+  otherTitle?: string
   initials: string
   name: string
   dob: string
@@ -25,10 +32,12 @@ export interface FatherDetailsState {
   yearOfLeaving: string
   branch: string
   reasonForLeaving: string
+  otherReasonForLeaving?: string
   qualification: string
   university: string
   occupation: string
   employmentCategory: string
+  otherEmploymentCategory?: string
   designation: string
   companyName: string
   officeAddress: string
@@ -39,6 +48,7 @@ export interface FatherDetailsState {
 
 export interface MotherDetailsState {
   title: string
+  otherTitle?: string
   initials: string
   name: string
   dob: string
@@ -48,11 +58,13 @@ export interface MotherDetailsState {
   yearOfLeaving: string
   branch: string
   reasonForLeaving: string
+  otherReasonForLeaving?: string
   qualification: string
   university: string
   isEmployed: boolean
   occupation: string
   employmentCategory: string
+  otherEmploymentCategory?: string
   designation: string
   companyName: string
   officeAddress: string
@@ -65,7 +77,9 @@ export interface GuardianDetailsState {
   isApplicable: boolean
   reason: string
   gender: string
+  otherGender?: string
   title: string
+  otherTitle?: string
   initials: string
   name: string
   isEmployed: boolean
@@ -82,9 +96,17 @@ export interface CommunicationDetailsState {
   address: string
   pincode: string
   residencePhone: string
+  email: string
   landmark: string
   distanceKm: string
   commuteMode: string[]
   parentAchievements: string
   isTransferFromOutside: boolean
+  transferDetails?: string
+}
+
+export interface AdditionalChild {
+  name: string
+  gender: string
+  passportNo?: string
 }

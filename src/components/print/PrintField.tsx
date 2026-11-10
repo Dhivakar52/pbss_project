@@ -8,6 +8,7 @@ export interface PrintFieldProps {
   className?: string
   labelClassName?: string
   valueClassName?: string
+  labelAlign?: 'left' | 'right'
   alignTop?: boolean
 }
 

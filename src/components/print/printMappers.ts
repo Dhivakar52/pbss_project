@@ -55,6 +55,10 @@ export interface TrackSheetData {
   submissionTimings: string
   timings?: string
   schoolAppliedFor: string
+  schoolAddress?: string
+  schoolId?: number
+  school?: string
+  preferredEmail?: string
   academicYear: string
 }
 
@@ -87,6 +91,7 @@ export interface RegistrationFormData extends TrackSheetData {
   guardianName: string
   guardianGender: string
   guardianOccupation: string
+  guardianDesignation?: string
   guardianCompany: string
   guardianMonthlyIncome: string
   guardianIncome?: string
@@ -117,19 +122,80 @@ export interface RegistrationFormData extends TrackSheetData {
 export function formatPrintDate(dateStr?: string): string {
   if (!dateStr) return ''
   try {
-    const d = new Date(dateStr)
-    if (isNaN(d.getTime())) return dateStr
+    const trimmed = String(dateStr).trim()
+    if (!trimmed) return ''
+
+    // Check if in DD-MM-YYYY or DD/MM/YYYY format
+    const ddmmyyyyMatch = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/.exec(trimmed)
+    if (ddmmyyyyMatch) {
+      const day = ddmmyyyyMatch[1].padStart(2, '0')
+      const month = ddmmyyyyMatch[2].padStart(2, '0')
+      const year = ddmmyyyyMatch[3]
+      return `${day}/${month}/${year}`
+    }
+
+    // Check if in YYYY-MM-DD or YYYY/MM/DD format
+    const yyyymmddMatch = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/.exec(trimmed)
+    if (yyyymmddMatch) {
+      const year = yyyymmddMatch[1]
+      const month = yyyymmddMatch[2].padStart(2, '0')
+      const day = yyyymmddMatch[3].padStart(2, '0')
+      return `${day}/${month}/${year}`
+    }
+
+    const d = new Date(trimmed)
+    if (isNaN(d.getTime())) return trimmed
     const day = String(d.getDate()).padStart(2, '0')
     const month = String(d.getMonth() + 1).padStart(2, '0')
     const year = d.getFullYear()
     return `${day}/${month}/${year}`
   } catch {
-    return dateStr
+    return String(dateStr)
   }
 }
 
+function formatPrintDob(dateStr?: string): string {
+  if (!dateStr) return ''
+
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+  const formatParts = (day: string, month: number, year: string) =>
+    month >= 1 && month <= months.length
+      ? `${day.padStart(2, '0')}/${months[month - 1]}/${year}`
+      : ''
+
+  const trimmed = String(dateStr).trim()
+  if (!trimmed) return ''
+
+  const dayMonthYear = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/.exec(trimmed)
+  if (dayMonthYear) {
+    return formatParts(dayMonthYear[1], Number(dayMonthYear[2]), dayMonthYear[3]) || trimmed
+  }
+
+  const yearMonthDay = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/.exec(trimmed)
+  if (yearMonthDay) {
+    return formatParts(yearMonthDay[3], Number(yearMonthDay[2]), yearMonthDay[1]) || trimmed
+  }
+
+  const namedMonth = /^(\d{1,2})[-/ ]([A-Za-z]{3})[-/ ](\d{4})$/.exec(trimmed)
+  if (namedMonth) {
+    const month = months.indexOf(namedMonth[2].toUpperCase()) + 1
+    if (month) return formatParts(namedMonth[1], month, namedMonth[3])
+  }
+
+  const date = new Date(trimmed)
+  if (isNaN(date.getTime())) return trimmed
+  return formatParts(String(date.getDate()), date.getMonth() + 1, String(date.getFullYear()))
+}
+
+function formatParentName(title: unknown, initials: unknown, fullName: unknown): string {
+  return [title, initials, fullName]
+    .map((part) => String(part || '').trim())
+    .filter(Boolean)
+    .join(' ')
+}
+
 /**
- * Maps a student record to TrackSheetData structure
+ * Maps a student record or raw DB record to TrackSheetData structure
  */
 export function mapStudentToTrackSheet(student: StudentRecord | any): TrackSheetData {
   if (!student) {
@@ -137,288 +203,732 @@ export function mapStudentToTrackSheet(student: StudentRecord | any): TrackSheet
   }
 
   const s = student
-  const hasSiblingsStudying =
+
+  // Extract nested Father, Mother, and Siblings objects
+  const fatherObj = (Array.isArray(s.Father) && s.Father.length > 0 ? s.Father[0] : (s.Father || s.father)) || {}
+  const motherObj = (Array.isArray(s.Mother) && s.Mother.length > 0 ? s.Mother[0] : (s.Mother || s.mother)) || {}
+
+  const rawSiblings = Array.isArray(s.Siblings)
+    ? s.Siblings
+    : Array.isArray(s.siblings)
+    ? s.siblings
+    : []
+  const transportModeNames = Array.isArray(s.TransporModeName)
+    ? s.TransporModeName
+        .map((mode: { TransportModeValue?: string }) => mode.TransportModeValue?.trim())
+        .filter((mode: string | undefined): mode is string => Boolean(mode))
+        .join('/ ')
+    : ''
+
+  const hasSiblingsStudying = Boolean(
+    s.SchoolGoingSibilings === 'Yes' ||
+    s.SchoolGoingSibilings === true ||
+    s.SchoolGoingSibilings === 1 ||
+    s.SchoolGoingSibilings === '1' ||
+    s.hasSiblings === true ||
+    s.hasSiblings === 'Yes' ||
+    s.hasSchoolGoingSiblings === true ||
+    s.hasSchoolGoingSiblings === 'Yes' ||
     s.siblingsStudying ||
     s.siblings_flag === 'Yes' ||
     s.SIBLINGS_FLAG === 'Yes' ||
-    Boolean(s.sibling_name || s.SIBLING_NAME)
+    Boolean(s.sibling_name || s.SIBLING_NAME) ||
+    (rawSiblings.length > 0 && rawSiblings.some((sib: any) => sib.SiblingName || sib.name))
+  )
 
-  const siblingRows: SiblingPrintRow[] = [
-    {
-      name: s.sibling_name || s.SIBLING_NAME || (hasSiblingsStudying ? 'Sibling' : ''),
-      school: s.schoolBranch || 'T.Nagar-PSBB',
-      usn: s.usn || s.USN || (hasSiblingsStudying ? 'USN-8821' : ''),
-      classSec: s.class_and_sec || s.CLASS_AND_SEC || (hasSiblingsStudying ? 'Std IV - A' : ''),
-      leavingDetails: '',
-      leavingYearAndClass: '',
-    },
-    { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
-    { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
-    { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
-    { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
-  ]
+  const siblingRows: SiblingPrintRow[] = rawSiblings.length > 0
+    ? rawSiblings.map((sib: any) => {
+        const leaving =
+          sib.LeftYear ||
+          sib.YearLeaving ||
+          sib.yearLeaving ||
+          sib.leavingYearAndClass ||
+          (sib.IsLeftSchool === 'Yes' ? (sib.LeftYear || 'Yes') : (sib.leftStudent === 'Yes' ? (sib.yearLeaving || 'Yes') : ''))
+        return {
+          name: sib.SiblingName || sib.name || '',
+          school: sib.School || sib.SchoolName || sib.school || '',
+          usn: sib.USN || sib.usn || '',
+          classSec: sib.Class && sib.Section
+            ? `${sib.Class} - ${sib.Section}`
+            : (sib.classSec || sib.Class || sib.Section || ''),
+          leavingDetails: sib.LeavingDetails || sib.leavingDetails || leaving || '',
+          leavingYearAndClass: leaving || '',
+        }
+      })
+    : [
+        {
+          name: s.sibling_name || s.SIBLING_NAME || '',
+          school: s.sibling_school || '',
+          usn: s.usn || s.USN || '',
+          classSec: s.class_and_sec || s.CLASS_AND_SEC || '',
+          leavingDetails: '',
+          leavingYearAndClass: '',
+        },
+        { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
+        { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
+        { name: '', school: '', usn: '', classSec: '', leavingDetails: '', leavingYearAndClass: '' },
+      ]
 
-  const isFatherAlumnus =
+  const isFatherAlumnus = Boolean(
+    fatherObj.IsAlumnus === 'Yes' ||
+    fatherObj.IsAlumnus === true ||
+    fatherObj.isAlumnus === true ||
+    s.fatherAlumnus === true ||
+    s.fatherAlumnus === 'Yes' ||
+    s.isFatherAlumnus === 'Yes' ||
     s.alumni ||
     s.father_alumni_flag === 'Yes' ||
-    s.FATHER_ALUMNI_FLAG === 'Yes'
+    s.FATHER_ALUMNI_FLAG === 'Yes' ||
+    s.father?.isAlumnus === true
+  )
 
-  const isMotherAlumnus =
+  const isMotherAlumnus = Boolean(
+    motherObj.IsAlumnus === 'Yes' ||
+    motherObj.IsAlumnus === true ||
+    motherObj.isAlumnus === true ||
+    s.motherAlumnus === true ||
+    s.motherAlumnus === 'Yes' ||
+    s.isMotherAlumnus === 'Yes' ||
     s.mother_alumni_flag === 'Yes' ||
-    s.MOTHER_ALUMNI_FLAG === 'Yes'
+    s.MOTHER_ALUMNI_FLAG === 'Yes' ||
+    s.mother?.isAlumnus === true
+  )
 
-  const isHealthy =
-    s.isHealthy !== undefined
-      ? s.isHealthy
-      : !s.physicallyChallenged && s.physically_challenged !== 'Yes' && s.PHYSICALLY_CHALLENGED !== 'Yes'
+  const isHealthy = Boolean(
+    s.IsNormalChild === 'Yes' ||
+    s.IsNormalChild === true ||
+    s.IsNormalChild === 1 ||
+    s.IsNormalChild === '1' ||
+    s.isHealthy === true ||
+    (s.isHealthy !== false && s.IsNormalChild !== 'No' && !s.physicallyChallenged && s.physically_challenged !== 'Yes' && s.PHYSICALLY_CHALLENGED !== 'Yes')
+  )
+
+  // Construct residential address with pincode
+  const rawAddr = s.ResAddress || s.comm?.address || s.address || (s.area && s.city ? `${s.area}, ${s.city}` : s.area || s.city || '')
+  const pin = s.ResPincode || s.comm?.pincode || s.pincode
+  let residentialAddress = rawAddr || ''
+  if (pin && !residentialAddress.includes(String(pin))) {
+    residentialAddress = residentialAddress ? `${residentialAddress}, PIN: ${pin}` : `PIN: ${pin}`
+  }
+
+  const fatherReason =
+    fatherObj.ReasonForLeaving ||
+    fatherObj.reasonForLeaving ||
+    s.fatherReasonForLeaving ||
+    s.fatherReasonLeaving ||
+    s.father_leaving_reason ||
+    s.FATHER_LEAVING_REASON ||
+    s.father?.reasonForLeaving ||
+    ''
+
+  const motherReason =
+    motherObj.ReasonForLeaving ||
+    motherObj.reasonForLeaving ||
+    s.motherReasonForLeaving ||
+    s.motherReasonLeaving ||
+    s.mother_leaving_reason ||
+    s.MOTHER_LEAVING_REASON ||
+    s.mother?.reasonForLeaving ||
+    ''
 
   return {
     registrationNo:
+      s.ApplicationNo ||
       s.registrationNumber ||
       s.application_number ||
       s.APPLICATION_NUMBER ||
-      `T25-${String(s.id || '0001').padStart(4, '0')}`,
-    childName: s.studentName || s.student_name || s.STUDENT_NAME || '',
-    dob: formatPrintDate(s.date || s.dob || s.DOB || '2021-04-12'),
-    gender: s.gender || s.GENDER || 'Male',
-    motherTongue: s.motherTongue || s.student_language || s.STUDENT_LANGUAGE || 'Tamil',
-    religion: s.religion || s.RELIGION || 'Hindu',
-    caste: s.caste || s.caste_name || s.CASTE_NAME || 'Brahmin',
-    residentialAddress:
-      s.address ||
-      (s.area && s.city ? `${s.area}, ${s.city}` : s.area || s.city || '12th Avenue, Chennai - 600078'),
-    fatherMobile: s.mobile || s.father_mobile_no || s.FATHER_MOBILE_NO || '9840123456',
-    motherMobile: s.motherMobile || s.mother_mobile_no || s.MOTHER_MOBILE_NO || '9840987654',
-    distanceFromResidence: s.distanceKm || s.distance_name || s.DISTANCE_NAME || '1.5 KM',
-    modeOfTransport: s.vehicle_name || s.VEHICLE_NAME || s.commuteMode?.[0] || 'Two Wheeler',
+      s.registrationNo ||
+      (s.id ? `T25-${String(s.id).padStart(4, '0')}` : ''),
+    childName: s.ChildName || s.studentName || s.student_name || s.STUDENT_NAME || s.childName || '',
+    dob: formatPrintDob(s.ChildDOB || s.date || s.dob || s.DOB || ''),
+    gender: s.Gender || s.gender || s.GENDER || '',
+    motherTongue: s.MotherTongue || s.motherTongue || s.student_language || s.STUDENT_LANGUAGE || '',
+    religion: s.Religion || s.religion || s.RELIGION || '',
+    caste: s.Caste || s.caste || s.caste_name || s.CASTE_NAME || '',
+    residentialAddress,
+    fatherMobile:
+      fatherObj.MobileNo ||
+      fatherObj.mobileNo ||
+      s.mobile ||
+      s.fatherMobile ||
+      s.father_mobile_no ||
+      s.FATHER_MOBILE_NO ||
+      s.father?.mobileNo ||
+      '',
+    motherMobile:
+      motherObj.MobileNo ||
+      motherObj.mobileNo ||
+      s.motherMobile ||
+      s.mother_mobile_no ||
+      s.MOTHER_MOBILE_NO ||
+      s.mother?.mobileNo ||
+      '',
+    distanceFromResidence:
+      s.Distance ||
+      s.comm?.distanceKm ||
+      s.distanceKm ||
+      s.distance_name ||
+      s.DISTANCE_NAME ||
+      '',
+    modeOfTransport:
+      transportModeNames ||
+      s.TransportMode ||
+      (Array.isArray(s.comm?.commuteMode) ? s.comm?.commuteMode.join(', ') : s.comm?.commuteMode) ||
+      (Array.isArray(s.commuteMode) ? s.commuteMode.join(', ') : s.commuteMode) ||
+      s.vehicle_name ||
+      s.VEHICLE_NAME ||
+      '',
     hasSiblings: hasSiblingsStudying ? 'Yes' : 'No',
     hasSchoolGoingSiblings: hasSiblingsStudying,
     siblings: siblingRows,
-    fatherName: s.fatherName || s.father_name || s.FATHER_NAME || '',
+    fatherName: formatParentName(
+      fatherObj.Title || fatherObj.TitleName || s.fatherTitle || s.FatherTitle,
+      fatherObj.Initials || fatherObj.initials || s.fatherInitials || s.FatherInitials,
+      fatherObj.FullName ||
+        fatherObj.name ||
+        s.fatherName ||
+        s.father_name ||
+        s.FATHER_NAME ||
+        s.father?.name ||
+        '',
+    ),
     fatherQualification:
+      fatherObj.EducationalQualification ||
+      fatherObj.qualification ||
       s.fatherQualification ||
       s.father_qualification ||
       s.FATHER_QUALIFICATION ||
-      'M.Tech Software Engineering',
+      s.father?.qualification ||
+      '',
     fatherDesignation:
+      fatherObj.Designation ||
+      fatherObj.designation ||
       s.fatherDesignation ||
       s.father_designation ||
       s.FATHER_DESIGNATION ||
-      'Principal Architect',
+      s.father?.designation ||
+      '',
     fatherIncome:
+      fatherObj.IncomeRange ||
+      fatherObj.monthlyIncome ||
+      s.fatherIncome ||
       s.incomeRange ||
       s.father_monthly_income ||
       s.FATHER_MONTHLY_INCOME ||
-      '₹1,25,000',
-    motherName: s.motherName || s.mother_name || s.MOTHER_NAME || '',
+      s.father?.monthlyIncome ||
+      '',
+    motherName: formatParentName(
+      motherObj.Title || motherObj.TitleName || s.motherTitle || s.MotherTitle,
+      motherObj.Initials || motherObj.initials || s.motherInitials || s.MotherInitials,
+      motherObj.FullName ||
+        motherObj.name ||
+        s.motherName ||
+        s.mother_name ||
+        s.MOTHER_NAME ||
+        s.mother?.name ||
+        '',
+    ),
     motherQualification:
+      motherObj.EducationalQualification ||
+      motherObj.qualification ||
       s.motherQualification ||
       s.mother_qualification ||
       s.MOTHER_QUALIFICATION ||
-      'M.Sc Mathematics, B.Ed',
+      s.mother?.qualification ||
+      '',
     motherDesignation:
+      motherObj.Designation ||
+      motherObj.designation ||
       s.motherDesignation ||
       s.mother_designation ||
       s.MOTHER_DESIGNATION ||
-      'Senior Assistant Professor',
+      s.mother?.designation ||
+      '',
     motherIncome:
+      motherObj.IncomeRange ||
+      motherObj.monthlyIncome ||
       s.motherIncome ||
       s.mother_monthly_income ||
       s.MOTHER_MONTHLY_INCOME ||
-      '₹75,000',
+      s.mother?.monthlyIncome ||
+      '',
     isFatherAlumnus: isFatherAlumnus ? 'Yes' : 'No',
     fatherAlumnus: isFatherAlumnus,
     isMotherAlumnus: isMotherAlumnus ? 'Yes' : 'No',
     motherAlumnus: isMotherAlumnus,
     fatherPassingYear:
+      fatherObj.YearOfLeaving ||
+      fatherObj.LeftYear ||
+      fatherObj.yearOfLeaving ||
+      s.fatherPassingYear ||
       s.father_passing_year ||
       s.FATHER_PASSING_YEAR ||
-      (isFatherAlumnus ? '2006' : ''),
+      s.father?.yearOfLeaving ||
+      '',
     motherPassingYear:
+      motherObj.YearOfLeaving ||
+      motherObj.LeftYear ||
+      motherObj.yearOfLeaving ||
+      s.motherPassingYear ||
       s.mother_passing_year ||
       s.MOTHER_PASSING_YEAR ||
-      (isMotherAlumnus ? '2008' : ''),
+      s.mother?.yearOfLeaving ||
+      '',
     fatherYearsStudied:
+      fatherObj.TotalYearsStudied ||
+      fatherObj.yearsStudied ||
+      s.fatherYearsStudied ||
       s.father_total_years_studied ||
       s.FATHER_TOTAL_YEARS_STUDIED ||
-      (isFatherAlumnus ? '12' : ''),
+      s.father?.yearsStudied ||
+      '',
     motherYearsStudied:
+      motherObj.TotalYearsStudied ||
+      motherObj.yearsStudied ||
+      s.motherYearsStudied ||
       s.mother_total_years_studied ||
       s.MOTHER_TOTAL_YEARS_STUDIED ||
-      (isMotherAlumnus ? '10' : ''),
+      s.mother?.yearsStudied ||
+      '',
     fatherClassLastStudied:
+      fatherObj.ClassLastStudied ||
+      fatherObj.classLastStudied ||
+      s.fatherClassLastStudied ||
       s.fatherstudiedclass ||
       s.FATHERSTUDIEDCLASS ||
-      (isFatherAlumnus ? 'XII' : ''),
+      s.father?.classLastStudied ||
+      '',
     motherClassLastStudied:
+      motherObj.ClassLastStudied ||
+      motherObj.classLastStudied ||
+      s.motherClassLastStudied ||
       s.motherstudiedclass ||
       s.MOTHERSTUDIEDCLASS ||
-      (isMotherAlumnus ? 'XII' : ''),
-    fatherBranch: s.fatherBranch || s.schoolBranch || 'T.Nagar-PSBB',
-    motherBranch: s.motherBranch || s.schoolBranch || 'T.Nagar-PSBB',
-    fatherReasonForLeaving:
-      s.father_leaving_reason ||
-      s.FATHER_LEAVING_REASON ||
-      (isFatherAlumnus ? 'Higher Studies' : ''),
-    fatherReasonLeaving:
-      s.father_leaving_reason ||
-      s.FATHER_LEAVING_REASON ||
-      (isFatherAlumnus ? 'Higher Studies' : ''),
-    motherReasonForLeaving:
-      s.mother_leaving_reason ||
-      s.MOTHER_LEAVING_REASON ||
-      (isMotherAlumnus ? 'College Studies' : ''),
-    motherReasonLeaving:
-      s.mother_leaving_reason ||
-      s.MOTHER_LEAVING_REASON ||
-      (isMotherAlumnus ? 'College Studies' : ''),
-    isNormalHealthyChild: isHealthy ? 'Yes' : 'No',
-    majorAilment: isHealthy ? 'Nil' : s.phy_challenged_remarks || s.PHY_CHALLENGED_REMARKS || 'None',
-    dateOfSubmission: formatPrintDate(s.date_of_submission || s.DATE_OF_SUBMISSION || s.date || '2025-01-10'),
-    submissionTimings: '09:00 AM - 12:00 PM',
-    timings: '09:00 AM - 12:00 PM',
-    schoolAppliedFor: s.schoolBranch || 'T.NAGAR-PSBB',
-    academicYear: s.academicYear || '2024-25',
+      s.mother?.classLastStudied ||
+      '',
+    fatherBranch:
+      fatherObj.Branch ||
+      fatherObj.branch ||
+      s.fatherBranch ||
+      s.father?.branch ||
+      '',
+    motherBranch:
+      motherObj.Branch ||
+      motherObj.branch ||
+      s.motherBranch ||
+      s.mother?.branch ||
+      '',
+    fatherReasonForLeaving: fatherReason || s.ReasonForLeaving || '',
+    fatherReasonLeaving: fatherReason || s.ReasonForLeaving || '',
+    motherReasonForLeaving: motherReason || s.ReasonForLeaving || '',
+    motherReasonLeaving: motherReason || s.ReasonForLeaving || '',
+    isNormalHealthyChild: s.IsNormalChild,
+    majorAilment: isHealthy ? 'Nil' : (s.ChildMajorAilment || s.phy_challenged_remarks || s.PHY_CHALLENGED_REMARKS || s.majorAilment || 'Nil'),
+    dateOfSubmission: formatPrintDate(s.submissionDate || s.dateOfSubmission || s.date_of_submission || s.DATE_OF_SUBMISSION || ''),
+    submissionTimings: s.submissionTimings || s.timings || '',
+    timings: s.submissionTimings || s.timings || '',
+    schoolAppliedFor: s.School || s.schoolAppliedFor || s.schoolBranch || s.BranchName || s.selectedSchoolName || '',
+    schoolAddress: s.schoolAddress || s.SchoolAddress || s.admissionSchoolAddress || '',
+    schoolId: s.schoolId || s.SchoolID || undefined,
+    school: s.School || '',
+    preferredEmail:
+      s.preferredEmail ||
+      s.PreferredEmail ||
+      s.email ||
+      s.Email ||
+      s.EmailID ||
+      s.userEmail ||
+      s.fatherEmail ||
+      s.motherEmail ||
+      (typeof window !== 'undefined' ? (localStorage.getItem('email') || localStorage.getItem('user_email') || '') : '') ||
+      '',
+    academicYear: s.AcademicYear || s.academicYear || s.academic_year || '2026-27',
   }
 }
 
 /**
- * Maps a student record to RegistrationFormData structure
+ * Maps a student record or raw DB record to RegistrationFormData structure
  */
 export function mapStudentToRegistrationForm(student: StudentRecord | any): RegistrationFormData {
   const base = mapStudentToTrackSheet(student)
   const s = student
 
-  const goesToPlaySchool =
+  const fatherObj = (Array.isArray(s.Father) && s.Father.length > 0 ? s.Father[0] : (s.Father || s.father)) || {}
+  const motherObj = (Array.isArray(s.Mother) && s.Mother.length > 0 ? s.Mother[0] : (s.Mother || s.mother)) || {}
+  const guardianObj = (Array.isArray(s.Guardian) && s.Guardian.length > 0 ? s.Guardian[0] : (s.Guardian || s.guardian)) || {}
+
+  const isGuardianApplicable = Boolean(
+    guardianObj.IsGuardianApplicable === 'Yes' ||
+    guardianObj.IsGuardianApplicable === true ||
+    guardianObj.IsGuardianApplicable === 1 ||
+    guardianObj.isGuardianApplicable === 'Yes' ||
+    guardianObj.isGuardianApplicable === true ||
+    guardianObj.isGuardianApplicable === 1 ||
+    s.guardianApplicable === true ||
+    s.guardianApplicable === 'Yes' ||
+    s.isGuardianApplicable === true ||
+    s.isGuardianApplicable === 'Yes' ||
+    (s.guardian && s.guardian.isApplicable === true)
+  )
+
+  const goesToPlaySchool = Boolean(
+    s.ChildGotoPlaySchool === 'Yes' ||
+    s.ChildGotoPlaySchool === true ||
+    s.ChildGotoPlaySchool === 1 ||
+    s.ChildGotoPlaySchool === '1' ||
+    s.childGoesToSchool === true ||
+    s.childGoesToSchool === 'Yes' ||
     s.playSchool ||
     s.playschool_going === 'Yes' ||
-    s.PLAYSCHOOL_GOING === 'Yes'
+    s.PLAYSCHOOL_GOING === 'Yes' ||
+    Boolean(s.PlaySchoolName || s.prevSchool)
+  )
 
-  const isTwins =
+  const isTwins = Boolean(
+    s.IsTwins === 'Yes' ||
+    s.IsTwins === true ||
+    s.IsTwins === 1 ||
+    s.IsTwins === '1' ||
+    s.isTwins === true ||
+    s.isTwins === 'Yes' ||
     s.twinsTriplets ||
     s.twin_triplets_flag === 'Yes' ||
     s.TWIN_TRIPLETS_FLAG === 'Yes'
+  )
 
-  const isMotherEmployed =
-    s.mother_occupation && s.mother_occupation !== 'Homemaker'
-      ? 'Yes'
-      : 'Yes'
+  const isMotherEmployed = Boolean(
+    motherObj.IsEmployed === 'Yes' ||
+    motherObj.IsEmployed === true ||
+    motherObj.isEmployed === true ||
+    s.mother?.isEmployed === true ||
+    (motherObj.Occupation && motherObj.Occupation.trim().toLowerCase() !== 'homemaker') ||
+    (s.mother_occupation && s.mother_occupation.trim().toLowerCase() !== 'homemaker') ||
+    (s.mother?.occupation && s.mother.occupation.trim().toLowerCase() !== 'homemaker')
+  )
+
+  const isComingOnTransfer = Boolean(
+    s.TransferfromOutside === 'Yes' ||
+    s.TransferfromOutside === true ||
+    s.comm?.isTransferFromOutside ||
+    s.isTransferFromOutside ||
+    s.is_parent_coming_on_transfer_from_outside_chennai_or_outside_india === 'Yes' ||
+    s.IS_PARENT_COMING_ON_TRANSFER_FROM_OUTSIDE_CHENNAI_OR_OUTSIDE_INDIA === 'Yes'
+  )
+
+  const fatherPhone =
+    fatherObj.CompanyMobileNo ||
+    fatherObj.phoneOff ||
+    s.fatherPhoneOff ||
+    s.fatherPhoneOffice ||
+    s.father_phone_number ||
+    s.FATHER_PHONE_NUMBER ||
+    s.father?.phoneOff ||
+    ''
+
+  const motherPhone =
+    motherObj.CompanyMobileNo ||
+    motherObj.phoneOff ||
+    s.motherPhoneOff ||
+    s.motherPhoneOffice ||
+    s.mother_phone_number ||
+    s.MOTHER_PHONE_NUMBER ||
+    s.mother?.phoneOff ||
+    ''
+
+  const guardianPhoneOff =
+    guardianObj.CompanyMobileNo ||
+    guardianObj.phoneOff ||
+    s.guardianPhoneOff ||
+    s.guardianPhoneOffice ||
+    s.guardian_office_phone_number ||
+    s.GUARDIAN_OFFICE_PHONE_NUMBER ||
+    s.guardian?.phoneOff ||
+    ''
+
+  const landmark =
+    s.ResLandmark ||
+    s.comm?.landmark ||
+    s.landmark ||
+    s.LANDMARK ||
+    ''
 
   return {
     ...base,
-    passportNo: s.passport_number || s.PASSPORT_NUMBER || '',
-    nationality: s.nationality || s.NATIONALITY || 'Indian',
-    community: s.community || 'FC',
+    passportNo: s.PassportNo || s.passportNo || s.passport_number || s.PASSPORT_NUMBER || '',
+    nationality: s.Nationality || s.nationality || s.NATIONALITY || '',
+    community: s.Community || s.community || '',
     doesChildGoToPlaySchool: goesToPlaySchool ? 'Yes' : 'No',
     goesToPlaySchool,
     playSchoolName:
+      s.PlaySchoolName ||
+      s.prevSchool ||
       s.play_school_name ||
       s.PLAY_SCHOOL_NAME ||
-      (goesToPlaySchool ? 'EuroKids KK Nagar' : ''),
+      '',
     isTwinsTriplets: isTwins ? 'Yes' : 'No',
     isMultipleBirth: isTwins,
-    fatherDob: formatPrintDate(s.father_dob || s.FATHER_DOB || s.fatherDob || '1988-06-15'),
-    motherDob: formatPrintDate(s.mother_dob || s.MOTHER_DOB || s.motherDob || '1990-09-22'),
+    fatherDob: formatPrintDob(
+      fatherObj.DOB ||
+      fatherObj.dob ||
+      s.fatherDob ||
+      s.father_dob ||
+      s.FATHER_DOB ||
+      s.father?.dob ||
+      ''
+    ),
+    motherDob: formatPrintDob(
+      motherObj.DOB ||
+      motherObj.dob ||
+      s.motherDob ||
+      s.mother_dob ||
+      s.MOTHER_DOB ||
+      s.mother?.dob ||
+      ''
+    ),
     fatherUniversity:
+      fatherObj.UniversityOrInstitution ||
+      fatherObj.university ||
+      s.fatherUniversity ||
       s.father_instituation_name ||
       s.FATHER_INSTITUATION_NAME ||
-      s.fatherUniversity ||
-      'IIT Madras',
+      s.father?.university ||
+      '',
     motherUniversity:
+      motherObj.UniversityOrInstitution ||
+      motherObj.university ||
+      s.motherUniversity ||
       s.mother_instituation_name ||
       s.MOTHER_INSTITUATION_NAME ||
-      s.motherUniversity ||
-      'Madras Christian College',
+      s.mother?.university ||
+      '',
     fatherOccupation:
+      fatherObj.Occupation ||
+      fatherObj.occupation ||
+      s.fatherOccupation ||
       s.father_occupation ||
       s.FATHER_OCCUPATION ||
-      s.fatherOccupation ||
-      'Salaried',
-    isMotherEmployed,
+      s.father?.occupation ||
+      '',
+    isMotherEmployed: isMotherEmployed ? 'Yes' : 'No',
     motherOccupation:
+      motherObj.Occupation ||
+      motherObj.occupation ||
+      s.motherOccupation ||
       s.mother_occupation ||
       s.MOTHER_OCCUPATION ||
-      s.motherOccupation ||
-      'Senior Educator',
+      s.mother?.occupation ||
+      '',
     fatherEmploymentCategory:
+      fatherObj.EmployementCategory ||
+      fatherObj.employmentCategory ||
+      s.fatherEmploymentCategory ||
       s.father_employment_category_name ||
       s.FATHER_EMPLOYMENT_CATEGORY_NAME ||
-      s.fatherEmploymentCategory ||
-      'Information Technology',
+      s.father?.employmentCategory ||
+      '',
     motherEmploymentCategory:
+      motherObj.EmployementCategory ||
+      motherObj.employmentCategory ||
+      s.motherEmploymentCategory ||
       s.mother_employment_category_name ||
       s.MOTHER_EMPLOYMENT_CATEGORY_NAME ||
-      s.motherEmploymentCategory ||
-      'Education',
+      s.mother?.employmentCategory ||
+      '',
     fatherCompany:
+      fatherObj.CompanyName ||
+      fatherObj.companyName ||
+      s.fatherCompany ||
       s.father_company_name ||
       s.FATHER_COMPANY_NAME ||
-      s.fatherCompanyName ||
-      'Infosys Ltd',
+      s.father?.companyName ||
+      '',
     motherCompany:
+      motherObj.CompanyName ||
+      motherObj.companyName ||
+      s.motherCompany ||
       s.mother_company_name ||
       s.MOTHER_COMPANY_NAME ||
-      s.motherCompanyName ||
-      'DAV Girls School',
+      s.mother?.companyName ||
+      '',
     fatherOfficeAddress:
+      fatherObj.CompanyAddress ||
+      fatherObj.officeAddress ||
+      s.fatherOfficeAddress ||
       s.father_office_address ||
       s.FATHER_OFFICE_ADDRESS ||
-      s.fatherOfficeAddress ||
-      'OMR Sholinganallur, Chennai',
+      s.father?.officeAddress ||
+      '',
     motherOfficeAddress:
+      motherObj.CompanyAddress ||
+      motherObj.officeAddress ||
+      s.motherOfficeAddress ||
       s.mother_office_address ||
       s.MOTHER_OFFICE_ADDRESS ||
-      s.motherOfficeAddress ||
-      'Gopalapuram, Chennai',
-    fatherPhoneOff:
-      s.father_phone_number ||
-      s.FATHER_PHONE_NUMBER ||
-      s.fatherPhoneOff ||
-      '044-24891234',
-    fatherPhoneOffice:
-      s.father_phone_number ||
-      s.FATHER_PHONE_NUMBER ||
-      s.fatherPhoneOff ||
-      '044-24891234',
-    motherPhoneOff:
-      s.mother_phone_number ||
-      s.MOTHER_PHONE_NUMBER ||
-      s.motherPhoneOff ||
-      '044-24891235',
-    motherPhoneOffice:
-      s.mother_phone_number ||
-      s.MOTHER_PHONE_NUMBER ||
-      s.motherPhoneOff ||
-      '044-24891235',
-    guardianName: s.guardian_name || s.GUARDIAN_NAME || s.guardianName || '',
-    guardianGender: s.guardian_gender || s.GUARDIAN_GENDER || s.guardianGender || '',
-    guardianOccupation: s.guardian_occupation || s.GUARDIAN_OCCUPATION || s.guardianOccupation || '',
-    guardianCompany: s.guardian_instituation_name || s.GUARDIAN_INSTITUATION_NAME || '',
-    guardianMonthlyIncome: s.guardian_monthly_income || '',
-    guardianIncome: s.guardian_monthly_income || '',
-    guardianOfficeAddress: s.guardian_office_address || s.GUARDIAN_OFFICE_ADDRESS || '',
-    guardianPhoneOff: s.guardian_office_phone_number || s.GUARDIAN_OFFICE_PHONE_NUMBER || '',
-    guardianPhoneOffice: s.guardian_office_phone_number || s.GUARDIAN_OFFICE_PHONE_NUMBER || '',
-    guardianPhoneRes: s.guardian_residence_phone_number || s.GUARDIAN_RESIDENCE_PHONE_NUMBER || '',
-    guardianMobile: s.guardian_mobile_number || s.GUARDIAN_MOBILE_NUMBER || '',
-    residenceTelephone: s.residence_phone_number || s.RESIDENCE_PHONE_NUMBER || '044-24741122',
-    landmark: s.landmark || s.LANDMARK || 'Near Sivan Park',
-    importantLandmark: s.landmark || s.LANDMARK || 'Near Sivan Park',
-    parentAchievements: s.parent_acheivements || 'National Olympiad Mentor & Tech Speaker',
-    isComingOnTransfer:
-      s.is_parent_coming_on_transfer_from_outside_chennai_or_outside_india ||
-      s.IS_PARENT_COMING_ON_TRANSFER_FROM_OUTSIDE_CHENNAI_OR_OUTSIDE_INDIA ||
-      'No',
-    isTransferParent:
-      s.is_parent_coming_on_transfer_from_outside_chennai_or_outside_india === 'Yes' ||
-      s.IS_PARENT_COMING_ON_TRANSFER_FROM_OUTSIDE_CHENNAI_OR_OUTSIDE_INDIA === 'Yes',
-    fatherEmail: s.fatherEmail || s.father_email || s.FATHER_EMAIL || 'father@psbb.edu.in',
-    motherEmail: s.motherEmail || s.mother_email || s.MOTHER_EMAIL || 'mother@psbb.edu.in',
-    guardianEmail: s.guardianEmail || s.guardian_email || s.GUARDIAN_EMAIL || 'guardian@psbb.edu.in',
-    guardianRelationship: s.guardianRelationship || s.guardian_relationship || s.GUARDIAN_RELATIONSHIP || 'Paternal Uncle',
-    fatherAddress: s.father_office_address || s.FATHER_OFFICE_ADDRESS || s.fatherAddress || s.address || 'No. 12, OMR Sholinganallur, Chennai - 600119',
-    motherAddress: s.mother_office_address || s.MOTHER_OFFICE_ADDRESS || s.motherAddress || s.address || 'No. 45, Gopalapuram Main Road, Chennai - 600086',
-    guardianAddress: s.guardian_office_address || s.GUARDIAN_OFFICE_ADDRESS || s.guardianAddress || s.address || 'No. 88, 10th Avenue, Ashok Nagar, Chennai - 600083',
-    guardianDob: formatPrintDate(s.guardian_dob || s.GUARDIAN_DOB || s.guardianDob || '1985-04-10'),
+      s.mother?.officeAddress ||
+      '',
+    fatherPhoneOff: fatherPhone,
+    fatherPhoneOffice: fatherPhone,
+    motherPhoneOff: motherPhone,
+    motherPhoneOffice: motherPhone,
+    guardianName: isGuardianApplicable
+      ? formatParentName(
+          guardianObj.Title || guardianObj.TitleName || s.guardianTitle || s.GuardianTitle,
+          guardianObj.Initials || guardianObj.initials || s.guardianInitials || s.GuardianInitials,
+          guardianObj.FullName ||
+            guardianObj.name ||
+            s.guardianName ||
+            s.guardian_name ||
+            s.GUARDIAN_NAME ||
+            s.guardian?.name ||
+            '',
+        )
+      : '',
+    guardianGender: isGuardianApplicable
+      ? guardianObj.Gender ||
+        guardianObj.gender ||
+        s.guardianGender ||
+        s.guardian_gender ||
+        s.GUARDIAN_GENDER ||
+        s.guardian?.gender ||
+        ''
+      : '',
+    guardianOccupation: isGuardianApplicable
+      ? guardianObj.Occupation ||
+        guardianObj.occupation ||
+        s.guardianOccupation ||
+        s.guardian_occupation ||
+        s.GUARDIAN_OCCUPATION ||
+        s.guardian?.occupation ||
+        ''
+      : '',
+    guardianDesignation: isGuardianApplicable
+      ? guardianObj.Designation ||
+        guardianObj.designation ||
+        s.guardianDesignation ||
+        s.guardian_designation ||
+        s.GUARDIAN_DESIGNATION ||
+        s.guardian?.designation ||
+        ''
+      : '',
+    guardianCompany: isGuardianApplicable
+      ? guardianObj.CompanyName ||
+        guardianObj.companyName ||
+        s.guardianCompany ||
+        s.guardian_instituation_name ||
+        s.GUARDIAN_INSTITUATION_NAME ||
+        s.guardian?.companyName ||
+        ''
+      : '',
+    guardianMonthlyIncome: isGuardianApplicable
+      ? guardianObj.IncomeRange ||
+        guardianObj.monthlyIncome ||
+        s.guardianMonthlyIncome ||
+        s.guardianIncome ||
+        s.guardian_monthly_income ||
+        s.guardian?.monthlyIncome ||
+        ''
+      : '',
+    guardianIncome: isGuardianApplicable
+      ? guardianObj.IncomeRange ||
+        guardianObj.monthlyIncome ||
+        s.guardianMonthlyIncome ||
+        s.guardianIncome ||
+        s.guardian_monthly_income ||
+        s.guardian?.monthlyIncome ||
+        ''
+      : '',
+    guardianOfficeAddress: isGuardianApplicable
+      ? guardianObj.CompanyAddress ||
+        guardianObj.officeAddress ||
+        s.guardianOfficeAddress ||
+        s.guardian_office_address ||
+        s.GUARDIAN_OFFICE_ADDRESS ||
+        s.guardian?.officeAddress ||
+        ''
+      : '',
+    guardianPhoneOff: isGuardianApplicable ? guardianPhoneOff : '',
+    guardianPhoneOffice: isGuardianApplicable ? guardianPhoneOff : '',
+    guardianPhoneRes: isGuardianApplicable
+      ? guardianObj.phoneRes ||
+        s.guardianPhoneRes ||
+        s.guardian_residence_phone_number ||
+        s.GUARDIAN_RESIDENCE_PHONE_NUMBER ||
+        s.guardian?.phoneRes ||
+        ''
+      : '',
+    guardianMobile: isGuardianApplicable
+      ? guardianObj.MobileNo ||
+        guardianObj.mobileNo ||
+        s.guardianMobile ||
+        s.guardian_mobile_number ||
+        s.GUARDIAN_MOBILE_NUMBER ||
+        s.guardian?.mobileNo ||
+        ''
+      : '',
+    residenceTelephone:
+      s.residence_phone_number ||
+      s.RESIDENCE_PHONE_NUMBER ||
+      s.residenceTelephone ||
+      s.residencePhone ||
+      s.comm?.residencePhone ||
+      '',
+    landmark,
+    importantLandmark: landmark,
+    parentAchievements:
+      s.ParentsAchivements ||
+      s.comm?.parentAchievements ||
+      s.parentAchievements ||
+      s.parent_acheivements ||
+      '',
+    isComingOnTransfer: isComingOnTransfer ? 'Yes' : 'No',
+    isTransferParent: isComingOnTransfer,
+    fatherEmail: s.fatherEmail || s.father_email || s.FATHER_EMAIL || '',
+    motherEmail: s.motherEmail || s.mother_email || s.MOTHER_EMAIL || '',
+    guardianEmail: isGuardianApplicable ? (s.guardianEmail || s.guardian_email || s.GUARDIAN_EMAIL || '') : '',
+    guardianRelationship: isGuardianApplicable
+      ? guardianObj.Relationship ||
+        guardianObj.relationship ||
+        s.guardianRelationship ||
+        s.guardian_relationship ||
+        s.GUARDIAN_RELATIONSHIP ||
+        s.guardian?.relationship ||
+        ''
+      : '',
+    fatherAddress:
+      fatherObj.CompanyAddress ||
+      fatherObj.officeAddress ||
+      s.father_office_address ||
+      s.FATHER_OFFICE_ADDRESS ||
+      s.fatherAddress ||
+      s.father?.officeAddress ||
+      '',
+    motherAddress:
+      motherObj.CompanyAddress ||
+      motherObj.officeAddress ||
+      s.mother_office_address ||
+      s.MOTHER_OFFICE_ADDRESS ||
+      s.motherAddress ||
+      s.mother?.officeAddress ||
+      '',
+    guardianAddress: isGuardianApplicable
+      ? guardianObj.CompanyAddress ||
+        guardianObj.officeAddress ||
+        s.guardian_office_address ||
+        s.GUARDIAN_OFFICE_ADDRESS ||
+        s.guardianAddress ||
+        s.guardian?.officeAddress ||
+        ''
+      : '',
+    guardianDob: isGuardianApplicable
+      ? formatPrintDob(
+          guardianObj.DOB ||
+          guardianObj.dob ||
+          s.guardianDob ||
+          s.guardian_dob ||
+          s.GUARDIAN_DOB ||
+          s.guardian?.dob ||
+          ''
+        )
+      : '',
   }
 }
