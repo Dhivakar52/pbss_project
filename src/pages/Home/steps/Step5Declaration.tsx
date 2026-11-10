@@ -35,7 +35,7 @@ export const Step5Declaration: React.FC<Step5DeclarationProps> = ({
   isTwins = false,
   twinsNo = '',
   additionalChildren = [],
-  childDeclarations = [false, false, false, false],
+  childDeclarations: _childDeclarations = [false, false, false, false],
   setChildDeclarations,
   isDeclared,
   setIsDeclared,
@@ -83,9 +83,7 @@ export const Step5Declaration: React.FC<Step5DeclarationProps> = ({
   }, [childName, childGender, isTwins, additionalChildren, twinsNo])
 
   const isMultiple = isTwins && allChildren.length > 1
-  const allDeclared = isMultiple
-    ? allChildren.every((_, idx) => Boolean(childDeclarations[idx]))
-    : isDeclared
+  const allDeclared = isDeclared
 
   return (
     <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-6">
@@ -154,11 +152,11 @@ export const Step5Declaration: React.FC<Step5DeclarationProps> = ({
               </Field>
             </div>
 
-            {/* Single Child Declaration Input & Paragraph */}
+            {/* Single Child Declaration Terms */}
             {!isMultiple && (
               <div className="space-y-4 text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium pt-1">
                 <p>
-                  We, the parents (father & mother) / guardian of{' '}
+                  We, the parents (father &amp; mother) / guardian of{' '}
                   <span className="font-bold text-blue-900 dark:text-blue-200 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-md border border-blue-200 dark:border-blue-800 inline-block shadow-2xs">
                     {childName.trim() ? childName : 'Name of the Child'}
                   </span>{' '}
@@ -167,28 +165,15 @@ export const Step5Declaration: React.FC<Step5DeclarationProps> = ({
                 <p className="font-semibold text-slate-900 dark:text-white">
                   We also declare that we have applied in <span className="text-blue-700 dark:text-blue-400 font-bold">{displayBranch}</span> branch only.
                 </p>
-
-                <label className="flex items-center gap-2.5 cursor-pointer pt-3 border-t border-blue-100 dark:border-blue-900/40">
-                  <input
-                    type="checkbox"
-                    checked={isDeclared}
-                    onChange={(e) => setIsDeclared(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
-                    I agree and accept the declaration terms above.
-                  </span>
-                </label>
               </div>
             )}
           </div>
 
-          {/* Multiple Children Declarations (Repeated for each child) */}
+          {/* Multiple Children Declarations Terms (Without checkbox inside) */}
           {isMultiple && (
             <div className="space-y-4">
               {allChildren.map((ch, idx) => {
                 const pronoun = getPronoun(ch.gender)
-                const isChecked = Boolean(childDeclarations[idx])
                 const displayName = ch.name.trim() || ch.label
 
                 return (
@@ -214,30 +199,34 @@ export const Step5Declaration: React.FC<Step5DeclarationProps> = ({
                       <p className="font-semibold text-slate-900 dark:text-white">
                         We also declare that we have applied in <span className="text-blue-700 dark:text-blue-400 font-bold">{displayBranch}</span> branch only.
                       </p>
-
-                      <label className="flex items-center gap-2.5 cursor-pointer pt-3 border-t border-blue-100 dark:border-blue-900/40">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={(e) => {
-                            const next = [...childDeclarations]
-                            next[idx] = e.target.checked
-                            setChildDeclarations?.(next)
-                            const everyChecked = allChildren.every((_, i) => (i === idx ? e.target.checked : Boolean(next[i])))
-                            setIsDeclared(everyChecked)
-                          }}
-                          className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                        />
-                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                          I agree and accept the declaration terms above for {displayName}.
-                        </span>
-                      </label>
                     </div>
                   </div>
                 )
               })}
             </div>
           )}
+
+          {/* Shared Application-Level Declaration Agreement Checkbox - Exactly ONE in the entire application */}
+          <div className="p-5 sm:p-6 rounded-2xl bg-[#E6F4FF]/50 dark:bg-blue-950/30 border border-[#BAE0FF] dark:border-blue-900/60 shadow-2xs">
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                id="declarationAgreementCheckbox"
+                checked={isDeclared}
+                onChange={(e) => {
+                  const val = e.target.checked
+                  setIsDeclared(val)
+                  if (setChildDeclarations) {
+                    setChildDeclarations([val, val, val, val])
+                  }
+                }}
+                className="h-4.5 w-4.5 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+              />
+              <span className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">
+                I agree and accept the declaration terms above.
+              </span>
+            </label>
+          </div>
         </div>
       </fieldset>
 
@@ -286,7 +275,7 @@ export const Step5Declaration: React.FC<Step5DeclarationProps> = ({
               type="button"
               disabled={!allDeclared}
               onClick={onSaveAndNext}
-              title={!allDeclared ? (isMultiple ? "Please accept the declaration terms for all children to enable submission" : "Please tick 'I agree and accept the declaration terms above' to enable submission") : undefined}
+              title={!allDeclared ? "Please tick 'I agree and accept the declaration terms above' to enable submission" : undefined}
               className={`h-10 px-8 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${allDeclared
                 ? 'bg-[#1677FF] hover:bg-[#0958D9] dark:bg-blue-600 dark:hover:bg-blue-500 text-white shadow-md cursor-pointer'
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-300/70 dark:border-slate-700 shadow-none'
