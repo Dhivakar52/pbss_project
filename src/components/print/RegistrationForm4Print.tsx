@@ -75,10 +75,6 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
   const motherPhone = data.motherMobile || data.motherPhoneOffice || data.motherPhoneOff || ''
   const guardianPhone = data.guardianMobile || data.guardianPhoneOffice || data.guardianPhoneOff || ''
 
-  const fatherAddr = data.fatherAddress || data.fatherOfficeAddress || data.residentialAddress || ''
-  const motherAddr = data.motherAddress || data.motherOfficeAddress || data.residentialAddress || ''
-  const guardianAddr = data.guardianAddress || data.guardianOfficeAddress || data.residentialAddress || ''
-
   return (
     <div className="registration-form-document font-sans text-black bg-white select-none">
       {/* ================= PAGE 1: CHILD DETAILS, SIBLING TABLE & HEALTH DETAILS ================= */}
@@ -310,6 +306,22 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                       </td>
                     </tr>
 
+                    {/* Row 4b: University / Institution */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        University / Institution
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black break-words">
+                        {data.fatherUniversity || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black break-words">
+                        {data.motherUniversity || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
                     {/* Row 5: Occupation */}
                     <tr className="border-b border-black">
                       <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
@@ -326,6 +338,38 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                       </td>
                     </tr>
 
+                    {/* Row 5b: Employment Category */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Employment Category
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherEmploymentCategory || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherEmploymentCategory || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
+                    {/* Row 5c: Designation */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Designation
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherDesignation || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherDesignation || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        {data.guardianDesignation || '-'}
+                      </td>
+                    </tr>
+
                     {/* Row 6: Company Name */}
                     <tr className="border-b border-black">
                       <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
@@ -339,6 +383,22 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                       </td>
                       <td className="px-2 py-1 font-normal text-black">
                         {data.guardianCompany || '-'}
+                      </td>
+                    </tr>
+
+                    {/* Row 6b: Office Address */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60 align-top">
+                        Office Address
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black leading-tight align-top break-words">
+                        {data.fatherOfficeAddress || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black leading-tight align-top break-words">
+                        {data.motherOfficeAddress || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black leading-tight align-top break-words">
+                        {data.guardianOfficeAddress || '-'}
                       </td>
                     </tr>
 
@@ -374,6 +434,22 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                       </td>
                     </tr>
 
+                    {/* Row 8b: Office Phone Number */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Office Phone Number
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherPhoneOff || data.fatherPhoneOffice || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherPhoneOff || data.motherPhoneOffice || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        {data.guardianPhoneOff || data.guardianPhoneOffice || '-'}
+                      </td>
+                    </tr>
+
                     {/* Row 9: Email */}
                     <tr className="border-b border-black">
                       <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
@@ -390,24 +466,8 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                       </td>
                     </tr>
 
-                    {/* Row 10: Address */}
-                    <tr className="border-b border-black">
-                      <td className="px-2 py-1.5 font-bold border-r border-black bg-slate-50/60 align-top">
-                        Address
-                      </td>
-                      <td className="px-2 py-1.5 font-normal text-black border-r border-black leading-tight align-top break-words">
-                        {fatherAddr || '-'}
-                      </td>
-                      <td className="px-2 py-1.5 font-normal text-black border-r border-black leading-tight align-top break-words">
-                        {motherAddr || '-'}
-                      </td>
-                      <td className="px-2 py-1.5 font-normal text-black leading-tight align-top break-words">
-                        {guardianAddr || '-'}
-                      </td>
-                    </tr>
-
                     {/* Row 11: Is Alumnus? */}
-                    <tr>
+                    <tr className="border-b border-black">
                       <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
                         Is Alumnus?
                       </td>
@@ -416,6 +476,86 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                       </td>
                       <td className="px-2 py-1 font-normal text-black border-r border-black">
                         {data.motherAlumnus ? 'Yes' : 'No'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
+                    {/* Row 11b: Total No of Years Studied */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Total No of Years Studied
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherYearsStudied || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherYearsStudied || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
+                    {/* Row 11c: Class Last Studied */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Class Last Studied
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherClassLastStudied || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherClassLastStudied || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
+                    {/* Row 11d: Year of Leaving / Passing */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Year of Leaving / Passing
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherPassingYear || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherPassingYear || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
+                    {/* Row 11e: Branch */}
+                    <tr className="border-b border-black">
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Branch
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.fatherBranch || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black">
+                        {data.motherBranch || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black">
+                        -
+                      </td>
+                    </tr>
+
+                    {/* Row 11f: Reason for Leaving */}
+                    <tr>
+                      <td className="px-2 py-1 font-bold border-r border-black bg-slate-50/60">
+                        Reason for Leaving
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black break-words">
+                        {data.fatherReasonLeaving || data.fatherReasonForLeaving || '-'}
+                      </td>
+                      <td className="px-2 py-1 font-normal text-black border-r border-black break-words">
+                        {data.motherReasonLeaving || data.motherReasonForLeaving || '-'}
                       </td>
                       <td className="px-2 py-1 font-normal text-black">
                         -
@@ -456,7 +596,7 @@ export const RegistrationForm4Print: React.FC<RegistrationForm4PrintProps> = ({ 
                   <span className="font-normal ml-2 break-words">{data.importantLandmark || data.landmark || '-'}</span>
                 </div>
                 <div className="flex items-start">
-                  <span className="font-bold shrink-0">Parent Transfer :</span>
+                  <span className="font-bold shrink-0">Is Parent coming on transfer from outside Chennai/from outside India :</span>
                   <span className="font-normal ml-2">{data.isComingOnTransfer || (data.isTransferParent ? 'Yes' : 'No')}</span>
                 </div>
               </div>

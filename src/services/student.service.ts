@@ -1,4 +1,4 @@
-import { mockStudents, type StudentRecord } from '@/data/mockStudents'
+import type { StudentRecord } from '@/data/mockStudents'
 
 export class StudentService {
   /**
@@ -55,32 +55,32 @@ export class StudentService {
       id: payload.id || id,
       slNo: payload.slNo || slNo,
       registrationNumber: payload.registrationNumber || registrationNumber,
-      studentName: payload.studentName || 'Applicant Child',
-      schoolBranch: payload.schoolBranch || 'T.Nagar-PSBB',
-      academicYear: payload.academicYear || '2025-26',
+      studentName: payload.studentName || '',
+      schoolBranch: payload.schoolBranch || '',
+      academicYear: payload.academicYear || '',
       gender: payload.gender || 'Male',
-      motherTongue: payload.motherTongue || 'Tamil',
-      applicationStatus: payload.applicationStatus || 'Declared',
+      motherTongue: payload.motherTongue || '',
+      applicationStatus: payload.applicationStatus || 'Pending',
       date: payload.date || now,
-      trackSheet: payload.trackSheet ?? payload.status1 ?? true,
-      registrationForm: payload.registrationForm ?? payload.status2 ?? true,
-      status1: payload.trackSheet ?? payload.status1 ?? true,
-      status2: payload.registrationForm ?? payload.status2 ?? true,
+      trackSheet: payload.trackSheet ?? payload.status1 ?? false,
+      registrationForm: payload.registrationForm ?? payload.status2 ?? false,
+      status1: payload.trackSheet ?? payload.status1 ?? false,
+      status2: payload.registrationForm ?? payload.status2 ?? false,
       fatherName: payload.fatherName || '',
       motherName: payload.motherName || '',
       mobile: payload.mobile || '',
-      city: payload.city || 'Chennai',
-      area: payload.area || 'T.Nagar',
+      city: payload.city || '',
+      area: payload.area || '',
       playSchool: payload.playSchool ?? false,
       physicallyChallenged: payload.physicallyChallenged ?? false,
       twinsTriplets: payload.twinsTriplets ?? false,
       alumni: payload.alumni ?? false,
       siblingsStudying: payload.siblingsStudying ?? false,
-      distanceKm: payload.distanceKm || '< 2 KM',
-      incomeRange: payload.incomeRange || '10-15 Lakhs',
-      religion: payload.religion || 'Hindu',
+      distanceKm: payload.distanceKm || '',
+      incomeRange: payload.incomeRange || '',
+      religion: payload.religion || '',
       caste: payload.caste || '',
-      community: payload.community || 'FC',
+      community: payload.community || '',
     }
   }
 
@@ -161,7 +161,7 @@ export class StudentService {
    * Initial seed records.
    */
   static getInitialStudents(): StudentRecord[] {
-    return mockStudents
+    return []
   }
 }
 

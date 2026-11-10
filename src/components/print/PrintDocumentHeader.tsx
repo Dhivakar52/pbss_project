@@ -1,22 +1,73 @@
 import React from 'react'
 import logoImg from '@/assets/images/logo.png'
+import { useMasterStore } from '@/store/useMasterStore'
 
 export interface PrintDocumentHeaderProps {
   documentType: 'track-sheet' | 'registration-form'
   academicYear?: string
   student?: any
+  logoSrc?: string
 }
 
 export const PrintDocumentHeader: React.FC<PrintDocumentHeaderProps> = ({
   documentType,
   academicYear,
   student,
+  logoSrc,
 }) => {
   const year =
     academicYear ||
     student?.academicYear ||
     student?.academic_year ||
-    '2024-25'
+    student?.AcademicYear ||
+    '2025-2026'
+
+  const effectiveLogo = logoSrc || student?.logoSrc || logoImg
+
+  const schoolAddress = React.useMemo(() => {
+    const rawAddress =
+      student?.schoolAddress ||
+      student?.SchoolAddress ||
+      student?.admissionSchoolAddress
+    if (rawAddress && typeof rawAddress === 'string' && rawAddress.trim()) {
+      return rawAddress.trim()
+    }
+
+    const schoolApplied = String(
+      student?.schoolAppliedFor ||
+      student?.School ||
+      student?.schoolBranch ||
+      student?.BranchName ||
+      ''
+    ).toLowerCase()
+
+    const schoolId = Number(student?.schoolId || student?.SchoolID)
+
+    const masterSchools = useMasterStore.getState().schools || []
+    if (schoolId > 0) {
+      const matchById = masterSchools.find((s) => Number(s.SchoolID) === schoolId)
+      if (matchById?.SchoolAddress?.trim()) {
+        return matchById.SchoolAddress.trim()
+      }
+    }
+
+    if (schoolApplied) {
+      const matchByName = masterSchools.find((s) => {
+        const sName = (s.SchoolName || s.School || s.SchoolShortName || '').toLowerCase()
+        return sName && (sName.includes(schoolApplied) || schoolApplied.includes(sName))
+      })
+      if (matchByName?.SchoolAddress?.trim()) {
+        return matchByName.SchoolAddress.trim()
+      }
+    }
+
+    // Direct fallback if master store not yet populated
+    if (schoolId === 2 || schoolApplied.includes('k.k') || schoolApplied.includes('kk')) {
+      return '29, Alagirisamy Salai, K.K. Nagar, Chennai - 600078'
+    }
+
+    return 'No: 17, Thirumalai Road, T.Nagar, Chennai - 600017'
+  }, [student])
 
   const title =
     documentType === 'track-sheet'
@@ -32,7 +83,7 @@ export const PrintDocumentHeader: React.FC<PrintDocumentHeaderProps> = ({
         {/* School Logo */}
         <div className="shrink-0 w-20 flex items-center justify-center">
           <img
-            src={logoImg}
+            src={effectiveLogo}
             alt="PSBB Logo"
             className="h-20 w-20 object-contain"
           />
@@ -44,7 +95,7 @@ export const PrintDocumentHeader: React.FC<PrintDocumentHeaderProps> = ({
             Padma Seshadri Bala Bhavan Sr. Sec. School
           </h1>
           <p className="text-[15px] font-normal text-black leading-snug mt-0.5 font-sans">
-            No.17,Thirumalai Road,T.Nagar,Chennai - 17.
+            {schoolAddress}
           </p>
           <h2 className="text-[15px] font-normal text-black mt-1 font-sans">
             {title}

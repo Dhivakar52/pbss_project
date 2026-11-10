@@ -1,4 +1,4 @@
-import { Fragment, useState, useMemo } from "react"
+import { Fragment, useState, useMemo, useEffect } from "react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,7 +7,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,22 +26,21 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
-  UserPlus,
+  // UserPlus,
   LogOut,
   ChevronDown,
-  Sun,
-  Moon,
   Search,
   X,
   Menu,
 } from "lucide-react"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
-import { useTheme } from "@/context/ThemeContext"
 import { useAuthStore } from "@/store/useAuthStore"
 import { toast } from "@/components/ui/toast"
 import { getMenuConfig, type MenuItem } from "@/config/menu.config"
+import { useMasterStore } from "@/store/useMasterStore"
 import Logo from "@/assets/images/logo.png"
 import { cn } from "@/lib/utils"
+import { ApiService } from "@/services/api.service"
 
 interface HeaderProps {
   breadcrumbItems?: {
@@ -108,14 +106,77 @@ const formatLabel = (str: string): string => {
 export function Header({
   breadcrumbItems = []
 }: HeaderProps) {
-  const { theme, toggleTheme } = useTheme()
-  const { user, logout } = useAuthStore()
+  const { user, logout, applicantUserName, setApplicantUserName } = useAuthStore()
   const location = useLocation()
   const navigate = useNavigate()
+  const admissionSchoolAddress = useMasterStore((state) => state.admissionSchoolAddress)
   const [search, setSearch] = useState("")
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [applicantBreadcrumbName, setApplicantBreadcrumbName] = useState("")
+
+  useEffect(() => {
+    const segments = location.pathname.split("/").filter(Boolean)
+    const applicantId = segments[0] === "admission" ? segments[segments.length - 1] : ""
+    if (!/^\d+$/.test(applicantId)) {
+      setApplicantBreadcrumbName("")
+      return
+    }
+
+    let isMounted = true
+    setApplicantBreadcrumbName("")
+    const fetchApplicantName = async () => {
+      const applicants = await ApiService.fetchApplicant({ applicantId: Number(applicantId) })
+      if (!isMounted) return
+      const applicant = applicants?.find((record: any) => Number(record.ApplicantID) === Number(applicantId)) || applicants?.[0]
+      const name = applicant?.ChildName || applicant?.StudentName
+      if (typeof name === "string" && name.trim()) setApplicantBreadcrumbName(name.trim())
+      const rawUserName = applicant?.UserName ?? applicant?.userName
+      if (typeof rawUserName === "string" && rawUserName.trim()) {
+        setApplicantUserName(rawUserName.trim())
+      }
+    }
+
+    void fetchApplicantName()
+    return () => { isMounted = false }
+  }, [location.pathname, setApplicantUserName])
+
+  useEffect(() => {
+    // Avoid duplicate API calls if applicantUserName is already present in store
+    if (applicantUserName) return
+    if (!user?.userId || isNaN(Number(user.userId))) return
+
+    let isMounted = true
+    const loadApplicantUserName = async () => {
+      try {
+        const segments = location.pathname.split("/").filter(Boolean)
+        const pathApplicantId = segments[0] === "admission" && /^\d+$/.test(segments[segments.length - 1])
+          ? Number(segments[segments.length - 1])
+          : undefined
+
+        const params = pathApplicantId
+          ? { applicantId: pathApplicantId }
+          : { userId: Number(user.userId) }
+
+        const applicants = await ApiService.fetchApplicant(params)
+        if (!isMounted) return
+        const firstItem = Array.isArray(applicants) ? applicants[0] : null
+        const rawName = firstItem?.UserName ?? firstItem?.userName
+        if (typeof rawName === "string" && rawName.trim()) {
+          setApplicantUserName(rawName.trim())
+        }
+      } catch (err) {
+        console.warn("Failed to fetch applicant user name for header:", err)
+      }
+    }
+
+    void loadApplicantUserName()
+    return () => {
+      isMounted = false
+    }
+  }, [user?.userId, applicantUserName, location.pathname, setApplicantUserName])
 
   const isSearching = search.trim().length > 0
+  const isAdmissionPage = location.pathname === "/admission" || location.pathname.startsWith("/admission/")
 
   const activeMenuConfig = useMemo(() => {
     return getMenuConfig(user?.role)
@@ -177,8 +238,12 @@ export function Header({
       const label = formatLabel(segment)
       const isLast = i === pathSegments.length - 1
 
+      const isApplicantId = i === pathSegments.length - 1 &&
+        pathSegments[0] === "admission" &&
+        /^\d+$/.test(segment)
+
       breadcrumbs.push({
-        label,
+        label: isApplicantId ? applicantBreadcrumbName || label : label,
         href: isLast ? undefined : currentPath,
       })
     }
@@ -194,14 +259,59 @@ export function Header({
     navigate('/')
   }
 
-  const profileMenuItems = [
-    { label: "Profile", icon: UserPlus, url: "/profile" },
-  ]
+  // const profileMenuItems = [
+  //   { label: "Profile", icon: UserPlus, url: "/profile" },
+  // ]
+
+  const getUserName = () => {
+    // 1. Dynamic UserName extracted from FetchApplicant API response
+    if (applicantUserName && applicantUserName.trim()) {
+      return applicantUserName.trim()
+    }
+
+    // 2. Pre-existing authenticated user.userName (if valid and not an email)
+    if (user?.userName && user.userName.trim() && !user.userName.includes('@')) {
+      return user.userName.trim()
+    }
+
+    // 3. Fallback from localStorage if previously stored and valid
+    if (typeof window !== 'undefined') {
+      const storedApplicant = localStorage.getItem('applicant_username')
+      if (storedApplicant && storedApplicant.trim() && !storedApplicant.includes('@')) {
+        return storedApplicant.trim()
+      }
+      const stored = localStorage.getItem('username')
+      if (stored && stored.trim() && !stored.includes('@')) {
+        return stored.trim()
+      }
+    }
+
+    const registered = useAuthStore.getState().registeredUsers || []
+    const matched = registered.find(
+      (u) => (user?.email && u.email.toLowerCase() === user.email.toLowerCase()) ||
+        (user?.userId && u.userId === user.userId)
+    )
+    if (matched?.userName && matched.userName.trim() && !matched.userName.includes('@')) {
+      return matched.userName.trim()
+    }
+    if (matched?.name && matched.name.trim() && !matched.name.includes('@')) {
+      return matched.name.trim()
+    }
+
+    if (user?.name && user.name.trim() && !user.name.includes('@')) {
+      return user.name.trim()
+    }
+
+    // 4. Default fallback when username is empty or unavailable (never display email)
+    return 'User'
+  }
 
   const getUserInitials = () => {
-    if (user?.name) {
-      return user.name
+    const name = getUserName()
+    if (name && name !== 'User') {
+      return name
         .split(' ')
+        .filter(Boolean)
         .map((n: string) => n[0])
         .join('')
         .toUpperCase()
@@ -213,19 +323,15 @@ export function Header({
     return 'U'
   }
 
-  const getUserName = () => {
-    return user?.name || user?.userId || 'User'
-  }
-
   const getUserEmail = () => {
-    return user?.userId || 'user@example.com'
+    return user?.email || (typeof window !== 'undefined' ? (localStorage.getItem('email') || '') : '') || user?.userId || ''
   }
 
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Primary Top Header Bar with Cyan Blue Gradient & Lime Green Accent Line */}
       <div
-        className="flex h-16 items-center justify-between px-4 sm:px-6 text-white"
+        className="flex min-h-16 items-center justify-between gap-3 px-4 py-2 sm:px-6 text-white"
         style={{
           background: "var(--app-gradient)",
         }}
@@ -357,61 +463,30 @@ export function Header({
           </div>
 
           {/* School Logo & Title */}
-          <NavLink to={user?.role === 'admin' ? "/dashboard" : "/admission"} className="flex items-center gap-3 shrink-0 group">
+          <NavLink to={user?.role?.toLowerCase() === 'admin' ? "/dashboard" : "/admission"} className="flex items-center gap-3 shrink-0 group">
             <img
               src={Logo}
               className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
               alt="PADMA SESHADRI BALA BHAVAN Logo"
             />
-            <div className="hidden md:flex flex-col leading-tight text-white select-none">
-              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wide drop-shadow-xs">
-                Padma Seshadri Bala Bhavan
+            <div className="hidden min-w-0 flex-col items-start text-white select-none md:flex">
+              <span className="whitespace-nowrap text-[10px] lg:text-xs xl:text-sm font-bold uppercase tracking-wide">
+                Padma Seshadri Bala Bhavan Senior Secondary School
               </span>
-              <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider text-white/90 uppercase">
-                Senior Secondary School
-              </span>
+              {isAdmissionPage && admissionSchoolAddress && (
+                <span
+                  className="max-w-[65vw] truncate text-[10px] leading-tight text-white/85"
+                  title={admissionSchoolAddress}
+                >
+                  {admissionSchoolAddress}
+                </span>
+              )}
             </div>
           </NavLink>
         </div>
 
         {/* Right Section: Search, Theme Toggle & Profile Dropdown */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Quick Search (Desktop) */}
-          <div className="hidden lg:flex relative items-center">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/70" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search menu..."
-              className="h-8 w-44 lg:w-56 rounded-full border border-white/20 bg-white/10 pl-8 pr-7 text-xs text-white placeholder:text-white/70 outline-none focus:border-white focus:bg-white/20 transition-all"
-            />
-            {isSearching && (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/70 hover:text-white cursor-pointer"
-                aria-label="Clear search"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Theme Toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/20 cursor-pointer"
-            aria-label="Toggle theme"
-          >
-            {theme === "light" ? (
-              <Moon className="h-4 w-4" />
-            ) : (
-              <Sun className="h-4 w-4" />
-            )}
-          </button>
-
-          <Separator orientation="vertical" className="h-6 bg-white/20 hidden sm:block mx-0.5" />
 
           {/* Profile Dropdown */}
           <DropdownMenu>
@@ -460,7 +535,7 @@ export function Header({
                 </DropdownMenuLabel>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuGroup>
+              {/* <DropdownMenuGroup>
                 {profileMenuItems.map((item) => (
                   <DropdownMenuItem
                     key={item.label}
@@ -471,8 +546,8 @@ export function Header({
                     {item.label}
                   </DropdownMenuItem>
                 ))}
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
+              </DropdownMenuGroup> */}
+              {/* <DropdownMenuSeparator /> */}
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className="cursor-pointer rounded-lg text-xs py-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/30 font-medium"
@@ -610,4 +685,3 @@ export function Header({
     </header >
   )
 }
-

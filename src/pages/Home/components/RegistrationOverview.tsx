@@ -5,21 +5,23 @@ import {
   ChevronRight,
   CheckCircle2,
   RotateCcw,
-  Sparkles,
   Eye,
+  ArrowLeft,
   Lock,
-  Bell
+  Check,
 } from 'lucide-react'
 import type { Step } from '../types'
+import { useNavigate } from 'react-router-dom'
 
-interface RegistrationOverviewProps {
+export interface RegistrationOverviewProps {
   steps: Step[]
-  completedCount: number
+  completedCount?: number
   isRegistrationComplete: boolean
-  activeStepId: number
+  activeStepId?: number
   completedStepIds?: number[]
   isFromAdmin?: boolean
   isAdminUser?: boolean
+  isReadOnly?: boolean
   onStepClick: (stepId: number) => void
   onCompleteAll: () => void
   onReset: () => void
@@ -27,341 +29,436 @@ interface RegistrationOverviewProps {
   onPrintRegistrationForm: () => void
   onOpenSuccessModal?: () => void
   onViewApplicationDetails?: () => void
+  onOpenInstruction?: () => void
+  applicationNo?: string
+  studentName?: string
+  upperNotice?: string
+  lowerNotice?: string
+  onBackToAdmin?: () => void
+  backAdminLabel?: string
 }
 
 export const RegistrationOverview: React.FC<RegistrationOverviewProps> = ({
   steps,
-  completedCount,
+  completedCount: _completedCount,
   isRegistrationComplete,
-  activeStepId,
+  activeStepId: _activeStepId,
   completedStepIds = [],
-  isFromAdmin = false,
+  isFromAdmin: _isFromAdmin = false,
   isAdminUser = false,
+  isReadOnly = false,
   onStepClick,
   onCompleteAll,
   onReset,
   onPrintTrackSheet,
   onPrintRegistrationForm,
   onOpenSuccessModal,
-  onViewApplicationDetails,
+  onViewApplicationDetails: _onViewApplicationDetails,
+  onOpenInstruction,
+  applicationNo,
+  studentName,
+  upperNotice,
+  lowerNotice,
+  onBackToAdmin,
+  backAdminLabel,
 }) => {
+  const navigate = useNavigate()
+
   return (
-    <div className="space-y-6">
-      {/* Quick Action Control Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/40 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Registration Portal</span>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">| Click any step item to open separate step form screen</span>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Top Admin / Utility Bar - only shown for existing applications */}
+      {Boolean(applicationNo) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/40 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {isAdminUser && (
+              <button
+                type="button"
+                onClick={onBackToAdmin || (() => navigate('/admin/students'))}
+                className="h-8 px-2.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>{backAdminLabel || "Student Master"}</span>
+              </button>
+            )}
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              Pre-KG (2027-28) Registration
+            </span>
+            {applicationNo && (
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                {applicationNo}
+              </span>
+            )}
+            {studentName && (
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium hidden sm:inline">
+                • {studentName}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {isRegistrationComplete && onOpenSuccessModal && (
+              <button
+                type="button"
+                onClick={onOpenSuccessModal}
+                className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/80 hover:bg-emerald-200/80 dark:hover:bg-emerald-900/80 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-emerald-300/60 dark:border-emerald-800"
+              >
+                <Eye className="h-3.5 w-3.5" /> Submission Details
+              </button>
+            )}
+            {isAdminUser && (
+              <>
+                <button
+                  type="button"
+                  onClick={onCompleteAll}
+                  className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Complete All
+                </button>
+                <button
+                  type="button"
+                  onClick={onReset}
+                  className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-slate-300/50 dark:border-slate-700"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Reset
+                </button>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {onViewApplicationDetails && (
-            <button
-              type="button"
-              onClick={onViewApplicationDetails}
-              className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60"
-            >
-              <FileText className="h-3.5 w-3.5" /> Application Details
-            </button>
-          )}
-          {isRegistrationComplete && onOpenSuccessModal && (
-            <button
-              type="button"
-              onClick={onOpenSuccessModal}
-              className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/80 hover:bg-emerald-200/80 dark:hover:bg-emerald-900/80 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-emerald-300/60 dark:border-emerald-800"
-            >
-              <Eye className="h-3.5 w-3.5" /> View Success Details
-            </button>
-          )}
-          {isAdminUser && (
+      )}
+
+      {/* Main Form Portal Card matching PDF Pages 3 & 18 */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        {/* Subheader Banner (PDF Pages 3 & 18) */}
+        <div className="bg-slate-100 dark:bg-slate-800/80 px-6 py-3 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-700 dark:text-slate-200">
+          <div className="text-slate-900 dark:text-white font-extrabold text-sm tracking-tight">
+            Please fill up the following
+          </div>
+          <div className="flex items-center gap-4 text-xs font-semibold">
+            {isAdminUser ? (
+              <button
+                type="button"
+                onClick={() => navigate('/admin/students')}
+                className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Admin Home
+              </button>
+            ) : (
+              <span className="text-blue-600 dark:text-blue-400">Home</span>
+            )}
+            <span className="text-slate-400 dark:text-slate-500">•</span>
+            <span className="text-slate-800 dark:text-slate-200 font-bold">
+              Pre-KG (2027-28) Registration Form
+            </span>
+          </div>
+        </div>
+
+        {/* Yellow Notice Banner 1 (Top) */}
+        <div className="bg-[#FFF8E7] dark:bg-amber-950/40 border-b border-[#FFE8B3] dark:border-amber-900/50 px-6 py-2.5 text-center">
+          <p className="text-xs sm:text-sm font-bold text-[#D46B08] dark:text-amber-400">
+            {upperNotice || '*Track sheet print option will not be available after midnight of specified date.'}
+          </p>
+        </div>
+
+        {/* 7 Registration Steps List (PDF Pages 3 & 18) */}
+        <div className="p-6 sm:p-8 space-y-3.5 bg-slate-50/40 dark:bg-slate-900/60">
+          {/* 1. Applicant Details */}
+          {(() => {
+            const isStep1Done = completedStepIds.includes(1) || steps[0]?.status === 'COMPLETED'
+            return (
+              <div
+                onClick={() => onStepClick(1)}
+                className="group flex items-center justify-between px-5 py-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer shadow-2xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isStep1Done ? 'bg-emerald-500 text-white' : 'border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {isStep1Done ? <Check className="h-3.5 w-3.5" /> : '1'}
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    1. Applicant Details
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-extrabold tracking-wide uppercase ${
+                      isStep1Done ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    ({isStep1Done ? 'DONE' : 'PENDING'})
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* 2. Parent Details */}
+          {(() => {
+            const isStep2Done = completedStepIds.includes(2)
+            const isStep2Locked = !isReadOnly && !isRegistrationComplete && !isStep2Done && !completedStepIds.includes(1)
+            return (
+              <div
+                onClick={() => !isStep2Locked && onStepClick(2)}
+                className={`group flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all shadow-2xs ${
+                  isStep2Locked
+                    ? 'border-slate-200/60 dark:border-slate-800/60 bg-slate-100/50 dark:bg-slate-900/40 opacity-60 cursor-not-allowed select-none'
+                    : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isStep2Done
+                        ? 'bg-emerald-500 text-white'
+                        : isStep2Locked
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700'
+                        : 'border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {isStep2Done ? <Check className="h-3.5 w-3.5" /> : '2'}
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    2. Parent Details
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-extrabold tracking-wide uppercase flex items-center gap-1 ${
+                      isStep2Done ? 'text-emerald-600 dark:text-emerald-400' : isStep2Locked ? 'text-slate-400 dark:text-slate-500' : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    ({isStep2Done ? 'DONE' : isStep2Locked ? 'LOCKED' : 'PENDING'})
+                  </span>
+                  {isStep2Locked ? (
+                    <Lock className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* 3. Guardian Details (If Applicable) */}
+          {(() => {
+            const isStep3Done = completedStepIds.includes(3)
+            const isStep3Locked = !isReadOnly && !isRegistrationComplete && !isStep3Done && !completedStepIds.includes(2)
+            return (
+              <div
+                onClick={() => !isStep3Locked && onStepClick(3)}
+                className={`group flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all shadow-2xs ${
+                  isStep3Locked
+                    ? 'border-slate-200/60 dark:border-slate-800/60 bg-slate-100/50 dark:bg-slate-900/40 opacity-60 cursor-not-allowed select-none'
+                    : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isStep3Done
+                        ? 'bg-emerald-500 text-white'
+                        : isStep3Locked
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700'
+                        : 'border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {isStep3Done ? <Check className="h-3.5 w-3.5" /> : '3'}
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    3. Guardian Details
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-extrabold tracking-wide uppercase flex items-center gap-1 ${
+                      isStep3Done ? 'text-emerald-600 dark:text-emerald-400' : isStep3Locked ? 'text-slate-400 dark:text-slate-500' : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    ({isStep3Done ? 'DONE' : isStep3Locked ? 'LOCKED' : 'PENDING'})
+                  </span>
+                  {isStep3Locked ? (
+                    <Lock className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* 4. Communication and Other Details */}
+          {(() => {
+            const isStep4Done = completedStepIds.includes(4)
+            const isStep4Locked = !isReadOnly && !isRegistrationComplete && !isStep4Done && !completedStepIds.includes(3) && !completedStepIds.includes(2)
+            return (
+              <div
+                onClick={() => !isStep4Locked && onStepClick(4)}
+                className={`group flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all shadow-2xs ${
+                  isStep4Locked
+                    ? 'border-slate-200/60 dark:border-slate-800/60 bg-slate-100/50 dark:bg-slate-900/40 opacity-60 cursor-not-allowed select-none'
+                    : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isStep4Done
+                        ? 'bg-emerald-500 text-white'
+                        : isStep4Locked
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700'
+                        : 'border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {isStep4Done ? <Check className="h-3.5 w-3.5" /> : '4'}
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    4. Communication and Other Details
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-extrabold tracking-wide uppercase flex items-center gap-1 ${
+                      isStep4Done ? 'text-emerald-600 dark:text-emerald-400' : isStep4Locked ? 'text-slate-400 dark:text-slate-500' : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    ({isStep4Done ? 'DONE' : isStep4Locked ? 'LOCKED' : 'PENDING'})
+                  </span>
+                  {isStep4Locked ? (
+                    <Lock className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* 5. Declaration */}
+          {(() => {
+            const isStep5Done = completedStepIds.includes(5)
+            const isStep5Locked = !isReadOnly && !isRegistrationComplete && !isStep5Done && !completedStepIds.includes(4)
+            return (
+              <div
+                onClick={() => !isStep5Locked && onStepClick(5)}
+                className={`group flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all shadow-2xs ${
+                  isStep5Locked
+                    ? 'border-slate-200/60 dark:border-slate-800/60 bg-slate-100/50 dark:bg-slate-900/40 opacity-60 cursor-not-allowed select-none'
+                    : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isStep5Done
+                        ? 'bg-emerald-500 text-white'
+                        : isStep5Locked
+                        ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700'
+                        : 'border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {isStep5Done ? <Check className="h-3.5 w-3.5" /> : '5'}
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    5. Declaration
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-extrabold tracking-wide uppercase flex items-center gap-1 ${
+                      isStep5Done ? 'text-emerald-600 dark:text-emerald-400' : isStep5Locked ? 'text-slate-400 dark:text-slate-500' : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    ({isStep5Done ? 'DONE' : isStep5Locked ? 'LOCKED' : 'PENDING'})
+                  </span>
+                  {isStep5Locked ? (
+                    <Lock className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* 6. Print Track Sheet (Mandatory) */}
+          <div
+            onClick={onPrintTrackSheet}
+            className={`group px-5 py-3.5 rounded-xl border transition-all shadow-2xs ${isRegistrationComplete || Boolean(applicationNo)
+                ? 'border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 cursor-pointer'
+                : 'border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 cursor-pointer'
+              }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Printer className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                  6. Print Track Sheet
+                </span>
+                <span className="text-xs font-extrabold text-rose-600 dark:text-rose-400">
+                  (Mandatory)
+                </span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+            </div>
+            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400 leading-normal pl-6">
+              <strong className="text-slate-700 dark:text-slate-300">Note:</strong> Registration Process is considered to be complete only on submission of Track Sheet in person as per specified dates. For more details read the{' '}
+              <span
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onOpenInstruction?.()
+                }}
+                className="text-blue-600 dark:text-blue-400 underline font-semibold cursor-pointer"
+              >
+                instruction
+              </span>
+            </p>
+          </div>
+
+          {/* 7. Print Registration Form (Optional) */}
+          <div
+            onClick={onPrintRegistrationForm}
+            className={`group flex items-center justify-between px-5 py-3.5 rounded-xl border transition-all shadow-2xs ${isRegistrationComplete || Boolean(applicationNo)
+                ? 'border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 cursor-pointer'
+                : 'border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 cursor-pointer'
+              }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                7. Print Registration Form
+              </span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                (Optional)
+              </span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+          </div>
+        </div>
+
+        {/* Yellow Notice Banner 2 (Bottom - PDF Pages 3 & 18) */}
+        <div className="bg-[#FFF8E7] dark:bg-amber-950/40 border-t border-[#FFE8B3] dark:border-amber-900/50 px-6 py-4 text-center space-y-1">
+          {lowerNotice ? (
+            lowerNotice.split('\n').filter(Boolean).map((line, idx) => (
+              <p key={idx} className="text-xs sm:text-sm font-bold text-[#D46B08] dark:text-amber-400">
+                {line.trim()}
+              </p>
+            ))
+          ) : (
             <>
-              <button
-                type="button"
-                onClick={onCompleteAll}
-                className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60"
-              >
-                <CheckCircle2 className="h-3.5 w-3.5" /> Complete All Steps
-              </button>
-              <button
-                type="button"
-                onClick={onReset}
-                className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-slate-300/50 dark:border-slate-700"
-              >
-                <RotateCcw className="h-3.5 w-3.5" /> Reset
-              </button>
+              <p className="text-xs sm:text-sm font-bold text-[#D46B08] dark:text-amber-400">
+                *Please ensure that you have taken the Track Sheet print out.
+              </p>
+              <p className="text-xs sm:text-sm font-bold text-[#D46B08] dark:text-amber-400">
+                "Print" option will not be available after midnight of specified date.
+              </p>
             </>
           )}
         </div>
       </div>
-
-      {/* Completion Notification Banner */}
-      {isRegistrationComplete && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-blue-500/15 dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-blue-950/40 border border-emerald-300/80 dark:border-emerald-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-                Registration Completed & Ready for Submission!
-              </h3>
-              <p className="text-xs text-emerald-800/90 dark:text-emerald-300/80">
-                All 5 admission steps have been fully completed. Track sheet printing is now enabled.
-              </p>
-            </div>
-          </div>
-          {onOpenSuccessModal && (
-            <button
-              type="button"
-              onClick={onOpenSuccessModal}
-              className="h-9 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-            >
-              <Eye className="h-3.5 w-3.5" /> View Submission Modal
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Main 2-Column Overview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-        {/* LEFT PANEL: Registration Progress */}
-        <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h2 className="text-sm font-bold text-[#0F294A] dark:text-slate-100">Registration Progress</h2>
-            <span className="text-xs font-semibold text-slate-400 dark:text-slate-400">
-              {completedCount} / 5 Completed
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {steps.map((step) => {
-              const isActive = activeStepId === step.id
-              const isDone = step.status === 'COMPLETED'
-              const isPrevDone = step.id === 1 || completedStepIds.includes(step.id - 1)
-              const isLocked = !isFromAdmin && !isRegistrationComplete && !isPrevDone
-
-              return (
-                <div
-                  key={step.id}
-                  onClick={() => {
-                    if (isLocked) {
-                      return
-                    }
-                    onStepClick(step.id)
-                  }}
-                  className={`group relative flex items-center justify-between px-4 py-3.5 rounded-xl border transition-all ${isLocked
-                    ? 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/60 opacity-60 cursor-not-allowed select-none'
-                    : isActive
-                      ? 'bg-[#F0F7FF] dark:bg-blue-950/40 border-[#BDE0FE] dark:border-blue-800 shadow-2xs cursor-pointer'
-                      : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer'
-                    }`}
-                >
-                  <div className="flex items-center gap-3.5 min-w-0 pr-3">
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${isDone
-                        ? 'bg-emerald-500 text-white'
-                        : isLocked
-                          ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-300 dark:border-slate-700'
-                          : isActive
-                            ? 'bg-[#1677FF] text-white'
-                            : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                        }`}
-                    >
-                      {isDone ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : isLocked ? (
-                        <Lock className="h-3.5 w-3.5 text-slate-400" />
-                      ) : (
-                        step.id
-                      )}
-                    </div>
-
-                    <span
-                      className={`text-xs sm:text-sm font-semibold truncate ${isLocked
-                        ? 'text-slate-400 dark:text-slate-500'
-                        : isActive
-                          ? 'text-[#1677FF] dark:text-blue-400'
-                          : 'text-slate-700 dark:text-slate-200'
-                        }`}
-                    >
-                      {step.title}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0">
-                    {isLocked ? (
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase border border-slate-200 dark:border-slate-700 shadow-2xs">
-                        LOCKED
-                      </span>
-                    ) : step.status === 'PENDING' ? (
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#FFD6D6] dark:border-red-900 shadow-2xs">
-                        PENDING
-                      </span>
-                    ) : step.status === 'OPTIONAL' ? (
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#E6F4FF] dark:bg-blue-950/60 text-[#1677FF] dark:text-blue-400 uppercase border border-[#BAE0FF] dark:border-blue-900 shadow-2xs">
-                        OPTIONAL
-                      </span>
-                    ) : (
-                      <span className="w-[84px] h-7 flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 uppercase border border-emerald-200 dark:border-emerald-800 shadow-2xs">
-                        DONE
-                      </span>
-                    )}
-
-                    <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${isLocked ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500 group-hover:translate-x-0.5'
-                      }`} />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* RIGHT PANEL: Documents & Printing */}
-        <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
-          <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h2 className="text-sm font-bold text-[#0F294A] dark:text-slate-100">Documents & Printing</h2>
-          </div>
-
-          <div className="space-y-4">
-            {/* Track Sheet Card */}
-            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
-              <div className="flex items-start gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-[#E6F4FF] dark:bg-blue-950/60 text-[#1677FF] dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <Printer className="h-5 w-5" />
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Track Sheet</h3>
-                    <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#FFD6D6] dark:border-red-900 shadow-2xs whitespace-nowrap">
-                      REQUIRED
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Registration must be completed before printing.
-                  </p>
-                  <p className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
-                    Note: Track sheet print option will be available only after midnight of 21/01/2025 (Tuesday).
-                  </p>
-                </div>
-              </div>
-
-              <div className="shrink-0 self-end md:self-center">
-                <button
-                  type="button"
-                  onClick={onPrintTrackSheet}
-                  disabled={!isRegistrationComplete}
-                  className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
-                    ? 'bg-[#1677FF] dark:bg-blue-600 text-white hover:bg-[#0958D9] dark:hover:bg-blue-500 shadow-2xs cursor-pointer'
-                    : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
-                    }`}
-                >
-                  <Printer className="h-3.5 w-3.5" /> Print Track Sheet
-                </button>
-              </div>
-            </div>
-
-            {/* Registration Form Card */}
-            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all">
-              <div className="flex items-start gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-[#F4EEFF] dark:bg-purple-950/60 text-[#722ED1] dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <FileText className="h-5 w-5" />
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Registration Form</h3>
-                    <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF0F0] dark:bg-red-950/60 text-[#FF4D4F] dark:text-red-400 uppercase border border-[#BAE0FF] dark:border-blue-900 shadow-2xs whitespace-nowrap">
-                      Required
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Download and print a copy of your completed registration form.
-                  </p>
-                </div>
-              </div>
-
-              <div className="shrink-0 self-end md:self-center">
-                <button
-                  type="button"
-                  onClick={onPrintRegistrationForm}
-                  disabled={!isRegistrationComplete}
-                  className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 w-[200px] ${isRegistrationComplete
-                    ? 'bg-[#1677FF] dark:bg-blue-600 text-white hover:bg-[#0958D9] dark:hover:bg-blue-500 shadow-2xs cursor-pointer'
-                    : 'bg-[#EAECEF] dark:bg-slate-800 text-[#8C98A6] dark:text-slate-500 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
-                    }`}
-                >
-                  <Printer className="h-3.5 w-3.5" /> Print Registration Form
-                </button>
-              </div>
-            </div>
-
-            {/* Important Notice Card */}
-            <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40  flex-col md:flex-row md:items-center justify-between gap-4 transition-all overflow-hidden">
-              <div className="flex items-start gap-3.5 shrink-0">
-                <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <Bell className="h-5 w-5" />
-                </div>
-
-                <div className="space-y-1  mb-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">Important Notice</h3>
-                    <span className="min-w-[80px] px-2.5 h-6 inline-flex items-center justify-center text-[10px] font-bold tracking-wider rounded-md bg-[#FFF7E6] dark:bg-amber-950/60 text-[#D46B08] dark:text-amber-400 uppercase border border-[#FFD591] dark:border-amber-900 shadow-2xs whitespace-nowrap">
-                      NOTICE
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Admissions deadline & submission guidelines.
-                  </p>
-                  {/* <p className="text-[11px] text-slate-400 dark:text-slate-500 font-normal">
-                    Note: Last day of application submission is 30-09-2026.
-                  </p> */}
-                </div>
-              </div>
-
-              {/* Right Side Animation */}
-              <div className="w-full md:w-auto md:flex-1 md:max-w-[340px] lg:max-w-[370px] overflow-hidden relative rounded-xl bg-amber-50/50 dark:bg-slate-900/80 border border-amber-200/70 dark:border-slate-800 py-2.5 px-3 shadow-2xs">
-                {/* Soft gradient masks at edges */}
-                <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-amber-50/90 dark:from-slate-900 to-transparent pointer-events-none z-10" />
-                <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-amber-50/90 dark:from-slate-900 to-transparent pointer-events-none z-10" />
-
-                <div className="overflow-hidden w-full relative">
-                  <div className="animate-marquee font-bold text-xs tracking-wide flex items-center gap-6 whitespace-nowrap" style={{ animationDuration: '22s' }}>
-                    <span className="text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block"></span>
-                      ⚠️ Last Day of Submission : <strong className="underline decoration-amber-500 underline-offset-2 font-extrabold">30-09-2026</strong>
-                    </span>
-                    <span className="text-amber-400/80">•</span>
-                    <span className="text-slate-700 dark:text-slate-200">
-                      📋 Complete and submit all required application steps before the deadline
-                    </span>
-                    <span className="text-amber-400/80">•</span>
-                    <span className="text-blue-700 dark:text-blue-300">
-                      🖨️ Track sheet available after completion
-                    </span>
-                    <span className="text-amber-400/80">•</span>
-                    <span className="text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block"></span>
-                      ⚠️ Last Day of Submission : <strong className="underline decoration-amber-500 underline-offset-2 font-extrabold">30-09-2026</strong>
-                    </span>
-                    <span className="text-amber-400/80">•</span>
-                    <span className="text-slate-700 dark:text-slate-200">
-                      📋 Complete and submit all required application steps before the deadline
-                    </span>
-                    <span className="text-amber-400/80">•</span>
-                    <span className="text-blue-700 dark:text-blue-300">
-                      🖨️ Track sheet available after completion
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
     </div>
   )
 }
-

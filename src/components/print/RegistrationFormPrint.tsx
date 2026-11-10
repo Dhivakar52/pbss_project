@@ -508,7 +508,7 @@ export const RegistrationFormPrint: React.FC<RegistrationFormPrintProps> = ({ da
               />
 
               <PrintField
-                label="Is the Parent coming on transfer from outside Chennai / from outside India"
+                label="Is Parent coming on transfer from outside Chennai/from outside India"
                 value={data.isTransferParent ? 'Yes' : 'No'}
                 labelWidth="w-[280px]"
               />

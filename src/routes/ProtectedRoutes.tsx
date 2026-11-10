@@ -23,13 +23,26 @@ const ProtectedRoutes = ({
   const authStatus = isAuthenticated !== undefined ? isAuthenticated : storeAuth
   const hasShownToast = useRef(false)
 
-  const userRoles = user?.roles || ["user"]
+  const userRoles = (user?.roles || [user?.role || "user"]).map((r) => r.toLowerCase())
 
   const hasRequiredRole =
     requiredRoles.length === 0 ||
-    requiredRoles.some((role) => userRoles.includes(role))
+    requiredRoles.some((role) => userRoles.includes(role.toLowerCase()))
 
   useEffect(() => {
+    // If the user deliberately clicked logout, skip showing the "Please login to access this page" error toast
+    const isLoggingOut = typeof window !== 'undefined' && sessionStorage.getItem('psbb_logging_out') === '1'
+    if (isLoggingOut) {
+      hasShownToast.current = true
+      return
+    }
+
+    // Do not show login toast if navigating to public / login page
+    if (location.pathname === '/' || location.pathname === redirectTo) {
+      hasShownToast.current = true
+      return
+    }
+
     if (!authStatus && !hasShownToast.current) {
       toast.error("Please login to access this page")
       hasShownToast.current = true
@@ -39,7 +52,7 @@ const ProtectedRoutes = ({
     } else if (authStatus && hasRequiredRole) {
       hasShownToast.current = false
     }
-  }, [authStatus, hasRequiredRole])
+  }, [authStatus, hasRequiredRole, location.pathname, redirectTo])
 
   if (!authStatus) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />

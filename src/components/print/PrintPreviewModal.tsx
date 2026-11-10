@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { createPortal } from 'react-dom'
 import {
   Dialog,
@@ -20,6 +20,10 @@ export interface PrintPreviewModalProps {
   onClose: () => void
   documentType: 'track-sheet' | 'track-sheet-2' | 'registration-form' | 'registration-form-5'
   student: any | null
+  isTwins?: boolean
+  childrenList?: { name: string; gender?: string }[]
+  selectedChildIndex?: number
+  onSelectChild?: (index: number) => void
 }
 
 export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
@@ -27,7 +31,20 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
   onClose,
   documentType,
   student,
+  isTwins = false,
+  childrenList = [],
+  selectedChildIndex = 0,
+  onSelectChild,
 }) => {
+  const trackSheetData = React.useMemo(
+    () => (student ? mapStudentToTrackSheet(student) : null),
+    [student],
+  )
+  const registrationFormData = React.useMemo(
+    () => (student ? mapStudentToRegistrationForm(student) : null),
+    [student],
+  )
+
   React.useEffect(() => {
     if (isOpen && typeof window !== 'undefined') {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
@@ -37,35 +54,20 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
-      setTimeout(() => {
-        window.print()
-      }, 50)
+      setTimeout(() => window.print(), 50)
     }
   }
 
-  const trackSheetData = useMemo(() => {
-    if (!student) return null
-    return mapStudentToTrackSheet(student)
-  }, [student])
-
-  const registrationFormData = useMemo(() => {
-    if (!student) return null
-    return mapStudentToRegistrationForm(student)
-  }, [student])
-
   if (!student) return null
 
-  const isTrackSheet = documentType === 'track-sheet'
-  const isTrackSheet2 = documentType === 'track-sheet-2'
-  const isRegistrationForm5 = documentType === 'registration-form-5'
-  const title = isTrackSheet
+  const title = documentType === 'track-sheet'
     ? 'Track Sheet Preview'
-    : isTrackSheet2
-      ? 'Track Sheet 2 Preview'
-      : isRegistrationForm5
-        ? 'Registration Form 2 Preview'
+    : documentType === 'track-sheet-2'
+      ? 'Track Sheet v2 Preview'
+      : documentType === 'registration-form-5'
+        ? 'Registration Form v2 Preview'
         : 'Registration Form Preview'
-  const studentName = student.studentName || student.childName || 'Applicant'
+  const studentName = student.studentName || student.childName || ''
   const regNo = student.registrationNumber || student.id || ''
 
   return (
@@ -80,7 +82,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
         >
           {/* Header */}
           <DialogHeader className="bg-slate-50 dark:bg-slate-800/60 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2.5 text-slate-900 dark:text-white">
                 <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
                   <FileText className="h-5 w-5" />
@@ -94,15 +96,35 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                   </DialogDescription>
                 </div>
               </div>
+
+              {isTwins && childrenList && childrenList.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <label htmlFor="previewSelectChild" className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    Child:
+                  </label>
+                  <select
+                    id="previewSelectChild"
+                    value={selectedChildIndex}
+                    onChange={(e) => onSelectChild?.(Number(e.target.value))}
+                    className="h-8 px-2.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
+                  >
+                    {childrenList.map((_, idx) => (
+                      <option key={idx} value={idx}>
+                        Child {idx + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </DialogHeader>
 
           {/* Scrollable Document Preview Body */}
           <div className="flex-1 overflow-y-auto bg-slate-200/80 dark:bg-slate-950 p-4 sm:p-6 flex flex-col items-center gap-6 print:hidden">
-            {isTrackSheet && trackSheetData && (
+            {documentType === 'track-sheet' && trackSheetData && (
               <TrackSheetPrint data={trackSheetData} />
             )}
-            {isTrackSheet2 && registrationFormData && (
+            {documentType === 'track-sheet-2' && registrationFormData && (
               <TrackSheet2Print data={registrationFormData} />
             )}
             {documentType === 'registration-form' && registrationFormData && (
@@ -135,15 +157,13 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Standalone Print-Only Portal attached directly to document.body for clean browser printing */}
-      {isOpen &&
+      {isOpen && student &&
         createPortal(
           <div id="printable-document-container" className="print-document-standalone">
-            {isTrackSheet && trackSheetData && (
+            {documentType === 'track-sheet' && trackSheetData && (
               <TrackSheetPrint data={trackSheetData} />
             )}
-            {isTrackSheet2 && registrationFormData && (
+            {documentType === 'track-sheet-2' && registrationFormData && (
               <TrackSheet2Print data={registrationFormData} />
             )}
             {documentType === 'registration-form' && registrationFormData && (
@@ -153,7 +173,7 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
               <RegistrationForm5Print data={registrationFormData} />
             )}
           </div>,
-          document.body
+          document.body,
         )}
     </>
   )

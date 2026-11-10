@@ -23,7 +23,7 @@ export interface MenuItem {
 }
 
 export const getMenuConfig = (role?: string): MenuItem[] => {
-  if (role === 'admin') {
+  if (role?.toLowerCase() === 'admin') {
     return [
       {
         title: "Dashboard",

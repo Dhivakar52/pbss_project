@@ -39,15 +39,19 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
           {/* Top Section with Registration & Photo Box */}
           <div className="flex justify-between items-start gap-4 mt-1">
             <div className="space-y-2 flex-1">
-              <PrintField
-                label="Registration No."
-                value={
-                  <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
-                    {data.registrationNo}
-                  </span>
-                }
-              />
-
+              <div className="grid grid-cols-2 gap-4">
+                <PrintField
+                  label="Registration No."
+                  value={
+                    <span className="inline-block border border-black px-4 py-0.5 font-bold text-sm min-w-[140px] text-center">
+                      {data.registrationNo}
+                    </span>
+                  }
+                />
+                <PrintField
+                  label="Branch Name" value={data.school || '-'} labelAlign="right" labelClassName="text-right pr-1"
+                />
+              </div>
               <PrintField
                 label="Name of the Child"
                 value={<span className="uppercase">{data.childName}</span>}
@@ -55,14 +59,14 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <PrintField label="Date of Birth" value={data.dob} />
-                <PrintField label="Gender" value={data.gender} />
+                <PrintField label="Gender" value={data.gender} labelAlign="right" labelClassName="text-right pr-12" />
               </div>
 
               <PrintField label="Mother Tongue" value={data.motherTongue} />
 
               <div className="grid grid-cols-2 gap-4">
                 <PrintField label="Religion" value={data.religion} />
-                <PrintField label="Caste" value={data.caste} />
+                <PrintField label="Caste" value={data.caste} labelAlign="right" labelClassName="text-right pr-14" />
               </div>
 
               <PrintField
@@ -85,6 +89,8 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
               <PrintField label="Father's Mobile No" value={fatherMobile} />
               <PrintField label="Mother's Mobile No" value={motherMobile} />
             </div>
+
+            <PrintField label="Preferred Email ID for Communication" value={data.preferredEmail || (data as any).fatherEmail || (data as any).motherEmail || '-'} />
 
             <div className="grid grid-cols-2 gap-6">
               <PrintField label="Distance from Residence" value={data.distanceFromResidence} />
@@ -135,7 +141,7 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
                 <thead>
                   <tr className="border-b border-black bg-slate-100">
                     <th className="w-1/5 px-2 py-1 font-bold text-left border-r border-black bg-slate-200/80">
-                      Field
+                      Particulars
                     </th>
                     <th className="w-[26.66%] px-2 py-1 font-bold text-left border-r border-black">
                       Father's Details
@@ -344,7 +350,7 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
           <div className="mt-4 space-y-2">
             <PrintField
               label="Is the child a normal healthy child"
-              value={data.isNormalHealthyChild ? 'Yes' : 'No'}
+              value={data.isNormalHealthyChild}
               labelWidth="w-[280px]"
             />
             <PrintField
@@ -393,9 +399,11 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
           </div>
 
           {/* Signatures Row - Dedicated Signing Height */}
-          <div className="mt-6 pt-2">
+          {/* <div className="mt-6 pt-2">
             <div className="flex justify-between items-start text-[12px] font-bold min-h-[85px] pt-14">
-              <div className="pt-1.5 font-bold shrink-0">Date :</div>
+              <div className="pt-1.5 font-bold shrink-0">
+                Date : <span className="font-normal ml-1">{data.dateOfSubmission || ''}</span>
+              </div>
               <div className="flex justify-end gap-6 flex-1">
                 <div className="text-center border-t border-black pt-1.5 px-2 w-[150px]">
                   Signature of Father
@@ -413,7 +421,62 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
             <div className="mt-4 text-[11.5px]">
               <span className="font-bold">Name in BLOCK LETTER :</span>
             </div>
+          </div> */}
+
+
+
+          <div className="mt-6 pt-2">
+            <div className="grid grid-cols-[180px_repeat(3,minmax(0,1fr))] gap-3 items-start text-[12px] font-bold min-h-[85px] pt-14">
+
+              {/* Date */}
+              <div className="pt-1.5 whitespace-nowrap">
+                Date : <span className="font-normal ml-1">
+                  {data.dateOfSubmission || ''}
+                </span>
+              </div>
+
+              {/* Father Signature */}
+              <div className="text-center px-2">
+                <div className="pt-1.5  border-black">
+                  Signature of Father
+                </div>
+              </div>
+
+              {/* Mother Signature */}
+              <div className="text-center px-2">
+                <div className="pt-1.5  border-black">
+                  Signature of Mother
+                </div>
+              </div>
+
+              {/* Guardian Signature */}
+              <div className="text-center px-2">
+                <div className="pt-1.5  border-black">
+                  Signature of Guardian
+                </div>
+                <div className="text-[10px] font-normal leading-tight">
+                  (If Applicable)
+                </div>
+              </div>
+            </div>
+
+            {/* Name of the Letter */}
+            <div className="mt-4 grid grid-cols-[180px_repeat(3,minmax(0,1fr))] gap-3 items-end text-[11.5px]">
+
+              <div className="font-bold whitespace-nowrap">
+                Name in BLOCK LETTERS :
+              </div>
+
+              <div className="min-h-[22px] border-b border-black w-full" />
+
+              <div className="min-h-[22px] border-b border-black w-full" />
+
+              <div className="min-h-[22px] border-b border-black w-full" />
+
+            </div>
           </div>
+
+
 
           {/* Bottom Submission Box containing Date of Submission, Timings, Reg No., Child's Name */}
           <div className="mt-4 border border-black p-3 text-[12.5px] select-none text-black">
@@ -440,9 +503,7 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
                   label="Child's Name"
                   value={
                     <span className="uppercase" title={data.childName}>
-                      {data.childName.trim().length > 18
-                        ? `${data.childName.trim().slice(0, 18)}...`
-                        : data.childName.trim()}
+                      {data.childName.trim()}
                     </span>
                   }
                   labelWidth="w-[100px]"
@@ -481,7 +542,7 @@ export const TrackSheet2Print: React.FC<TrackSheet2PrintProps> = ({ data }) => {
                   </p>
                   <p>2. Birth Certificate of Child - COPY</p>
                   <p>3. Passport size photographs of both parents with Reg No. written at the back.</p>
-                  <p>4. Address proof of parents - COPY</p>
+                  <p>4. Address proof for both parents - COPY</p>
                 </div>
               </li>
               <li>

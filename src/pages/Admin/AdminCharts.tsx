@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
+import { ApiService, type ChartRecord } from '@/services/api.service'
 import {
   Bar,
   BarChart,
@@ -23,6 +24,7 @@ import { BarChart3, Users, ArrowUpDown, ArrowLeft, Briefcase, MapPin, Layers } f
 import { toast } from '@/components/ui/toast'
 import type { ColumnDef } from '@tanstack/react-table'
 import { SeatAvailabilityTable } from './components/SeatAvailabilityTable'
+import { useMasterStore } from '@/store/useMasterStore'
 
 // ---------- Table Row Interfaces ----------
 interface KKNagarSeatRow {
@@ -364,8 +366,17 @@ const MetricCard: React.FC<MetricCardProps> = ({ label, value, icon, valueClass,
 
 // ---------- Main Component ----------
 export const AdminCharts: React.FC = () => {
+  const schools = useMasterStore((s) => s.schools)
+  const academicYears = useMasterStore((s) => s.academicYears)
+  const lookups = useMasterStore((s) => s.lookups)
+  const fetchMasters = useMasterStore((s) => s.fetchMasters)
+
+  useEffect(() => {
+    fetchMasters()
+  }, [fetchMasters])
+
   // Controlled dropdown states
-  const [selectedAcademicYear, setSelectedAcademicYear] = useState('2025-26')
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState('2025-2026')
   const [selectedBranch, setSelectedBranch] = useState('ALL')
   const [selectedStatus, setSelectedStatus] = useState('ALL')
   // Single Chart Date filter ('ALL' | '10' | '11' | '12') & Drill-down state
@@ -374,12 +385,25 @@ export const AdminCharts: React.FC = () => {
 
   // Applied filter state (updated ONLY when SUBMIT is clicked)
   const [appliedFilters, setAppliedFilters] = useState({
-    academicYear: '2025-26',
+    academicYear: '2025-2026',
     branch: 'ALL',
     status: 'ALL',
   })
 
-  const handleSubmit = () => {
+  // Live database records from [App].[ProcGenerateCharts]
+  const [dbData, setDbData] = useState<ChartRecord[] | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+    ApiService.fetchDashboardCharts().then((data) => {
+      if (isMounted && data && Array.isArray(data)) {
+        setDbData(data)
+      }
+    })
+    return () => { isMounted = false }
+  }, [])
+
+  const handleSubmit = async () => {
     setAppliedFilters({
       academicYear: selectedAcademicYear,
       branch: selectedBranch,
@@ -388,12 +412,28 @@ export const AdminCharts: React.FC = () => {
     const branchLabel = selectedBranch === 'ALL' ? 'Select All' : selectedBranch
     const statusLabel = selectedStatus === 'ALL' ? 'Select All' : selectedStatus
     toast.success(`Filter Applied: Academic Year (${selectedAcademicYear}) | Branch (${branchLabel}) | Status (${statusLabel})`)
+
+    const matchedBranch = schools.find((s) => s.School?.toLowerCase() === selectedBranch.toLowerCase() || String(s.SchoolID) === selectedBranch)
+    const matchedYear = academicYears.find((a) => a.AcademicYear.toLowerCase() === selectedAcademicYear.toLowerCase() || String(a.AcademicYearID) === selectedAcademicYear)
+    const matchedStatus = lookups.find((l) => l.LookupRefID === 11 && (l.LookupValue.toLowerCase() === selectedStatus.toLowerCase() || String(l.LookupID) === selectedStatus))
+
+    const branchId = selectedBranch === 'ALL' ? undefined : matchedBranch?.SchoolID
+    const academicYearId = selectedAcademicYear === 'ALL' ? undefined : matchedYear?.AcademicYearID
+    const statusId = selectedStatus === 'ALL' ? undefined : matchedStatus?.LookupID
+
+    const liveCharts = await ApiService.fetchDashboardCharts(academicYearId, branchId, statusId)
+    if (liveCharts && Array.isArray(liveCharts)) {
+      setDbData(liveCharts)
+    }
   }
 
   // Summary Cards: Total Application & Application Submitted
   const totalApplications = useMemo(() => {
+    if (dbData && dbData.length > 0) {
+      return dbData.length
+    }
     return dateTimeCountData.reduce((acc, curr) => acc + curr.count, 0)
-  }, [])
+  }, [dbData])
   const totalApplicationSubmitted = totalApplications
 
   // Dynamic Gender Wise Report Data
@@ -459,7 +499,7 @@ export const AdminCharts: React.FC = () => {
 
   // 5. KK Nagar Branch Table Data
   const kkNagarSeatData = useMemo<KKNagarSeatRow[]>(() => {
-    if (appliedFilters.branch !== 'ALL' && appliedFilters.branch !== 'KK Nagar-PSBB') {
+    if (appliedFilters.branch !== 'ALL' && !/kk\s*nagar|k\.k\.nagar/i.test(appliedFilters.branch)) {
       return []
     }
     return defaultKKNagarSlotData
@@ -467,7 +507,7 @@ export const AdminCharts: React.FC = () => {
 
   // 6. T-Nagar (Inagar) Branch Table Data
   const tNagarSeatData = useMemo<TNagarSeatRow[]>(() => {
-    if (appliedFilters.branch !== 'ALL' && appliedFilters.branch !== 'T.Nagar-PSBB') {
+    if (appliedFilters.branch !== 'ALL' && !/t\.?\s*nagar/i.test(appliedFilters.branch)) {
       return []
     }
     return defaultTNagarSlotData
@@ -658,7 +698,11 @@ export const AdminCharts: React.FC = () => {
             onChange={(e) => setSelectedAcademicYear(e.target.value)}
             className="h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
           >
-            <option value="2025-26">2025-26</option>
+            {academicYears.map((ay) => (
+              <option key={ay.AcademicYearID} value={ay.AcademicYear}>
+                {ay.AcademicYear}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -671,8 +715,11 @@ export const AdminCharts: React.FC = () => {
             className="h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
           >
             <option value="ALL">-- Select All --</option>
-            <option value="T.Nagar-PSBB">T.Nagar-PSBB</option>
-            <option value="KK Nagar-PSBB">KK Nagar-PSBB</option>
+            {schools.map((s) => (
+              <option key={s.SchoolID} value={s.School}>
+                {s.School}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -685,8 +732,13 @@ export const AdminCharts: React.FC = () => {
             className="h-8 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
           >
             <option value="ALL">-- Select All --</option>
-            <option value="Approved">Approved</option>
-            <option value="Pending">Pending</option>
+            {lookups
+              .filter((l) => l.LookupRefID === 11 && l.LookupValue)
+              .map((st) => (
+                <option key={st.LookupID} value={st.LookupValue}>
+                  {st.LookupValue}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -1302,7 +1354,7 @@ export const AdminCharts: React.FC = () => {
       {/* ================= DATA TABLES (BOTTOM) ================= */}
       <div className={`grid grid-cols-1 ${appliedFilters.branch === 'ALL' ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-6`}>
         {/* KK Nagar Table */}
-        {(appliedFilters.branch === 'ALL' || appliedFilters.branch === 'KK Nagar-PSBB') && (
+        {(appliedFilters.branch === 'ALL' || /kk\s*nagar|k\.k\.nagar/i.test(appliedFilters.branch)) && (
           <SeatAvailabilityTable
             title="KK Nagar"
             subtitle="Application Submission slots"
@@ -1314,7 +1366,7 @@ export const AdminCharts: React.FC = () => {
         )}
 
         {/* T-Nagar Table */}
-        {(appliedFilters.branch === 'ALL' || appliedFilters.branch === 'T.Nagar-PSBB') && (
+        {(appliedFilters.branch === 'ALL' || /t\.?\s*nagar/i.test(appliedFilters.branch)) && (
           <SeatAvailabilityTable
             title="T-Nagar"
             subtitle="Application Submission slots"

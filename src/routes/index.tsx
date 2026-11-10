@@ -6,11 +6,10 @@ import ProtectedRoutes from "./ProtectedRoutes"
 import { Layout } from "@/layout/Layout"
 import { useAuthStore } from "@/store/useAuthStore"
 import { ErrorFallback } from "@/components/ErrorFallback"
+import { ApplicationFormLoader } from "@/components/ApplicationFormLoader"
 
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-[400px]">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-  </div>
+  <ApplicationFormLoader message="Loading Application Details..." />
 )
 
 // Reusable wrapper — resetKeys la pathname pass panra, so route change aanaa
@@ -29,7 +28,7 @@ const withRouteErrorBoundary = (children: React.ReactNode, key: string) => (
 
 export const AppRoutes = () => {
   const location = useLocation()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
 
   const publicRoutes = routes.filter(route => !route.protected)
   const protectedRoutes = routes.filter(route => route.protected)
@@ -75,7 +74,7 @@ export const AppRoutes = () => {
           path="*"
           element={
             isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
+              <Navigate to={user?.role?.toLowerCase() === 'admin' ? "/dashboard" : "/admission"} replace />
             ) : (
               <Navigate to="/" replace />
             )

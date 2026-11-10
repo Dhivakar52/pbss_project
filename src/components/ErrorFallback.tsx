@@ -143,10 +143,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           </CardContent>
 
           <CardFooter className="flex flex-col items-start gap-3 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <LifeBuoy className="h-4 w-4" />
-              Need help? Contact support.
-            </div>
+            <div className="text-sm text-muted-foreground">Need help? Contact support.</div>
             <Button variant="ghost" className="gap-2 px-0 text-sm text-muted-foreground hover:text-foreground">
               <LifeBuoy className="h-4 w-4" />
               Contact Support
