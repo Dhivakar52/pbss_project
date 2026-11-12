@@ -107,9 +107,9 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                 onChange={(e) => onSelectChild?.(Number(e.target.value))}
                 className="h-8.5 px-3 text-xs font-semibold rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
               >
-                {childrenList.map((child, idx) => (
+                {childrenList.map((_, idx) => (
                   <option key={idx} value={idx}>
-                    {child.name?.trim() ? child.name.trim() : `Child ${idx + 1} (Name not entered)`}
+                    Child {idx + 1}
                   </option>
                 ))}
               </select>
@@ -449,9 +449,9 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                     onChange={(e) => onSelectChild?.(Number(e.target.value))}
                     className="w-full h-9 px-3 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
                   >
-                    {childrenList.map((child, idx) => (
+                    {childrenList.map((_, idx) => (
                       <option key={idx} value={idx}>
-                        {child.name?.trim() ? child.name.trim() : `Child ${idx + 1} (Name not entered)`}
+                        Child {idx + 1}
                       </option>
                     ))}
                   </select>
