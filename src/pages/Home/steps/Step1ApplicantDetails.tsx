@@ -658,19 +658,19 @@ export const Step1ApplicantDetails: React.FC<Step1ApplicantDetailsProps> = ({
           {/* 4-Column Grid for Input Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Field
-              label={isTwins ? "Name of Child 1" : "Name of the Child"}
+              label="Name of the Child"
               required
               error={isChildNameErr}
               errorText={
                 isChildNameEmpty
-                  ? (isTwins ? 'Name of Child 1 is required' : 'Name of the child is required')
+                  ? 'Name of the child is required'
                   : isChildNameInvalid
                     ? 'Name of child  should only contain alphabets and spaces'
                     : undefined
               }
             >
               <TextField
-                placeholder={isTwins ? "Enter full name of Child 1" : "Enter name of the child"}
+                placeholder="Enter name of the child"
                 maxLength={20}
                 value={childName}
                 onChange={(val) => setChildName(val.replace(/[^a-zA-Z\s.]/g, '').slice(0, 20))}
