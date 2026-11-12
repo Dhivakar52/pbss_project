@@ -108,9 +108,9 @@ export const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({
                     onChange={(e) => onSelectChild?.(Number(e.target.value))}
                     className="h-8 px-2.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
                   >
-                    {childrenList.map((_, idx) => (
+                    {childrenList.map((child, idx) => (
                       <option key={idx} value={idx}>
-                        Child {idx + 1}
+                        {child.name?.trim() ? child.name.trim() : `Child ${idx + 1} (Name not entered)`}
                       </option>
                     ))}
                   </select>
